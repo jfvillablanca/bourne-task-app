@@ -1,0 +1,18 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Check if yarn is available
+if [ -x "$(command -v yarn)" ]; then
+	package_manager_path="yarn"
+elif [ -x ".devenv/profile/bin/yarn" ]; then
+	package_manager_path=".devenv/profile/bin/yarn"
+    echo ".devenv yarn"
+fi
+
+# Execute the test command using the determined package manager path
+if [ -n "$package_manager_path" ]; then
+	$package_manager_path test
+else
+	echo "No yarn installation found. Please make sure yarn is installed."
+	exit 1
+fi
