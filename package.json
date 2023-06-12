@@ -16,8 +16,13 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "class-variance-authority": "^0.6.0",
+    "clsx": "^1.2.1",
+    "lucide-react": "^0.242.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^1.13.1",
+    "tailwindcss-animate": "^1.0.6"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
