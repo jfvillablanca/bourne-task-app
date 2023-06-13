@@ -16,6 +16,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.29.12",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "lucide-react": "^0.242.0",
@@ -25,6 +26,8 @@
     "tailwindcss-animate": "^1.0.6"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^4.29.9",
+    "@tanstack/react-query-devtools": "^4.29.12",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/jest": "^29.5.2",
