@@ -8,7 +8,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { worker } from './mocks/browser';
 import App from './App.tsx';
 
-import './styles/globals.css';
+import './index.css';
 
 async function main() {
     if (import.meta.env.DEV) {

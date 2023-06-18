@@ -53,7 +53,6 @@
       }
     ],
     "react/jsx-props-no-spreading": "off",
-    "react/prop-types": "off",
     "linebreak-style": "off",
     "eol-last": "off",
     "max-len": [
