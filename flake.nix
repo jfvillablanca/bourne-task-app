@@ -1,34 +1,29 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
-    systems.url = "github:nix-systems/default";
+    flake-utils.url = "github:numtide/flake-utils";
     devenv.url = "github:cachix/devenv";
   };
 
-  outputs = { self, nixpkgs, devenv, systems, ... } @ inputs:
-    let
-      forEachSystem = nixpkgs.lib.genAttrs (import systems);
-    in
-    {
-      devShells = forEachSystem
-        (system:
-          let
-            pkgs = import nixpkgs {
-              inherit system;
-            };
-          in
-          {
-            default = devenv.lib.mkShell {
-              inherit inputs pkgs;
-              modules = [
-                {
-                  packages = with pkgs; [
-                    nodejs_20
-                    yarn
-                  ];
-                }
+  outputs = { self, nixpkgs, devenv, flake-utils, ... } @ inputs:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+        };
+      in
+      {
+
+        devShells.default = devenv.lib.mkShell {
+          inherit inputs pkgs;
+          modules = [
+            {
+              packages = with pkgs; [
+                nodejs_20
+                yarn
               ];
-            };
-          });
-    };
+            }
+          ];
+        };
+      });
 }
