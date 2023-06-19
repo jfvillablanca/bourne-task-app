@@ -43,6 +43,7 @@
     }
   },
   "rules": {
+    "@typescript-eslint/no-empty-function": "off",
     "react-refresh/only-export-components": "warn",
     "no-use-before-define": "off",
     "react/react-in-jsx-scope": "off",
@@ -53,6 +54,8 @@
       }
     ],
     "react/jsx-props-no-spreading": "off",
+    "react/prop-types": "off",
+    "react/display-name": "off",
     "linebreak-style": "off",
     "eol-last": "off",
     "max-len": [
