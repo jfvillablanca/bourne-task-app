@@ -14,32 +14,26 @@ const Sidebar: React.FC<SidebarProps> = ({
     handleClickedProject,
     ...props
 }) => {
-    if (projects) {
-        return (
-            <div className={cn('', className)} {...props}>
-                <h2>Project List</h2>
-                <ul>
-                    {projects.map((project) => (
-                        <li
-                            key={project._id}
-                            onClick={() => {
-                                handleClickedProject(project._id);
-                            }}
-                        >
-                            {project.title}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        );
-    }
 
     return (
-        <div className={cn('', className)} {...props}>
-            <ul>
-                <li>Loading...</li>
-                <li>Loading...</li>
-                <li>Loading...</li>
+        <div className={cn('flex flex-col px-3', className)} {...props}>
+            <h2 className='self-center'>My Projects</h2>
+            <ul className='menu gap-2'>
+                {projects
+                    ? projects.map((project) => (
+                          <li
+                              className='btn'
+                              key={project._id}
+                              onClick={() => {
+                                  handleClickedProject(project._id);
+                              }}
+                          >
+                              {project.title}
+                          </li>
+                      ))
+                    : Array.from({ length: 3 }).map((_, i) => (
+                          <li key={i}>Loading...</li>
+                      ))}
             </ul>
         </div>
     );
