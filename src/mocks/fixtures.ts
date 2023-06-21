@@ -14,7 +14,35 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'Customer Feedback Implementation',
             ownerId: '648f629dc9ce700ba3f9ede0',
             collaborators: [],
-            tasks: [],
+            tasks: [
+                {
+                    title: 'Optimize Matrix Multiplication Algorithm',
+                    description:
+                        'Improve the efficiency of multiplying two matrices.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edef',
+                },
+                {
+                    title: 'Prove the Collatz Conjecture',
+                    description:
+                        'Determine whether every positive integer will eventually reach 1.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edf0',
+                },
+                {
+                    title: 'Implement Depth-First Search Algorithm',
+                    description: 'Traverse a graph in depth-first order.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edf1',
+                },
+                {
+                    title: 'Implement QuickSort Algorithm',
+                    description:
+                        'Write a function to sort an array using the QuickSort algorithm.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edf6',
+                },
+            ],
             createdAt: '2023-06-18T20:02:27.306Z',
             updatedAt: '2023-06-18T20:02:27.306Z',
         },
@@ -38,7 +66,29 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'Performance Optimization',
             ownerId: '648f629dc9ce700ba3f9ede0',
             collaborators: [],
-            tasks: [],
+            tasks: [
+                {
+                    title: 'Implement Binary Search Algorithm',
+                    description:
+                        'Write a function to perform binary search on a sorted array.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9eded',
+                },
+                {
+                    title: 'Solve the Traveling Salesman Problem',
+                    description:
+                        'Find the shortest possible route that visits each city exactly once.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edee',
+                },
+                {
+                    title: 'Solve the Tower of Hanoi Puzzle',
+                    description:
+                        'Move all the disks from one peg to another using the rules of the Tower of Hanoi puzzle.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edf5',
+                },
+            ],
             createdAt: '2023-06-18T20:02:27.306Z',
             updatedAt: '2023-06-18T20:02:27.306Z',
         },
@@ -47,7 +97,35 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'Test Automation',
             ownerId: '648f629dc9ce700ba3f9ede0',
             collaborators: [],
-            tasks: [],
+            tasks: [
+                {
+                    title: 'Find the meaning of life',
+                    description: 'Traverse a graph in depth-first order.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edf1',
+                },
+                {
+                    title: 'Find the Nth Fibonacci Number',
+                    description:
+                        'Write a function to calculate the Nth number in the Fibonacci sequence.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edf2',
+                },
+                {
+                    title: 'Build a Simple Calculator',
+                    description:
+                        'Create a basic calculator application with addition, subtraction, multiplication, and division.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edf3',
+                },
+                {
+                    title: "Implement Dijkstra's Algorithm",
+                    description:
+                        "Find the shortest path between nodes in a graph using Dijkstra's algorithm.",
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edf4',
+                },
+            ],
             createdAt: '2023-06-18T20:02:27.306Z',
             updatedAt: '2023-06-18T20:02:27.306Z',
         },
@@ -56,21 +134,31 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'UI/UX Enhancements',
             ownerId: '648f629dc9ce700ba3f9ede0',
             collaborators: [],
-            tasks: [],
+            tasks: [
+                {
+                    title: 'Solve the Traveling Salesman Problem',
+                    description:
+                        'Find the shortest possible route that visits each city exactly once.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edee',
+                },
+                {
+                    title: 'Optimize Matrix Multiplication Algorithm',
+                    description:
+                        'Improve the efficiency of multiplying two matrices.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edef',
+                },
+                {
+                    title: 'Prove the Collatz Conjecture',
+                    description:
+                        'Determine whether every positive integer will eventually reach 1.',
+                    assignedProjMemberId: [],
+                    _id: '648f63abc9ce700ba3f9edf0',
+                },
+            ],
             createdAt: '2023-06-18T20:02:27.306Z',
             updatedAt: '2023-06-18T20:02:27.306Z',
         },
     ];
-};
-
-export const newPostTask = () => {
-    return {
-        title: 'My first task',
-        assignedProjMemberId: [],
-        _id: '648f63abc9ce700ba3f9eded',
-    };
-};
-
-export const getProjectMembers = () => {
-    return ['648f629dc9ce700ba3f9ede0', '648f64fcc9ce700ba3f9edf2'];
 };
