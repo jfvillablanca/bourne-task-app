@@ -3,11 +3,11 @@ import { HTMLAttributes } from 'react';
 import { Task } from '../api';
 import { cn } from '../lib/utils';
 
-interface MainProps extends HTMLAttributes<HTMLDivElement> {
+interface CardViewProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
 }
 
-const CardView: React.FC<MainProps> = ({ className, projectId, ...props }) => {
+const CardView: React.FC<CardViewProps> = ({ className, projectId, ...props }) => {
     const tasksQuery = Task.useFindAll(projectId);
     const tasks = tasksQuery.data;
 
