@@ -1,5 +1,6 @@
 export type TaskDto = {
     title: string;
+    taskState: string;
     description?: string;
     assignedProjMemberId: string[];
 };
@@ -12,6 +13,7 @@ export type ProjectDto = {
     title: string;
     description?: string;
     collaborators: string[];
+    taskStates: string[];
     tasks: TaskDocument[];
 };
 

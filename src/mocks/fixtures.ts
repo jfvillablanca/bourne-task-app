@@ -14,9 +14,11 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'Customer Feedback Implementation',
             ownerId: '648f629dc9ce700ba3f9ede0',
             collaborators: [],
+            taskStates: ["todo", "doing", "done"],
             tasks: [
                 {
                     title: 'Optimize Matrix Multiplication Algorithm',
+                    taskState: "done",
                     description:
                         'Improve the efficiency of multiplying two matrices.',
                     assignedProjMemberId: [],
@@ -24,6 +26,7 @@ export const mockProjects = (): ProjectDocument[] => {
                 },
                 {
                     title: 'Prove the Collatz Conjecture',
+                    taskState: "todo",
                     description:
                         'Determine whether every positive integer will eventually reach 1.',
                     assignedProjMemberId: [],
@@ -31,12 +34,14 @@ export const mockProjects = (): ProjectDocument[] => {
                 },
                 {
                     title: 'Implement Depth-First Search Algorithm',
+                    taskState: "doing",
                     description: 'Traverse a graph in depth-first order.',
                     assignedProjMemberId: [],
                     _id: '648f63abc9ce700ba3f9edf1',
                 },
                 {
                     title: 'Implement QuickSort Algorithm',
+                    taskState: "todo",
                     description:
                         'Write a function to sort an array using the QuickSort algorithm.',
                     assignedProjMemberId: [],
@@ -51,9 +56,11 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'Code Refactoring',
             ownerId: '648f629dc9ce700ba3f9ede0',
             collaborators: ['648f64fcc9ce700ba3f9edf2'],
+            taskStates: ["todo", "doing", "done"],
             tasks: [
                 {
                     title: 'Revert commit HEAD~2',
+                    taskState: "todo",
                     assignedProjMemberId: [],
                     _id: '648f63abc9ce700ba3f9eded',
                 },
@@ -66,9 +73,11 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'Performance Optimization',
             ownerId: '648f629dc9ce700ba3f9ede0',
             collaborators: [],
+            taskStates: ["todo", "doing", "done"],
             tasks: [
                 {
                     title: 'Implement Binary Search Algorithm',
+                    taskState: "todo",
                     description:
                         'Write a function to perform binary search on a sorted array.',
                     assignedProjMemberId: [],
@@ -76,6 +85,7 @@ export const mockProjects = (): ProjectDocument[] => {
                 },
                 {
                     title: 'Solve the Traveling Salesman Problem',
+                    taskState: "doing",
                     description:
                         'Find the shortest possible route that visits each city exactly once.',
                     assignedProjMemberId: [],
@@ -83,6 +93,7 @@ export const mockProjects = (): ProjectDocument[] => {
                 },
                 {
                     title: 'Solve the Tower of Hanoi Puzzle',
+                    taskState: "todo",
                     description:
                         'Move all the disks from one peg to another using the rules of the Tower of Hanoi puzzle.',
                     assignedProjMemberId: [],
@@ -97,15 +108,18 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'Test Automation',
             ownerId: '648f629dc9ce700ba3f9ede0',
             collaborators: [],
+            taskStates: ["todo", "doing", "done"],
             tasks: [
                 {
                     title: 'Find the meaning of life',
+                    taskState: "todo",
                     description: 'Traverse a graph in depth-first order.',
                     assignedProjMemberId: [],
                     _id: '648f63abc9ce700ba3f9edf1',
                 },
                 {
                     title: 'Find the Nth Fibonacci Number',
+                    taskState: "todo",
                     description:
                         'Write a function to calculate the Nth number in the Fibonacci sequence.',
                     assignedProjMemberId: [],
@@ -113,6 +127,7 @@ export const mockProjects = (): ProjectDocument[] => {
                 },
                 {
                     title: 'Build a Simple Calculator',
+                    taskState: "todo",
                     description:
                         'Create a basic calculator application with addition, subtraction, multiplication, and division.',
                     assignedProjMemberId: [],
@@ -120,6 +135,7 @@ export const mockProjects = (): ProjectDocument[] => {
                 },
                 {
                     title: "Implement Dijkstra's Algorithm",
+                    taskState: "todo",
                     description:
                         "Find the shortest path between nodes in a graph using Dijkstra's algorithm.",
                     assignedProjMemberId: [],
@@ -134,9 +150,11 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'UI/UX Enhancements',
             ownerId: '648f629dc9ce700ba3f9ede0',
             collaborators: [],
+            taskStates: ["todo", "doing", "done"],
             tasks: [
                 {
                     title: 'Solve the Traveling Salesman Problem',
+                    taskState: "todo",
                     description:
                         'Find the shortest possible route that visits each city exactly once.',
                     assignedProjMemberId: [],
@@ -144,6 +162,7 @@ export const mockProjects = (): ProjectDocument[] => {
                 },
                 {
                     title: 'Optimize Matrix Multiplication Algorithm',
+                    taskState: "todo",
                     description:
                         'Improve the efficiency of multiplying two matrices.',
                     assignedProjMemberId: [],
@@ -151,6 +170,7 @@ export const mockProjects = (): ProjectDocument[] => {
                 },
                 {
                     title: 'Prove the Collatz Conjecture',
+                    taskState: "done",
                     description:
                         'Determine whether every positive integer will eventually reach 1.',
                     assignedProjMemberId: [],
