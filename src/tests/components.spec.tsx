@@ -2,7 +2,7 @@ import { setupServer } from 'msw/node';
 
 import { screen, waitFor } from '@testing-library/react';
 
-import { Sidebar } from '../components';
+import App from '../App';
 
 import { handlers, renderWithClient } from './utils';
 
@@ -14,9 +14,9 @@ afterEach(() => server.resetHandlers());
 
 afterAll(() => server.close());
 
-describe('Sidebar', () => {
+describe('App', () => {
     it('should render all project titles', async () => {
-        const result = renderWithClient(<Sidebar />);
+        const result = renderWithClient(<App />);
 
         await waitFor(() => result.findByText(/project list/i));
 
