@@ -15,11 +15,11 @@ const CardView: React.FC<MainProps> = ({ className, projectId, ...props }) => {
         return (
             <div className={cn('', className)} {...props}>
                 <h2>Project Task</h2>
-                <ul>
+                <div>
                     {tasks.map((task) => (
-                        <li key={task._id}>{task.title}</li>
+                        <div key={task._id}>{task.title}</div>
                     ))}
-                </ul>
+                </div>
             </div>
         );
     }

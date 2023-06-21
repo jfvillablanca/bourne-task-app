@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Project } from './api';
 import { CardView, Sidebar } from './components';
@@ -7,6 +7,13 @@ function App() {
 
     const projectsQuery = Project.useFindAll();
     const projects = projectsQuery.data;
+
+    useEffect(() => {
+        if (projects) {
+            const initialProjectId = projects[0]._id;
+            setSelectedProject(() => initialProjectId);
+        }
+    }, [projects]);
 
     const handleClickedProject = (projectId: string) => {
         setSelectedProject(() => projectId);
