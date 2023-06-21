@@ -3,6 +3,7 @@ import { setupServer } from 'msw/node';
 import { screen, waitFor } from '@testing-library/react';
 
 import App from '../App';
+import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 
 import { renderWithClient } from './utils';
@@ -26,5 +27,16 @@ describe('App', () => {
             .map((project) => project.textContent);
 
         expect(projectTitles).toHaveLength(5);
+    });
+
+    it('should render an initial list of tasks', async () => {
+        const mockProjectTasks = mockProjects()[0].tasks;
+        renderWithClient(<App />);
+
+        await waitFor(() => {
+            mockProjectTasks.forEach((task) => {
+                expect(screen.getByText(task.title)).toBeInTheDocument();
+            });
+        });
     });
 });
