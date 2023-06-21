@@ -27,6 +27,18 @@ describe('Project', () => {
 
         expect(projects).toHaveLength(5);
     });
+
+    it('should findOne project of a user', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const { result } = renderHook(() => Project.useFindOne(mockProjectId), {
+            wrapper: createWrapper(),
+        });
+
+        await waitFor(() => expect(result.current.data).toBeDefined());
+        const project = result.current.data;
+
+        expect(project?._id).toBe(mockProjectId);
+    });
 });
 
 describe('Task', () => {
