@@ -3,8 +3,9 @@ import { setupServer } from 'msw/node';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import { Project } from '../api';
+import { handlers } from '../mocks/handlers';
 
-import { createWrapper, handlers } from './utils';
+import { createWrapper } from './utils';
 
 const server = setupServer(...handlers);
 

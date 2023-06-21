@@ -3,8 +3,9 @@ import { setupServer } from 'msw/node';
 import { screen, waitFor } from '@testing-library/react';
 
 import App from '../App';
+import { handlers } from '../mocks/handlers';
 
-import { handlers, renderWithClient } from './utils';
+import { renderWithClient } from './utils';
 
 const server = setupServer(...handlers);
 

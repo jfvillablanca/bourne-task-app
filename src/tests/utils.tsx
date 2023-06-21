@@ -1,17 +1,7 @@
-import { HttpStatusCode } from 'axios';
-import { rest } from 'msw';
 import { ReactNode } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
-
-import { mockProjects } from '../mocks/fixtures';
-
-export const handlers = [
-    rest.get('/api/projects', (_req, res, ctx) => {
-        return res(ctx.json(mockProjects()), ctx.status(HttpStatusCode.Ok));
-    }),
-];
 
 const createTestQueryClient = () =>
     new QueryClient({
