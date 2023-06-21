@@ -2,7 +2,8 @@ import { setupServer } from 'msw/node';
 
 import { renderHook, waitFor } from '@testing-library/react';
 
-import { Project } from '../api';
+import { Project, Task } from '../api';
+import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 
 import { createWrapper } from './utils';
@@ -22,7 +23,22 @@ describe('Project', () => {
         });
 
         await waitFor(() => expect(result.current.data).toBeDefined());
+        const projects = result.current.data;
 
-        expect(result.current.data).toHaveLength(5);
+        expect(projects).toHaveLength(5);
+    });
+});
+
+describe('Task', () => {
+    it('should findAll projects of a user', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const { result } = renderHook(() => Task.useFindAll(mockProjectId), {
+            wrapper: createWrapper(),
+        });
+
+        await waitFor(() => expect(result.current.data).toBeDefined());
+        const tasks = result.current.data;
+
+        expect(tasks).toHaveLength(4);
     });
 });

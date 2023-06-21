@@ -7,4 +7,13 @@ export const handlers = [
     rest.get('/api/projects', (_req, res, ctx) => {
         return res(ctx.json(mockProjects()), ctx.status(HttpStatusCode.Ok));
     }),
+
+    rest.get('/api/projects/:projectId/tasks', (req, res, ctx) => {
+        const { projectId } = req.params;
+        const tasks = mockProjects().find(
+            (project) => project._id === projectId,
+        )?.tasks;
+
+        return res(ctx.json(tasks ?? []), ctx.status(HttpStatusCode.Ok));
+    }),
 ];
