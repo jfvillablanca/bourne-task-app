@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Project } from './api';
-import { Sidebar } from './components';
+import { CardView, Sidebar } from './components';
 function App() {
     const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
@@ -18,6 +18,7 @@ function App() {
                 projects={projects}
                 handleClickedProject={handleClickedProject}
             />
+            {selectedProject && <CardView projectId={selectedProject} />}
         </div>
     );
 }
