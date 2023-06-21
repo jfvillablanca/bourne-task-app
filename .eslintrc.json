@@ -59,7 +59,7 @@
     "linebreak-style": "off",
     "eol-last": "off",
     "max-len": [
-      "warn",
+      "off",
       {
         "code": 80
       }
