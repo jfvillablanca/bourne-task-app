@@ -14,15 +14,14 @@ const Sidebar: React.FC<SidebarProps> = ({
     handleClickedProject,
     ...props
 }) => {
-
     return (
         <div className={cn('flex flex-col px-3', className)} {...props}>
-            <h2 className='self-center'>My Projects</h2>
-            <ul className='menu gap-2'>
+            <h2 className="self-center">My Projects</h2>
+            <ul className="menu gap-2">
                 {projects
                     ? projects.map((project) => (
                           <li
-                              className='btn'
+                              className="btn"
                               key={project._id}
                               onClick={() => {
                                   handleClickedProject(project._id);
