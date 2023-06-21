@@ -1,21 +1,33 @@
 import { HTMLAttributes } from 'react';
 
-import { Project } from '../api';
+import { ProjectDocument } from '../common';
 import { cn } from '../lib/utils';
 
-const Sidebar: React.FC<HTMLAttributes<HTMLDivElement>> = ({
+interface SidebarProps extends HTMLAttributes<HTMLDivElement> {
+    projects: ProjectDocument[] | undefined;
+    handleClickedProject: (projectId: string) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({
     className,
+    projects,
+    handleClickedProject,
     ...props
 }) => {
-    const projects = Project.useFindAll();
-
-    if (projects.data) {
+    if (projects) {
         return (
             <div className={cn('', className)} {...props}>
                 <h2>Project List</h2>
                 <ul>
-                    {projects.data.map((project) => (
-                        <li key={project._id}>{project.title}</li>
+                    {projects.map((project) => (
+                        <li
+                            key={project._id}
+                            onClick={() => {
+                                handleClickedProject(project._id);
+                            }}
+                        >
+                            {project.title}
+                        </li>
                     ))}
                 </ul>
             </div>
