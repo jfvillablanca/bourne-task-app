@@ -20,7 +20,7 @@ describe('App', () => {
     it('should render all project titles', async () => {
         const result = renderWithClient(<App />);
 
-        await waitFor(() => result.findByText(/project list/i));
+        await waitFor(() => result.findByText(/my projects/i));
 
         const projectTitles = screen
             .getAllByRole('listitem')
