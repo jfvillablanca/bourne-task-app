@@ -9,10 +9,10 @@ export type TaskDocument = TaskDto & {
 };
 
 export type ProjectDto = {
-    title?: string;
+    title: string;
     description?: string;
-    collaborators?: string[];
-    tasks?: TaskDocument[];
+    collaborators: string[];
+    tasks: TaskDocument[];
 };
 
 export type ProjectDocument = ProjectDto & {
