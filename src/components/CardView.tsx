@@ -1,24 +1,36 @@
 import { HTMLAttributes } from 'react';
 
-import { Task } from '../api';
+import { Project } from '../api';
 import { cn } from '../lib/utils';
+
+import { TaskCardGroup } from '.';
 
 interface CardViewProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
 }
 
-const CardView: React.FC<CardViewProps> = ({ className, projectId, ...props }) => {
-    const tasksQuery = Task.useFindAll(projectId);
-    const tasks = tasksQuery.data;
+const CardView: React.FC<CardViewProps> = ({
+    className,
+    projectId,
+    ...props
+}) => {
+    const projectQuery = Project.useFindOne(projectId);
+    const projectTaskStates = projectQuery.data?.taskStates;
 
-    if (tasks) {
+    if (projectTaskStates) {
         return (
             <div className={cn('', className)} {...props}>
                 <h2>Project Task</h2>
                 <div>
-                    {tasks.map((task) => (
-                        <div key={task._id}>{task.title}</div>
-                    ))}
+                    {projectTaskStates.map((taskState, i) => {
+                        return (
+                            <TaskCardGroup
+                                key={i}
+                                taskState={taskState}
+                                projectId={projectId}
+                            />
+                        );
+                    })}
                 </div>
             </div>
         );
