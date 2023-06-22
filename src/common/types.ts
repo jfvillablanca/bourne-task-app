@@ -9,6 +9,14 @@ export type TaskDocument = TaskDto & {
     _id: string;
 };
 
+export type UpdateProjectDto = {
+    title?: string;
+    description?: string;
+    collaborators?: string[];
+    taskStates?: string[];
+    tasks?: TaskDocument[];
+};
+
 export type ProjectDto = {
     title: string;
     description?: string;
