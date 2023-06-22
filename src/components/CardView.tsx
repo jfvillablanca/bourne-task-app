@@ -15,13 +15,15 @@ const CardView: React.FC<CardViewProps> = ({
     ...props
 }) => {
     const projectQuery = Project.useFindOne(projectId);
-    const projectTaskStates = projectQuery.data?.taskStates;
 
-    if (projectTaskStates) {
+    if (projectQuery.data) {
+        const currentProject = projectQuery.data;
+
         return (
             <div className={cn('overflow-x-auto px-2', className)} {...props}>
+                <h2 className="cursor-text">{currentProject.title}</h2>
                 <div className="flex gap-2">
-                    {projectTaskStates.map((taskState, i) => {
+                    {currentProject.taskStates.map((taskState, i) => {
                         return (
                             <TaskCardGroup
                                 key={i}
