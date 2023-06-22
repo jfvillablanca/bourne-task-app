@@ -21,7 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {projects
                     ? projects.map((project) => (
                           <li
-                              className="btn"
+                              className="btn capitalize border border-base-content"
                               key={project._id}
                               onClick={() => {
                                   handleClickedProject(project._id);

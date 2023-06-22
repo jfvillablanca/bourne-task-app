@@ -22,11 +22,29 @@ const TaskCardGroup: React.FC<TaskCardGroupProps> = ({
         });
 
         return (
-            <div className={cn('', className)} {...props}>
-                <h2>{taskState}</h2>
-                {filteredTasks.map((task) => (
-                    <div key={task._id}>{task.title}</div>
-                ))}
+            <div
+                className={cn('bg-base-200 p-3 rounded-lg border', className)}
+                {...props}
+            >
+                <h2 className="capitalize text-xl font-semibold tracking-tight mb-3">
+                    {taskState}
+                </h2>
+                <div className="flex flex-col gap-4">
+                    {filteredTasks.map((task) => (
+                        <div
+                            key={task._id}
+                            className="card collapse p-2 rounded-lg border"
+                        >
+                            <input type="checkbox" />
+                            <h3 className="card-title collapse-title text-sm font-bold">
+                                {task.title}
+                            </h3>
+                            <div className="collapse-content">
+                                <p>{task.description}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }

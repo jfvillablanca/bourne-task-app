@@ -20,12 +20,15 @@ function App() {
     };
 
     return (
-        <div className="">
+        <div className="grid grid-cols-5 py-5">
             <Sidebar
+                className="col-span-1"
                 projects={projects}
                 handleClickedProject={handleClickedProject}
             />
-            {selectedProject && <CardView projectId={selectedProject} />}
+            {selectedProject && (
+                <CardView className="col-span-4" projectId={selectedProject} />
+            )}
         </div>
     );
 }

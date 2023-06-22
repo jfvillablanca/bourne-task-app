@@ -19,9 +19,8 @@ const CardView: React.FC<CardViewProps> = ({
 
     if (projectTaskStates) {
         return (
-            <div className={cn('', className)} {...props}>
-                <h2>Project Task</h2>
-                <div>
+            <div className={cn('overflow-x-auto px-2', className)} {...props}>
+                <div className="flex gap-2">
                     {projectTaskStates.map((taskState, i) => {
                         return (
                             <TaskCardGroup
