@@ -79,4 +79,14 @@ export const handlers = [
 
         return res(ctx.json(tasks ?? []), ctx.status(HttpStatusCode.Ok));
     }),
+
+    rest.patch('/api/projects/:projectId', async (req, res, ctx) => {
+        const interceptedPayload: UpdateProjectDto = await req.json();
+        const { projectId } = req.params;
+        const project = postProjectToStorage({
+            id: projectId as string,
+            payload: interceptedPayload,
+        });
+        return res(ctx.json(project), ctx.status(HttpStatusCode.Ok));
+    }),
 ];
