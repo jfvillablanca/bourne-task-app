@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 import { rest } from 'msw';
 
 import { mockProjects } from './fixtures';
-import { ProjectDocument } from '../common';
+import { ProjectDocument, UpdateProjectDto } from '../common';
 
 
 
@@ -18,6 +18,45 @@ const getProjectsFromStorage = (): ProjectDocument[] => {
         return initialData;
     }
 };
+
+const postProjectToStorage = ({
+    id,
+    payload,
+}: {
+    id: string;
+    payload: UpdateProjectDto;
+}) => {
+    const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
+    if (storedData) {
+        const parsedData: ProjectDocument[] = JSON.parse(storedData);
+        const existingProject = parsedData.find(
+            (project) => project._id === id,
+        );
+
+        if (existingProject) {
+            const updatedProject = {
+                ...existingProject,
+                ...payload,
+            };
+            const updatedData = parsedData.map((project) => {
+                if (project._id === id) {
+                    return updatedProject;
+                }
+                return project;
+            });
+            localStorage.setItem(
+                PROJECTS_STORAGE_KEY,
+                JSON.stringify(updatedData),
+            );
+            return updatedProject;
+        }
+
+        // TODO: Should I mock db creation of new project
+        // HACK: return first project
+        return parsedData[0];
+    }
+};
+
 export const handlers = [
     rest.get('/api/projects', (_req, res, ctx) => {
         const projects = getProjectsFromStorage();
