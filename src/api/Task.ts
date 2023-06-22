@@ -14,6 +14,10 @@ export const Task = {
             queryKey: Task.queryKeys.allByProjectId(projectId),
             queryFn: () => getTasks(projectId),
         }),
+
+    filterByTaskState: (allTasks: TaskDocument[], taskState: string) => {
+        return allTasks.filter((task) => task.taskState === taskState);
+    },
 };
 
 const getTasks = async (projectId: string): Promise<TaskDocument[]> => {

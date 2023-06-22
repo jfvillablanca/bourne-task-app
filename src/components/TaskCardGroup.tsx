@@ -17,9 +17,7 @@ const TaskCardGroup: React.FC<TaskCardGroupProps> = ({
     const tasks = tasksQuery.data;
 
     if (tasks) {
-        const filteredTasks = tasks.filter((task) => {
-            return task.taskState === taskState;
-        });
+        const filteredTasks = Task.filterByTaskState(tasks, taskState);
 
         return (
             <div
