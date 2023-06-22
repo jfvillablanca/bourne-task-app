@@ -81,4 +81,15 @@ describe('CardView', () => {
             });
         });
     });
+
+    it('should render the project title', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const mockProjectTitle = mockProjects()[0].title;
+
+        const result = renderWithClient(<CardView projectId={mockProjectId} />);
+
+        await waitFor(() =>
+            expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
+        );
+    });
 });
