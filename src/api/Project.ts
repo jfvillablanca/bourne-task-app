@@ -5,15 +5,20 @@ import { ProjectDocument } from '../common';
 import { get } from '.';
 
 export const Project = {
+    queryKeys: {
+        all: ['projects'] as const,
+        byId: (id: string) => [...Project.queryKeys.all, id] as const,
+    },
+
     useFindAll: () =>
         useQuery({
-            queryKey: ['projects'],
+            queryKey: Project.queryKeys.all,
             queryFn: () => getProjects(),
         }),
 
     useFindOne: (projectId: string) =>
         useQuery({
-            queryKey: ['projects', projectId],
+            queryKey: Project.queryKeys.byId(projectId),
             queryFn: () => getProjectById(projectId),
         }),
 };

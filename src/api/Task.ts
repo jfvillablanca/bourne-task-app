@@ -5,9 +5,13 @@ import { TaskDocument } from '../common';
 import { get } from '.';
 
 export const Task = {
+    queryKeys: {
+        allByProjectId: (projectId: string) => ['tasks', projectId] as const,
+    },
+
     useFindAll: (projectId: string) =>
         useQuery({
-            queryKey: ['tasks', projectId],
+            queryKey: Task.queryKeys.allByProjectId(projectId),
             queryFn: () => getTasks(projectId),
         }),
 };
