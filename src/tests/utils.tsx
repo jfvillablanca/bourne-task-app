@@ -6,9 +6,11 @@ import { render } from '@testing-library/react';
 const createTestQueryClient = () =>
     new QueryClient({
         logger: {
+            /* eslint-disable no-console*/
             log: console.log,
             warn: console.warn,
             error: process.env.NODE_ENV === 'test' ? () => {} : console.error,
+            /* eslint-enable no-console*/
         },
         defaultOptions: {
             queries: {
