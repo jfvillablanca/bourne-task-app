@@ -3,7 +3,7 @@ import { HTMLAttributes } from 'react';
 import { Project } from '../api';
 import { cn } from '../lib/utils';
 
-import { TaskCardGroup } from '.';
+import { ProjectTitle, TaskCardGroup } from '.';
 
 interface CardViewProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
@@ -21,7 +21,7 @@ const CardView: React.FC<CardViewProps> = ({
 
         return (
             <div className={cn('overflow-x-auto px-2', className)} {...props}>
-                <h2 className="cursor-text">{currentProject.title}</h2>
+                <ProjectTitle projectId={projectId} />
                 <div className="flex gap-2">
                     {currentProject.taskStates.map((taskState, i) => {
                         return (
