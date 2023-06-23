@@ -13,7 +13,8 @@ function App() {
             const initialProjectId = projects[0]._id;
             setSelectedProject(() => initialProjectId);
         }
-    }, [projects]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleClickedProject = (projectId: string) => {
         setSelectedProject(() => projectId);
@@ -26,8 +27,12 @@ function App() {
                 projects={projects}
                 handleClickedProject={handleClickedProject}
             />
-            {selectedProject && (
+            {selectedProject ? (
                 <CardView className="col-span-4" projectId={selectedProject} />
+            ) : (
+                <h2 className="col-span-4 self-center text-2xl font-semibold tracking-tight">
+                    Select a project
+                </h2>
             )}
         </div>
     );

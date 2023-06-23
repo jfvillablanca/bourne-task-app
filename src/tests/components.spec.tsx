@@ -31,17 +31,6 @@ describe('App', () => {
 
         expect(projectTitles).toHaveLength(5);
     });
-
-    it('should render an initial list of tasks', async () => {
-        const mockProjectTasks = mockProjects()[0].tasks;
-        renderWithClient(<App />);
-
-        await waitFor(() => {
-            mockProjectTasks.forEach((task) => {
-                expect(screen.getByText(task.title)).toBeInTheDocument();
-            });
-        });
-    });
 });
 
 describe('CardView', () => {
