@@ -1,12 +1,13 @@
 import { HttpStatusCode } from 'axios';
 import { rest } from 'msw';
 
-import { mockProjects } from './fixtures';
-import { ProjectDocument, UpdateProjectDto } from '../common';
+import { ProjectDocument, ProjectMember, UpdateProjectDto } from '../common';
 
+import { mockProjects, mockUsers } from './fixtures';
 
 
 const PROJECTS_STORAGE_KEY = 'projects';
+const USERS_STORAGE_KEY = 'users';
 
 const getProjectsFromStorage = (): ProjectDocument[] => {
     const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
@@ -16,6 +17,18 @@ const getProjectsFromStorage = (): ProjectDocument[] => {
         const initialData = mockProjects();
         localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(initialData));
         return initialData;
+    }
+};
+
+const getProjectMemberFromStorage = (userId: string) => {
+    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
+    if (storedData) {
+        const userList: ProjectMember[] = JSON.parse(storedData);
+        return userList.find((user) => user._id === userId);
+    } else {
+        const initialData = mockUsers();
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(initialData));
+        return initialData.find((user) => user._id === userId);
     }
 };
 
@@ -69,6 +82,22 @@ export const handlers = [
             (project) => project._id === projectId,
         );
         return res(ctx.json(project), ctx.status(HttpStatusCode.Ok));
+    }),
+
+    rest.get('/api/projects/:projectId/members', (req, res, ctx) => {
+        const { projectId } = req.params;
+        const project = getProjectsFromStorage().find(
+            (project) => project._id === projectId,
+        );
+        const projectMemberIds = project
+            ? [project.ownerId, ...project.collaborators]
+            : [];
+
+        const projectMembers = projectMemberIds.map((id) => {
+            return getProjectMemberFromStorage(id);
+        });
+
+        return res(ctx.json(projectMembers), ctx.status(HttpStatusCode.Ok));
     }),
 
     rest.get('/api/projects/:projectId/tasks', (req, res, ctx) => {

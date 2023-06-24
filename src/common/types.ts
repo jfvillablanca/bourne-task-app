@@ -31,3 +31,8 @@ export type ProjectDocument = ProjectDto & {
     createdAt: string;
     updatedAt: string;
 };
+
+export type ProjectMember = {
+    _id: string;
+    email: string;
+};

@@ -1,4 +1,4 @@
-import { ProjectDocument } from '../common';
+import { ProjectDocument, ProjectMember } from '../common';
 
 export const mockTokens = () => {
     return {
@@ -7,13 +7,30 @@ export const mockTokens = () => {
     };
 };
 
+export const mockUsers = (): ProjectMember[] => [
+    { _id: '648f629dc9ce700ba3f9ede0', email: 'lisa.miller@yahoo.com' },
+    { _id: '64956dead2af038ec2292788', email: 'samantha.turner@outlook.com' },
+    { _id: '64956dead2af038ec229278a', email: 'michael.white@example.com' },
+    { _id: '64956dead2af038ec229278c', email: 'robert.jackson@gmail.com' },
+    { _id: '64956dead2af038ec229278d', email: 'john.doe@example.com' },
+    { _id: '64956dead2af038ec229278e', email: 'jennifer.smith@gmail.com' },
+    { _id: '64956dead2af038ec229278f', email: 'david123@yahoo.com' },
+    { _id: '64956dead2af038ec229278g', email: 'emily.jones@outlook.com' },
+    { _id: '64956dead2af038ec229278h', email: 'alexanderbrown@hotmail.com' },
+    { _id: '64956dead2af038ec229278i', email: 'sarah.wilson@example.org' },
+];
+
 export const mockProjects = (): ProjectDocument[] => {
     return [
         {
             _id: '648f62d3c9ce700ba3f9ede4',
             title: 'Customer Feedback Implementation',
-            ownerId: '648f629dc9ce700ba3f9ede0',
-            collaborators: [],
+            ownerId: '64956dead2af038ec229278a',
+            collaborators: [
+                '64956dead2af038ec229278c',
+                '64956dead2af038ec229278g',
+                '64956dead2af038ec229278h',
+            ],
             taskStates: ['todo', 'doing', 'done'],
             tasks: [
                 {
@@ -21,7 +38,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'done',
                     description:
                         'Improve the efficiency of multiplying two matrices.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278a'],
                     _id: '648f63abc9ce700ba3f9edef',
                 },
                 {
@@ -29,14 +46,14 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Determine whether every positive integer will eventually reach 1.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278g'],
                     _id: '648f63abc9ce700ba3f9edf0',
                 },
                 {
                     title: 'Implement Depth-First Search Algorithm',
                     taskState: 'doing',
                     description: 'Traverse a graph in depth-first order.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278g'],
                     _id: '648f63abc9ce700ba3f9edf1',
                 },
                 {
@@ -44,7 +61,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Write a function to sort an array using the QuickSort algorithm.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278g'],
                     _id: '648f63abc9ce700ba3f9edf6',
                 },
             ],
@@ -54,14 +71,20 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62e3c9ce700ba3f9ede7',
             title: 'Code Refactoring',
-            ownerId: '648f629dc9ce700ba3f9ede0',
-            collaborators: ['648f64fcc9ce700ba3f9edf2'],
+            ownerId: '64956dead2af038ec229278e',
+            collaborators: [
+                '64956dead2af038ec229278h',
+                '64956dead2af038ec229278g',
+            ],
             taskStates: ['todo', 'doing', 'done'],
             tasks: [
                 {
                     title: 'Revert commit HEAD~2',
                     taskState: 'todo',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: [
+                        '64956dead2af038ec229278h',
+                        '64956dead2af038ec229278g',
+                    ],
                     _id: '648f63abc9ce700ba3f9eded',
                 },
             ],
@@ -71,8 +94,11 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648fi2d3c9ce700ba3f9ede4',
             title: 'Performance Optimization',
-            ownerId: '648f629dc9ce700ba3f9ede0',
-            collaborators: [],
+            ownerId: '64956dead2af038ec229278e',
+            collaborators: [
+                '64956dead2af038ec229278h',
+                '64956dead2af038ec229278g',
+            ],
             taskStates: ['todo', 'doing', 'done'],
             tasks: [
                 {
@@ -80,7 +106,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Write a function to perform binary search on a sorted array.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278h'],
                     _id: '648f63abc9ce700ba3f9eded',
                 },
                 {
@@ -88,7 +114,10 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'doing',
                     description:
                         'Find the shortest possible route that visits each city exactly once.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: [
+                        '64956dead2af038ec229278h',
+                        '64956dead2af038ec229278h',
+                    ],
                     _id: '648f63abc9ce700ba3f9edee',
                 },
                 {
@@ -96,7 +125,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Move all the disks from one peg to another using the rules of the Tower of Hanoi puzzle.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278h'],
                     _id: '648f63abc9ce700ba3f9edf5',
                 },
             ],
@@ -106,15 +135,18 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62d3c9ce700ba3f9ede5',
             title: 'Test Automation',
-            ownerId: '648f629dc9ce700ba3f9ede0',
-            collaborators: [],
+            ownerId: '64956dead2af038ec229278d',
+            collaborators: [
+                '64956dead2af038ec229278h',
+                '64956dead2af038ec229278a',
+            ],
             taskStates: ['todo', 'doing', 'done'],
             tasks: [
                 {
                     title: 'Find the meaning of life',
                     taskState: 'todo',
                     description: 'Traverse a graph in depth-first order.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278h'],
                     _id: '648f63abc9ce700ba3f9edf1',
                 },
                 {
@@ -122,7 +154,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Write a function to calculate the Nth number in the Fibonacci sequence.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278h'],
                     _id: '648f63abc9ce700ba3f9edf2',
                 },
                 {
@@ -130,7 +162,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Create a basic calculator application with addition, subtraction, multiplication, and division.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278h'],
                     _id: '648f63abc9ce700ba3f9edf3',
                 },
                 {
@@ -138,7 +170,10 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         "Find the shortest path between nodes in a graph using Dijkstra's algorithm.",
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: [
+                        '64956dead2af038ec229278h',
+                        '64956dead2af038ec229278a',
+                    ],
                     _id: '648f63abc9ce700ba3f9edf4',
                 },
             ],
@@ -148,8 +183,8 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62d3c9ce700ba3f9kde9',
             title: 'UI/UX Enhancements',
-            ownerId: '648f629dc9ce700ba3f9ede0',
-            collaborators: [],
+            ownerId: '64956dead2af038ec229278c',
+            collaborators: ['64956dead2af038ec229278a'],
             taskStates: ['todo', 'doing', 'done'],
             tasks: [
                 {
@@ -157,7 +192,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Find the shortest possible route that visits each city exactly once.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278c'],
                     _id: '648f63abc9ce700ba3f9edee',
                 },
                 {
@@ -165,7 +200,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Improve the efficiency of multiplying two matrices.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278c'],
                     _id: '648f63abc9ce700ba3f9edef',
                 },
                 {
@@ -173,7 +208,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'done',
                     description:
                         'Determine whether every positive integer will eventually reach 1.',
-                    assignedProjMemberId: [],
+                    assignedProjMemberId: ['64956dead2af038ec229278c'],
                     _id: '648f63abc9ce700ba3f9edf0',
                 },
             ],
