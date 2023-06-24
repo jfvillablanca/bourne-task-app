@@ -52,9 +52,13 @@ describe('CardView', () => {
         await waitFor(() => {
             mockProjectTaskStates.forEach((taskState) => {
                 const tasksInState = groupedTasks[taskState];
-                tasksInState.forEach((task) => {
-                    expect(screen.getByText(task.title)).toBeInTheDocument();
-                });
+                if (tasksInState) {
+                    tasksInState.forEach((task) => {
+                        expect(
+                            screen.getByText(task.title),
+                        ).toBeInTheDocument();
+                    });
+                }
             });
         });
     });
