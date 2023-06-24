@@ -6,7 +6,28 @@ import { cn } from '../lib/utils';
 interface ProjectTitleProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
 }
-const ProjectTitle: React.FC<ProjectTitleProps> = ({
+const ProjectTitle: React.FC<
+    HTMLAttributes<HTMLDivElement> & { projectId: string | null }
+> = ({ className, projectId }) => {
+    if (!projectId) {
+        return (
+            <h2
+                className={cn('text-2xl font-medium tracking-tight', className)}
+            >
+                Select a project
+            </h2>
+        );
+    } else {
+        return (
+            <ProjectTitleWrapped
+                className={cn('text-2xl font-medium tracking-tight', className)}
+                projectId={projectId}
+            />
+        );
+    }
+};
+
+const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
     className,
     projectId,
 }) => {
@@ -29,7 +50,7 @@ const ProjectTitle: React.FC<ProjectTitleProps> = ({
 
     if (projectQuery.data) {
         return (
-            <div className={cn('overflow-x-auto px-2', className)}>
+            <div className={cn('', className)}>
                 {isEditMode ? (
                     <input
                         value={title}

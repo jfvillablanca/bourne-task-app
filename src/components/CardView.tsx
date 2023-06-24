@@ -3,7 +3,7 @@ import { HTMLAttributes } from 'react';
 import { Project } from '../api';
 import { cn } from '../lib/utils';
 
-import { ProjectTitle, TaskCardGroup } from '.';
+import { TaskCardGroup } from '.';
 
 interface CardViewProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
@@ -20,19 +20,20 @@ const CardView: React.FC<CardViewProps> = ({
         const currentProject = projectQuery.data;
 
         return (
-            <div className={cn('overflow-x-auto px-2', className)} {...props}>
-                <ProjectTitle projectId={projectId} />
-                <div className="flex gap-2">
-                    {currentProject.taskStates.map((taskState, i) => {
-                        return (
-                            <TaskCardGroup
-                                key={i}
-                                taskState={taskState}
-                                projectId={projectId}
-                            />
-                        );
-                    })}
-                </div>
+            <div
+                className={cn('flex overflow-x-auto px-2', className)}
+                {...props}
+            >
+                {currentProject.taskStates.map((taskState, i) => {
+                    return (
+                        <TaskCardGroup
+                            className="w-full m-2 min-w-[16rem]"
+                            key={i}
+                            taskState={taskState}
+                            projectId={projectId}
+                        />
+                    );
+                })}
             </div>
         );
     }
