@@ -89,7 +89,7 @@ describe('CardView', () => {
                 if (tasksInState) {
                     tasksInState.forEach((task) => {
                         expect(
-                            screen.getByText(task.title),
+                            screen.getByTestId(`task-card-${task._id}`),
                         ).toBeInTheDocument();
                     });
                 }

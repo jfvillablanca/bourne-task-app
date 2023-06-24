@@ -18,7 +18,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
     ...props
 }) => {
     return (
-        <div className={cn('p-2 rounded-lg border', className)} {...props}>
+        <div
+            className={cn('p-2 rounded-lg border', className)}
+            data-testid={`task-card-${task._id}`}
+            {...props}
+        >
             <div className="flex justify-between">
                 <h3 className="text-sm font-semibold flex-1">{task.title}</h3>
                 <Edit className="w-4 ml-3 self-start text-neutral-500" />
