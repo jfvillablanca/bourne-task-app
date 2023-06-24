@@ -2,6 +2,8 @@ import { HTMLAttributes } from 'react';
 
 import { Task } from '../api';
 import { cn } from '../lib/utils';
+
+import { TaskCard } from '.';
 interface TaskCardGroupProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
     taskState: string;
@@ -29,18 +31,11 @@ const TaskCardGroup: React.FC<TaskCardGroupProps> = ({
                 </h2>
                 <div className="flex flex-col gap-4">
                     {filteredTasks.map((task) => (
-                        <div
+                        <TaskCard
                             key={task._id}
-                            className="card collapse p-2 rounded-lg border"
-                        >
-                            <input type="checkbox" />
-                            <h3 className="card-title collapse-title text-sm font-bold">
-                                {task.title}
-                            </h3>
-                            <div className="collapse-content">
-                                <p>{task.description}</p>
-                            </div>
-                        </div>
+                            task={task}
+                            projectId={projectId}
+                        />
                     ))}
                 </div>
             </div>
