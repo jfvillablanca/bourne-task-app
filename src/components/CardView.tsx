@@ -21,13 +21,13 @@ const CardView: React.FC<CardViewProps> = ({
 
         return (
             <div
-                className={cn('flex overflow-x-auto px-2', className)}
+                className={cn('flex overflow-x-auto', className)}
                 {...props}
             >
                 {currentProject.taskStates.map((taskState, i) => {
                     return (
                         <TaskCardGroup
-                            className="w-full m-2 min-w-[16rem]"
+                            className="w-full mr-4 min-w-[16rem]"
                             key={i}
                             taskState={taskState}
                             projectId={projectId}

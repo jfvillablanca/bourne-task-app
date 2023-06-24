@@ -28,7 +28,7 @@ function App() {
                 handleClickedProject={handleClickedProject}
             />
             <div className="col-span-4">
-                <ProjectTitle className="" projectId={selectedProject} />
+                <ProjectTitle className="mb-4" projectId={selectedProject} />
                 {selectedProject && (
                     <CardView className="h-full" projectId={selectedProject} />
                 )}
