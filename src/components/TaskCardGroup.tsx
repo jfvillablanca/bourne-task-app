@@ -22,11 +22,8 @@ const TaskCardGroup: React.FC<TaskCardGroupProps> = ({
         const filteredTasks = Task.filterByTaskState(tasks, taskState);
 
         return (
-            <div
-                className={cn('bg-base-200 p-3 rounded-lg border', className)}
-                {...props}
-            >
-                <h2 className="capitalize text-xl font-semibold tracking-tight mb-3">
+            <div className={cn('', className)} {...props}>
+                <h2 className="capitalize font-semibold tracking-tight mb-3">
                     {taskState}
                 </h2>
                 <div className="flex flex-col gap-4">
