@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 
 import App from '../App';
 import { TaskDocument } from '../common';
-import { CardView, TaskCard } from '../components';
+import { CardView, ProjectTitle, TaskCard } from '../components';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 
@@ -30,6 +30,40 @@ describe('App', () => {
             .map((project) => project.textContent);
 
         expect(projectTitles).toHaveLength(5);
+    });
+describe('ProjectTitle', () => {
+    it('should render the project title', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const mockProjectTitle = mockProjects()[0].title;
+
+        const result = renderWithClient(
+            <ProjectTitle projectId={mockProjectId} />,
+        );
+
+        await waitFor(() =>
+            expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
+        );
+    });
+
+    it('should toggle project title header to a form input', async () => {
+        const user = userEvent.setup();
+
+        const mockProjectId = mockProjects()[0]._id;
+        const mockProjectTitle = mockProjects()[0].title;
+        const result = renderWithClient(
+            <ProjectTitle projectId={mockProjectId} />,
+        );
+        await waitFor(() =>
+            expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
+        );
+
+        const titleHeader = result.getByText(mockProjectTitle);
+
+        await user.click(titleHeader);
+
+        const titleInput = result.getByDisplayValue(mockProjectTitle);
+        expect(titleInput).toBeInTheDocument();
+        expect(titleInput).toHaveFocus();
     });
 });
 
@@ -74,36 +108,6 @@ describe('CardView', () => {
                 expect(screen.getByText(taskState)).toBeInTheDocument();
             });
         });
-    });
-
-    it('should render the project title', async () => {
-        const mockProjectId = mockProjects()[0]._id;
-        const mockProjectTitle = mockProjects()[0].title;
-
-        const result = renderWithClient(<CardView projectId={mockProjectId} />);
-
-        await waitFor(() =>
-            expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
-        );
-    });
-
-    it('should toggle project title header to a form input', async () => {
-        const user = userEvent.setup();
-
-        const mockProjectId = mockProjects()[0]._id;
-        const mockProjectTitle = mockProjects()[0].title;
-        const result = renderWithClient(<CardView projectId={mockProjectId} />);
-        await waitFor(() =>
-            expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
-        );
-
-        const titleHeader = result.getByText(mockProjectTitle);
-
-        await user.click(titleHeader);
-
-        const titleInput = result.getByDisplayValue(mockProjectTitle);
-        expect(titleInput).toBeInTheDocument();
-        expect(titleInput).toHaveFocus();
     });
 });
 
