@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 
 import App from '../App';
 import { TaskDocument } from '../common';
-import { CardView } from '../components';
+import { CardView, TaskCard } from '../components';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 
@@ -100,5 +100,23 @@ describe('CardView', () => {
         const titleInput = result.getByDisplayValue(mockProjectTitle);
         expect(titleInput).toBeInTheDocument();
         expect(titleInput).toHaveFocus();
+    });
+});
+
+describe('TaskCard', () => {
+    it('should render an avatar for assigned member', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTask = mockProjects()[0].tasks[0];
+        const mockNoOfAssignedMembers = mockTask.assignedProjMemberId.length;
+
+        const result = renderWithClient(
+            <TaskCard task={mockTask} projectId={mockProjectId} />,
+        );
+
+        await waitFor(() =>
+            expect(result.getByRole('img')).toBeInTheDocument(),
+        );
+
+        expect(screen.getAllByRole('img').length).toBe(mockNoOfAssignedMembers);
     });
 });
