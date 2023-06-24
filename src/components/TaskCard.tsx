@@ -25,7 +25,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             </div>
             <MemberAvatars
                 projectId={projectId}
-                assignedMembers={task.assignedProjMemberId}
+                taskMemberIds={task.assignedProjMemberId}
             />
         </div>
     );
