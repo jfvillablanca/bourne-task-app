@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { ProjectDocument, UpdateProjectDto } from '../common';
+import { ProjectDocument, ProjectMember, UpdateProjectDto } from '../common';
 
 import { get, patch } from '.';
 
@@ -8,6 +8,8 @@ export const Project = {
     queryKeys: {
         all: ['projects'] as const,
         byId: (id: string) => [...Project.queryKeys.all, id] as const,
+        members: (id: string) =>
+            [...Project.queryKeys.byId(id), 'members'] as const,
     },
 
     useFindAll: () =>
@@ -20,6 +22,12 @@ export const Project = {
         useQuery({
             queryKey: Project.queryKeys.byId(projectId),
             queryFn: () => getProjectById(projectId),
+        }),
+
+    useGetProjectMembers: (projectId: string) =>
+        useQuery({
+            queryKey: Project.queryKeys.members(projectId),
+            queryFn: () => getProjectMembers(projectId),
         }),
 
     useUpdate: (projectId: string) => {
@@ -51,6 +59,13 @@ const getProjects = async (): Promise<ProjectDocument[]> => {
 
 const getProjectById = async (projectId: string): Promise<ProjectDocument> => {
     const response = await get(`/api/projects/${projectId}`);
+    return response.data;
+};
+
+const getProjectMembers = async (
+    projectId: string,
+): Promise<ProjectMember[]> => {
+    const response = await get(`/api/projects/${projectId}/members`);
     return response.data;
 };
 
