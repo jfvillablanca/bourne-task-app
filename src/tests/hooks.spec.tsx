@@ -40,6 +40,26 @@ describe('Project', () => {
         expect(project?._id).toBe(mockProjectId);
     });
 
+    it('should get project members', async () => {
+        const mockProject = mockProjects()[0];
+        const mockProjectId = mockProject._id;
+        const mockProjectMembers = [
+            mockProject.ownerId,
+            ...mockProject.collaborators,
+        ];
+        const { result } = renderHook(
+            () => Project.useGetProjectMembers(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => expect(result.current.data).toBeDefined());
+        const projectMembers = result.current.data?.map((member) => member._id);
+
+        expect(projectMembers).toStrictEqual(mockProjectMembers);
+    });
+
     it('should update project of a user', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const updatedDescription = 'new description';
