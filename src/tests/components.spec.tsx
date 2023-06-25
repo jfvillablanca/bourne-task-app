@@ -42,6 +42,8 @@ describe('App', () => {
 
         expect(projectTitles).toHaveLength(5);
     });
+});
+
 describe('ProjectTitle', () => {
     it('should render the project title', async () => {
         const mockProjectId = mockProjects()[0]._id;
