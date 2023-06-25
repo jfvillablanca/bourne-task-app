@@ -144,4 +144,28 @@ describe('TaskCard', () => {
 
         expect(screen.getAllByRole('img').length).toBe(mockNoOfAssignedMembers);
     });
+
+    it('should open a modal dialog on click of edit button', async () => {
+        const user = userEvent.setup();
+
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTask = mockProjects()[0].tasks[0];
+        const mockTaskId = mockTask._id;
+        const result = renderWithClient(
+            <TaskCard task={mockTask} projectId={mockProjectId} />,
+        );
+        await waitFor(() =>
+            expect(result.getByRole('img')).toBeInTheDocument(),
+        );
+
+        const taskCardEditButton = result.getByTestId(
+            `open-task-modal-${mockTaskId}`,
+        );
+
+        await user.click(taskCardEditButton);
+
+        const taskModal = result.getByTestId(`task-modal-${mockTaskId}`);
+        expect(taskModal).toBeInTheDocument();
+        expect(taskModal).toHaveAttribute('role', 'dialog');
+    });
 });
