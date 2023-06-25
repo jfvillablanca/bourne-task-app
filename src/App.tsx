@@ -24,7 +24,7 @@ function App() {
         <div className="grid grid-cols-5 py-5 h-screen">
             <Sidebar
                 className="col-span-1"
-                projects={projects}
+                projectQuery={projectsQuery}
                 handleClickedProject={handleClickedProject}
             />
             <div className="col-span-4">
