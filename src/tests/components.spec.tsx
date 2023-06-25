@@ -1,4 +1,5 @@
 import { setupServer } from 'msw/node';
+import { vi } from 'vitest';
 
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -13,7 +14,17 @@ import { renderWithClient } from './utils';
 
 const server = setupServer(...handlers);
 
-beforeAll(() => server.listen());
+beforeAll(() => {
+    window.ResizeObserver =
+        window.ResizeObserver ||
+        vi.fn().mockImplementation(() => ({
+            disconnect: vi.fn(),
+            observe: vi.fn(),
+            unobserve: vi.fn(),
+        }));
+
+    server.listen();
+});
 
 afterEach(() => server.resetHandlers());
 
@@ -57,11 +68,15 @@ describe('ProjectTitle', () => {
             expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
         );
 
-        const titleHeader = result.getByText(mockProjectTitle);
+        const titleHeader = result.getByTestId(
+            `project-title-${mockProjectId}`,
+        );
 
         await user.click(titleHeader);
 
-        const titleInput = result.getByDisplayValue(mockProjectTitle);
+        const titleInput = result.getByTestId(
+            `project-input-edit-title-${mockProjectId}`,
+        );
         expect(titleInput).toBeInTheDocument();
         expect(titleInput).toHaveFocus();
     });
