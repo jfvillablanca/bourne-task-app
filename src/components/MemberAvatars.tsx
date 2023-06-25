@@ -41,7 +41,12 @@ const MemberAvatars: React.FC<UserAvatarProps> = ({
                     {avatarsToDisplay.map((avatar) => {
                         return (
                             <li className="avatar" key={avatar._id}>
-                                <div className="rounded-full w-5 h-5">
+                                <div
+                                    className={cn(
+                                        'rounded-full w-5 h-5',
+                                        className,
+                                    )}
+                                >
                                     <img
                                         src={generateAvatarURL(avatar.email)}
                                         alt={avatar.email}
