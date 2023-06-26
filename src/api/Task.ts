@@ -6,12 +6,12 @@ import { get } from '.';
 
 export const Task = {
     queryKeys: {
-        allByProjectId: (projectId: string) => ['tasks', projectId] as const,
+        all: (projectId: string) => ['tasks', projectId] as const,
     },
 
     useFindAll: (projectId: string) =>
         useQuery({
-            queryKey: Task.queryKeys.allByProjectId(projectId),
+            queryKey: Task.queryKeys.all(projectId),
             queryFn: () => getTasks(projectId),
         }),
 
