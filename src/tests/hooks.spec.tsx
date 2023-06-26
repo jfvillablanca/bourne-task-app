@@ -1,4 +1,5 @@
 import { setupServer } from 'msw/node';
+import { describe, it } from 'vitest';
 
 import { renderHook, waitFor } from '@testing-library/react';
 
@@ -16,7 +17,7 @@ afterEach(() => server.resetHandlers());
 
 afterAll(() => server.close());
 
-describe('Project', () => {
+describe.concurrent('Project', () => {
     it('should findAll projects of a user', async () => {
         const { result } = renderHook(() => Project.useFindAll(), {
             wrapper: createWrapper(),
@@ -93,7 +94,7 @@ describe('Project', () => {
     });
 });
 
-describe('Task', () => {
+describe.concurrent('Task', () => {
     it('should findAll projects of a user', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const { result } = renderHook(() => Task.useFindAll(mockProjectId), {
