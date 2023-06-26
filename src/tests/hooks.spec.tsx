@@ -105,4 +105,20 @@ describe('Task', () => {
 
         expect(tasks).toHaveLength(4);
     });
+
+    it('should findOne task of a project', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTaskId = mockProjects()[0].tasks[0]._id;
+        const { result } = renderHook(
+            () => Task.useFindOne(mockProjectId, mockTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => expect(result.current.data).toBeDefined());
+        const task = result.current.data;
+
+        expect(task?._id).toBe(mockTaskId);
+    });
 });
