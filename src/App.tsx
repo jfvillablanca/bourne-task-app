@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Project } from './api';
-import { CardView, ProjectTitle, Sidebar } from './components';
+import { CardView, ProjectTitle, Sidebar, ToastContainer } from './components';
 function App() {
     const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
@@ -21,19 +21,28 @@ function App() {
     };
 
     return (
-        <div className="grid grid-cols-5 py-5 h-screen">
-            <Sidebar
-                className="col-span-1"
-                projectQuery={projectsQuery}
-                handleClickedProject={handleClickedProject}
-            />
-            <div className="col-span-4">
-                <ProjectTitle className="mb-4" projectId={selectedProject} />
-                {selectedProject && (
-                    <CardView className="h-full" projectId={selectedProject} />
-                )}
+        <>
+            <ToastContainer />
+            <div className="grid grid-cols-5 py-5 h-screen">
+                <Sidebar
+                    className="col-span-1"
+                    projectQuery={projectsQuery}
+                    handleClickedProject={handleClickedProject}
+                />
+                <div className="col-span-4">
+                    <ProjectTitle
+                        className="mb-4"
+                        projectId={selectedProject}
+                    />
+                    {selectedProject && (
+                        <CardView
+                            className="h-full"
+                            projectId={selectedProject}
+                        />
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 

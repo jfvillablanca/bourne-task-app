@@ -5,3 +5,4 @@ export { default as Sidebar } from './Sidebar';
 export { default as TaskCard } from './TaskCard';
 export { default as TaskCardGroup } from './TaskCardGroup';
 export { default as TaskModal } from './TaskModal';
+export { default as ToastContainer } from './ToastContainer';
