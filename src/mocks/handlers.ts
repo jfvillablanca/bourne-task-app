@@ -100,6 +100,16 @@ export const handlers = [
         return res(ctx.json(projectMembers), ctx.status(HttpStatusCode.Ok));
     }),
 
+    rest.patch('/api/projects/:projectId', async (req, res, ctx) => {
+        const interceptedPayload: UpdateProjectDto = await req.json();
+        const { projectId } = req.params;
+        const project = postProjectToStorage({
+            id: projectId as string,
+            payload: interceptedPayload,
+        });
+        return res(ctx.json(project), ctx.status(HttpStatusCode.Ok));
+    }),
+
     rest.get('/api/projects/:projectId/tasks', (req, res, ctx) => {
         const { projectId } = req.params;
         const tasks = getProjectsFromStorage().find(
@@ -109,13 +119,17 @@ export const handlers = [
         return res(ctx.json(tasks ?? []), ctx.status(HttpStatusCode.Ok));
     }),
 
-    rest.patch('/api/projects/:projectId', async (req, res, ctx) => {
-        const interceptedPayload: UpdateProjectDto = await req.json();
-        const { projectId } = req.params;
-        const project = postProjectToStorage({
-            id: projectId as string,
-            payload: interceptedPayload,
-        });
-        return res(ctx.json(project), ctx.status(HttpStatusCode.Ok));
+    rest.get('/api/projects/:projectId/tasks/:taskId', (req, res, ctx) => {
+        const { projectId, taskId } = req.params;
+        const tasks = getProjectsFromStorage().find(
+            (project) => project._id === projectId,
+        )?.tasks;
+
+        const task = tasks?.find((task) => task._id === taskId);
+
+        if (task) {
+            return res(ctx.json(task), ctx.status(HttpStatusCode.Ok));
+        }
+        return res(ctx.status(HttpStatusCode.NotFound));
     }),
 ];
