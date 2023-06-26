@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { TaskDocument } from '../common';
+import { TaskDocument, UpdateTaskDto } from '../common';
 
-import { get } from '.';
+import { get, patch } from '.';
 
 export const Task = {
     queryKeys: {
@@ -23,6 +23,19 @@ export const Task = {
             queryFn: () => getTaskById(projectId, taskId),
         }),
 
+    useUpdate: (projectId: string, taskId: string) => {
+        const queryClient = useQueryClient();
+        return useMutation({
+            mutationFn: (updatedFields: UpdateTaskDto) =>
+                updateTask(projectId, taskId, updatedFields),
+            onSuccess: () => {
+                return queryClient.invalidateQueries({
+                    queryKey: Task.queryKeys.all(projectId),
+                });
+            },
+        });
+    },
+
     filterByTaskState: (allTasks: TaskDocument[], taskState: string) => {
         return allTasks.filter((task) => task.taskState === taskState);
     },
@@ -38,5 +51,17 @@ const getTaskById = async (
     taskId: string,
 ): Promise<TaskDocument> => {
     const response = await get(`/api/projects/${projectId}/tasks/${taskId}`);
+    return response.data;
+};
+
+const updateTask = async (
+    projectId: string,
+    taskId: string,
+    updatedFields: UpdateTaskDto,
+): Promise<TaskDocument> => {
+    const response = await patch(
+        `/api/projects/${projectId}/tasks/${taskId}`,
+        updatedFields,
+    );
     return response.data;
 };
