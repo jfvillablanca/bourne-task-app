@@ -121,4 +121,39 @@ describe('Task', () => {
 
         expect(task?._id).toBe(mockTaskId);
     });
+
+    it('should update task', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTaskId = mockProjects()[0].tasks[0]._id;
+        const updatedTaskDescription = 'new task description';
+        const { result: useMutationResult } = renderHook(
+            () => Task.useUpdate(mockProjectId, mockTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        useMutationResult.current.mutate({
+            description: updatedTaskDescription,
+        });
+        await waitFor(() =>
+            expect(useMutationResult.current.data).toBeDefined(),
+        );
+        // Expect that PATCH returns the updated document
+        expect(useMutationResult.current.data?.description).toBe(
+            updatedTaskDescription,
+        );
+
+        const { result: useQueryResult } = renderHook(
+            () => Task.useFindOne(mockProjectId, mockTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        await waitFor(() => expect(useQueryResult.current.data).toBeDefined());
+        // Expect that the updated document is actually saved in DB
+        expect(useQueryResult.current.data?.description).toBe(
+            updatedTaskDescription,
+        );
+    });
 });
