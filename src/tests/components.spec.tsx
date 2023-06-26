@@ -1,12 +1,12 @@
 import { setupServer } from 'msw/node';
-import { vi } from 'vitest';
+import { describe, it, vi } from 'vitest';
 
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import App from '../App';
 import { TaskDocument } from '../common';
-import { CardView, ProjectTitle, TaskCard } from '../components';
+import { CardView, ProjectTitle, TaskCard, TaskModal } from '../components';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 
@@ -167,5 +167,32 @@ describe('TaskCard', () => {
         const taskModal = result.getByTestId(`task-modal-${mockTaskId}`);
         expect(taskModal).toBeInTheDocument();
         expect(taskModal).toHaveAttribute('role', 'dialog');
+    });
+});
+
+describe('TaskModal', () => {
+    it('should be able to edit the task title', async () => {
+        const user = userEvent.setup();
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTask = mockProjects()[0].tasks[0];
+        const mockTaskId = mockTask._id;
+        const result = renderWithClient(
+            <TaskModal task={mockTask} projectId={mockProjectId} />,
+        );
+        const taskCardEditButton = result.getByTestId(
+            `open-task-modal-${mockTaskId}`,
+        );
+        await user.click(taskCardEditButton);
+
+        await waitFor(() =>
+            expect(
+                result.getByTestId(`task-modal-${mockTaskId}`),
+            ).toBeInTheDocument(),
+        );
+
+        const titleInput = result.getByTestId(`task-edit-title-${mockTaskId}`);
+        await user.type(titleInput, ': Electric Boogaloo');
+
+        expect(titleInput).toHaveValue(`${mockTask.title}: Electric Boogaloo`);
     });
 });
