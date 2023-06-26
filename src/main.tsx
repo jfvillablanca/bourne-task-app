@@ -1,7 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { toast } from 'react-toastify';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+    QueryCache,
+    QueryClient,
+    QueryClientProvider,
+} from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // @ts-expect-error Used by mockServiceWorker and has no declaration file
@@ -15,7 +20,13 @@ async function main() {
         await worker.start();
     }
 
-    const queryClient = new QueryClient();
+    const queryCache = new QueryCache({
+        onError: (error) => {
+            toast.error(`Something went wrong: ${error}`);
+        },
+    });
+
+    const queryClient = new QueryClient({ queryCache });
 
     ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <React.StrictMode>
