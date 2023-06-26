@@ -1,3 +1,10 @@
+export type UpdateTaskDto = {
+    title?: string;
+    taskState?: string;
+    description?: string;
+    assignedProjMemberId?: string[];
+};
+
 export type TaskDto = {
     title: string;
     taskState: string;

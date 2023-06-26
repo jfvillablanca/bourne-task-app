@@ -1,7 +1,13 @@
 import { HttpStatusCode } from 'axios';
 import { rest } from 'msw';
 
-import { ProjectDocument, ProjectMember, UpdateProjectDto } from '../common';
+import {
+    ProjectDocument,
+    ProjectMember,
+    TaskDocument,
+    UpdateProjectDto,
+    UpdateTaskDto,
+} from '../common';
 
 import { mockProjects, mockUsers } from './fixtures';
 
@@ -70,6 +76,43 @@ const postProjectToStorage = ({
     }
 };
 
+const postTaskToStorage = ({
+    projectId,
+    taskId,
+    payload,
+}: {
+    projectId: string;
+    taskId: string;
+    payload: UpdateTaskDto;
+}): TaskDocument => {
+    const projects = getProjectsFromStorage();
+    const project = projects.find((project) => project._id === projectId);
+    const taskToUpdate = project?.tasks.find((task) => task._id === taskId);
+    if (project && taskToUpdate) {
+        const updatedTask = {
+            ...taskToUpdate,
+            ...payload,
+        };
+        const updatedTasks = project.tasks.map((task) => {
+            if (task._id === taskId) {
+                return updatedTask;
+            }
+            return task;
+        });
+        const updatedProject = { ...project, tasks: updatedTasks };
+        const updatedData = projects.map((project) => {
+            if (project._id === projectId) {
+                return updatedProject;
+            }
+            return project;
+        });
+        localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(updatedData));
+        return updatedTask;
+    }
+    // HACK: return first task
+    return projects[0].tasks[0];
+};
+
 export const handlers = [
     rest.get('/api/projects', (_req, res, ctx) => {
         const projects = getProjectsFromStorage();
@@ -132,4 +175,19 @@ export const handlers = [
         }
         return res(ctx.status(HttpStatusCode.NotFound));
     }),
+
+    rest.patch(
+        '/api/projects/:projectId/tasks/:taskId',
+        async (req, res, ctx) => {
+            const interceptedPayload: UpdateTaskDto = await req.json();
+            const { projectId, taskId } = req.params;
+            const task = postTaskToStorage({
+                projectId: projectId as string,
+                taskId: taskId as string,
+                payload: interceptedPayload,
+            });
+
+            return res(ctx.json(task), ctx.status(HttpStatusCode.Ok));
+        },
+    ),
 ];
