@@ -18,12 +18,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
 }) => {
     return (
         <div
-            className={cn('p-2 rounded-lg border', className)}
+            className={cn(
+                'flex flex-col gap-2 p-4 rounded-lg border',
+                className,
+            )}
             data-testid={`task-card-${task._id}`}
             {...props}
         >
             <div className="flex justify-between">
-                <h3 className="text-sm font-semibold flex-1 self-center">
+                <h3 className="text-xl font-semibold flex-1 self-center">
                     {task.title}
                 </h3>
                 <TaskModal task={task} projectId={projectId} />

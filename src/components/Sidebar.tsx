@@ -19,11 +19,14 @@ const Sidebar: React.FC<SidebarProps> = ({
     if (projectQuery && projectQuery.data) {
         return (
             <div className={cn('flex flex-col px-3', className)} {...props}>
-                <h2 className="self-center">My Projects</h2>
+                <h2 className="font-bold text-2xl self-center tracking-wider cursor-default">
+                    My Projects
+                </h2>
+                <div className="divider my-1"></div>
                 <ul className="menu gap-2">
                     {projectQuery.data.map((project) => (
                         <li
-                            className="btn capitalize border border-base-content"
+                            className="btn btn-ghost text-lg font-semibold capitalize h-min"
                             key={project._id}
                             onClick={() => {
                                 handleClickedProject(project._id);

@@ -23,7 +23,7 @@ function App() {
     return (
         <>
             <ToastContainer />
-            <div className="grid grid-cols-5 py-5 h-screen">
+            <div className="grid grid-cols-5 py-5 h-screen text-lg">
                 <Sidebar
                     className="col-span-1"
                     projectQuery={projectsQuery}

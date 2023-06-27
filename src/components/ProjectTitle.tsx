@@ -70,9 +70,9 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                             <Pencil className="w-4" />
                         </button>
                     </PopoverTrigger>
-                    <PopoverContent className="flex gap-3 items-center rounded-lg p-2 bg-neutral shadow-md shadow-accent/20">
+                    <PopoverContent className="flex gap-3 w-full max-w-sm items-center rounded-lg p-2 bg-neutral shadow-md shadow-accent/20">
                         <input
-                            className="input input-bordered input-accent w-full max-w-xs"
+                            className="input input-bordered input-accent w-full"
                             value={editTitle}
                             onChange={(e) => {
                                 setEditTitle(() => e.target.value);

@@ -37,13 +37,13 @@ const MemberAvatars: React.FC<UserAvatarProps> = ({
 
         return (
             <div className={cn('', className)} {...props}>
-                <ul className="flex gap-1">
+                <ul className="avatar-group -space-x-5">
                     {avatarsToDisplay.map((avatar) => {
                         return (
-                            <li className="avatar" key={avatar._id}>
+                            <li className="avatar border-none" key={avatar._id}>
                                 <div
                                     className={cn(
-                                        'rounded-full w-5 h-5',
+                                        'w-full h-8 m-1 bg-base-300 rounded-full border-2 border-accent-content',
                                         className,
                                     )}
                                 >

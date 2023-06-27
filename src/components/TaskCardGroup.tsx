@@ -23,7 +23,7 @@ const TaskCardGroup: React.FC<TaskCardGroupProps> = ({
 
         return (
             <div className={cn('', className)} {...props}>
-                <h2 className="capitalize font-semibold tracking-tight mb-3">
+                <h2 className="text-xl capitalize font-semibold tracking-tight mb-3 cursor-default">
                     {taskState}
                 </h2>
                 <div className="flex flex-col gap-4">
