@@ -101,6 +101,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                 className="input focus:input-accent text-xl w-full resize-none"
                                 id="title"
                                 name="title"
+                                placeholder="What are we working on?"
+                                required
                                 value={editTaskForm.title}
                                 onChange={handleChange}
                                 data-testid={`task-edit-title-${task._id}`}
@@ -123,9 +125,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             className="textarea textarea-md border-base-content focus:textarea-accent mt-1 resize-none"
                             id="description"
                             name="description"
+                            placeholder="Give a quick summary of the task"
                             value={editTaskForm.description}
                             onChange={handleChange}
-                            data-testid={`task-edit-description-${task._id}`}
                         />
                         <div>
                             <label htmlFor="description">
