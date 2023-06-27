@@ -95,6 +95,26 @@ describe.concurrent('Project', () => {
 });
 
 describe.concurrent('Task', () => {
+    it('should create new task', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTaskState = mockProjects()[0].taskStates[0];
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        // Expect that CREATE returns the created document
+        expect(createResult.current.data?.title).toBe(newTaskTitle);
+    });
+
     it('should findAll tasks of a user', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const { result } = renderHook(() => Task.useFindAll(mockProjectId), {
