@@ -7,6 +7,7 @@ import {
     ProjectDto,
     ProjectMember,
     TaskDocument,
+    TaskDto,
     UpdateProjectDto,
     UpdateTaskDto,
 } from '../common';
@@ -70,9 +71,6 @@ const postProjectToStorage = ({ id, payload }: IPostProjectToStorage) => {
             );
             return updatedProject;
         }
-
-        // HACK: return first project
-        // return parsedData[0];
     }
 };
 
@@ -126,7 +124,7 @@ const postTaskToStorage = ({
     projectId: string;
     taskId: string;
     payload: UpdateTaskDto;
-}): TaskDocument => {
+}) => {
     const projects = getProjectsFromStorage();
     const project = projects.find((project) => project._id === projectId);
     const taskToUpdate = project?.tasks.find((task) => task._id === taskId);
@@ -151,8 +149,35 @@ const postTaskToStorage = ({
         localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(updatedData));
         return updatedTask;
     }
-    // HACK: return first task
-    return projects[0].tasks[0];
+};
+
+const addTaskToStorage = ({
+    projectId,
+    payload,
+}: {
+    projectId: string;
+    payload: TaskDto;
+}) => {
+    const projects = getProjectsFromStorage();
+    const project = projects.find((project) => project._id === projectId);
+    if (project) {
+        const newTask: TaskDocument = {
+            _id: ObjectID().toHexString(),
+            description: '',
+            assignedProjMemberId: [],
+            ...payload,
+        };
+        const updatedTasks = [...project.tasks, newTask];
+        const updatedProject = { ...project, tasks: updatedTasks };
+        const updatedData = projects.map((project) => {
+            if (project._id === projectId) {
+                return updatedProject;
+            }
+            return project;
+        });
+        localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(updatedData));
+        return newTask;
+    }
 };
 
 export const handleCreateProjectTest = () => {
@@ -220,6 +245,17 @@ export const handlers = [
             payload: interceptedPayload,
         });
         return res(ctx.json(project), ctx.status(HttpStatusCode.Ok));
+    }),
+
+    rest.post('/api/projects/:projectId/tasks', async (req, res, ctx) => {
+        const interceptedPayload: TaskDto = await req.json();
+        const { projectId } = req.params;
+        const task = addTaskToStorage({
+            projectId: projectId as string,
+            payload: interceptedPayload,
+        });
+
+        return res(ctx.json(task), ctx.status(HttpStatusCode.Created));
     }),
 
     rest.get('/api/projects/:projectId/tasks', (req, res, ctx) => {
