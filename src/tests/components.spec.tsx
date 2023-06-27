@@ -1,3 +1,5 @@
+import { HttpStatusCode } from 'axios';
+import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { describe, it, vi } from 'vitest';
 
@@ -41,6 +43,21 @@ describe('App', () => {
             .map((project) => project.textContent);
 
         expect(projectTitles).toHaveLength(5);
+    });
+
+    it('should render toast notification on error', async () => {
+        server.use(
+            rest.get('/api/projects', (_req, res, ctx) => {
+                return res(ctx.status(HttpStatusCode.InternalServerError));
+            }),
+        );
+        const result = renderWithClient(<App />);
+
+        await waitFor(() =>
+            expect(
+                result.getByText(/something went wrong/i),
+            ).toBeInTheDocument(),
+        );
     });
 });
 
