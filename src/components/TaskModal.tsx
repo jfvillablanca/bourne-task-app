@@ -5,14 +5,7 @@ import { Task } from '../api';
 import { TaskDocument, UpdateTaskDto } from '../common';
 import { cn } from '../lib/utils';
 
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogHeading,
-    DialogTrigger,
-} from './ui';
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui';
 import { MemberAvatars } from '.';
 
 interface TaskModalProps extends HTMLAttributes<HTMLDivElement> {
@@ -49,7 +42,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
         }
     }, [taskQuery.isSuccess, taskQuery.data]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
         const { name, value } = e.target;
         setEditTaskForm((prev) => ({
             ...prev,
@@ -76,55 +71,75 @@ const TaskModal: React.FC<TaskModalProps> = ({
             </DialogTrigger>
             <DialogContent
                 className={cn(
-                    'h-max p-5 w-max bg-neutral rounded-lg',
+                    'h-1/2 w-1/3 p-5 bg-base-100 border rounded-lg',
                     className,
                 )}
                 data-testid={`task-modal-${task._id}`}
                 {...props}
             >
                 <form
+                    className="form-control h-full"
                     onSubmit={(e) => {
                         e.preventDefault();
                         handleMutation();
                     }}
                 >
                     <div className="flex justify-between">
-                        <DialogHeading className="font-semibold text-lg">
-                            <label htmlFor="title">Title: </label>
+                        <div className="flex flex-col gap-1 flex-1">
+                            <label htmlFor="title">
+                                <span className="label-text font-semibold">
+                                    Task:
+                                </span>
+                            </label>
                             <input
-                                type="text"
+                                className="input focus:input-accent text-xl w-full resize-none"
                                 id="title"
                                 name="title"
                                 value={editTaskForm.title}
                                 onChange={handleChange}
                                 data-testid={`task-edit-title-${task._id}`}
                             />
-                        </DialogHeading>
-                        <DialogClose className="btn btn-sm btn-circle btn-ghost">
+                        </div>
+                        <DialogClose className="btn btn-sm btn-circle btn-ghost ml-2">
                             <X className="text-sm" />
                         </DialogClose>
                     </div>
                     {task.description && (
                         <div className="divider mt-0 mb-2"></div>
                     )}
-                    <DialogDescription className="">
-                        <label htmlFor="Description">Description: </label>
-                        <input
-                            type="text"
+                    <div className="flex flex-col gap-2 flex-1">
+                        <label htmlFor="description">
+                            <span className="label-text font-semibold">
+                                Summary:
+                            </span>
+                        </label>
+                        <textarea
+                            className="textarea textarea-md border-base-content focus:textarea-accent mt-1 resize-none"
                             id="description"
                             name="description"
                             value={editTaskForm.description}
                             onChange={handleChange}
                             data-testid={`task-edit-description-${task._id}`}
                         />
-                    </DialogDescription>
-                    <MemberAvatars
-                        className="w-8 h-8"
-                        projectId={projectId}
-                        taskMemberIds={task.assignedProjMemberId}
-                    />
-                    <button type="submit">
+                        <div>
+                            <label htmlFor="description">
+                                <span className="label-text font-semibold">
+                                    Assigned:
+                                </span>
+                            </label>
+                            <MemberAvatars
+                                className="h-11 w-full"
+                                projectId={projectId}
+                                taskMemberIds={task.assignedProjMemberId}
+                            />
+                        </div>
+                    </div>
+                    <button
+                        className="btn btn-ghost hover:btn-accent self-end"
+                        type="submit"
+                    >
                         <Check />
+                        Submit
                     </button>
                 </form>
             </DialogContent>
