@@ -1,10 +1,12 @@
 import { ReactNode } from 'react';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 
+import { createQueryClient } from '../common';
+
 const createTestQueryClient = () =>
-    new QueryClient({
+    createQueryClient({
         logger: {
             /* eslint-disable no-console*/
             log: console.log,
