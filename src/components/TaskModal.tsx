@@ -1,11 +1,17 @@
-import { Check, Pencil, X } from 'lucide-react';
+import { Check, Pencil } from 'lucide-react';
 import { HTMLAttributes, useEffect, useState } from 'react';
 
 import { Task } from '../api';
 import { TaskDocument, UpdateTaskDto } from '../common';
 import { cn } from '../lib/utils';
 
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogTrigger,
+    ExitButton,
+} from './ui';
 import { MemberAvatars } from '.';
 
 interface TaskModalProps extends HTMLAttributes<HTMLDivElement> {
@@ -100,9 +106,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                 data-testid={`task-edit-title-${task._id}`}
                             />
                         </div>
-                        <DialogClose className="btn btn-sm btn-circle btn-ghost ml-2">
-                            <X className="text-sm" />
-                        </DialogClose>
+                        <ExitButton className="ml-2">
+                            <DialogClose />
+                        </ExitButton>
                     </div>
                     {task.description && (
                         <div className="divider mt-0 mb-2"></div>

@@ -1,10 +1,11 @@
-import { X } from 'lucide-react';
 import {
     CloseButtonProps,
     ToastContainer as ToastContainerWrapped,
 } from 'react-toastify';
 
 import { cn } from '../lib/utils';
+
+import { ExitButton } from './ui';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -19,14 +20,7 @@ function ToastContainer() {
 }
 
 const XButton: React.FC<CloseButtonProps> = ({ closeToast }) => {
-    return (
-        <button
-            className="btn btn-sm btn-circle btn-ghost"
-            onClick={closeToast}
-        >
-            <X className="text-sm" />
-        </button>
-    );
+    return <ExitButton onClick={closeToast} />;
 };
 
 export default ToastContainer;
