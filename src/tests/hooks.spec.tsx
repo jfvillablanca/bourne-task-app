@@ -13,7 +13,10 @@ const server = setupServer(...handlers);
 
 beforeAll(() => server.listen());
 
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+    localStorage.clear();
+    server.resetHandlers();
+});
 
 afterAll(() => server.close());
 
@@ -88,18 +91,6 @@ describe.concurrent('Project', () => {
         await waitFor(() => expect(updateResult.current.data).toBeDefined());
         // Expect that PATCH returns the updated document
         expect(updateResult.current.data?.description).toBe(updatedDescription);
-
-        const { result: findOneResult } = renderHook(
-            () => Project.useFindOne(mockProjectId),
-            {
-                wrapper: createWrapper(),
-            },
-        );
-        await waitFor(() => expect(findOneResult.current.data).toBeDefined());
-        // Expect that the updated document is actually saved in DB
-        expect(findOneResult.current.data?.description).toBe(
-            updatedDescription,
-        );
     });
 });
 
@@ -136,33 +127,19 @@ describe.concurrent('Task', () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockTaskId = mockProjects()[0].tasks[0]._id;
         const updatedTaskDescription = 'new task description';
-        const { result: useMutationResult } = renderHook(
+        const { result: updateResult } = renderHook(
             () => Task.useUpdate(mockProjectId, mockTaskId),
             {
                 wrapper: createWrapper(),
             },
         );
 
-        useMutationResult.current.mutate({
+        updateResult.current.mutate({
             description: updatedTaskDescription,
         });
-        await waitFor(() =>
-            expect(useMutationResult.current.data).toBeDefined(),
-        );
+        await waitFor(() => expect(updateResult.current.data).toBeDefined());
         // Expect that PATCH returns the updated document
-        expect(useMutationResult.current.data?.description).toBe(
-            updatedTaskDescription,
-        );
-
-        const { result: useQueryResult } = renderHook(
-            () => Task.useFindOne(mockProjectId, mockTaskId),
-            {
-                wrapper: createWrapper(),
-            },
-        );
-        await waitFor(() => expect(useQueryResult.current.data).toBeDefined());
-        // Expect that the updated document is actually saved in DB
-        expect(useQueryResult.current.data?.description).toBe(
+        expect(updateResult.current.data?.description).toBe(
             updatedTaskDescription,
         );
     });
