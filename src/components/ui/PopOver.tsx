@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 import {
+    autoPlacement,
     autoUpdate,
-    flip,
     FloatingFocusManager,
     FloatingPortal,
     offset,
@@ -28,7 +28,6 @@ interface PopoverOptions {
 // eslint-disable-next-line react-refresh/only-export-components
 export function usePopover({
     initialOpen = false,
-    placement = 'bottom',
     modal,
     open: controlledOpen,
     onOpenChange: setControlledOpen,
@@ -43,19 +42,10 @@ export function usePopover({
     const setOpen = setControlledOpen ?? setUncontrolledOpen;
 
     const data = useFloating({
-        placement,
         open,
         onOpenChange: setOpen,
         whileElementsMounted: autoUpdate,
-        middleware: [
-            offset(5),
-            flip({
-                crossAxis: placement.includes('-'),
-                fallbackAxisSideDirection: 'end',
-                padding: 5,
-            }),
-            shift({ padding: 5 }),
-        ],
+        middleware: [offset(5), autoPlacement(), shift({ padding: 5 })],
     });
 
     const context = data.context;
