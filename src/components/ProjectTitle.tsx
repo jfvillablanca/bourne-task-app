@@ -4,7 +4,7 @@ import { HTMLAttributes, useEffect, useState } from 'react';
 import { Project } from '../api';
 import { cn } from '../lib/utils';
 
-import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from './ui';
+import { Popover, PopoverContent, PopoverTrigger } from './ui';
 
 interface ProjectTitleProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
@@ -70,27 +70,37 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                             <Pencil className="w-4" />
                         </button>
                     </PopoverTrigger>
-                    <PopoverContent className="flex gap-3 w-full max-w-sm items-center rounded-lg p-2 bg-neutral shadow-md shadow-accent/20">
-                        <input
-                            className="input input-bordered input-accent w-full"
-                            value={editTitle}
-                            onChange={(e) => {
-                                setEditTitle(() => e.target.value);
+                    <PopoverContent>
+                        <form
+                            className="flex gap-3 w-full max-w-sm items-center rounded-lg p-2 bg-neutral shadow-md shadow-accent/20"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleMutation();
                             }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleMutation();
-                                }
-                            }}
-                            data-testid={`project-input-edit-title-${projectQuery.data._id}`}
-                            autoFocus={true}
-                        />
-                        <PopoverClose
-                            className="btn btn-sm btn-circle btn-ghost hover:btn-accent"
-                            onClick={handleMutation}
                         >
-                            <Check className="w-4" />
-                        </PopoverClose>
+                            <input
+                                className="input input-bordered input-accent w-full"
+                                placeholder="New project name"
+                                required
+                                value={editTitle}
+                                onChange={(e) => {
+                                    setEditTitle(() => e.target.value);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleMutation();
+                                    }
+                                }}
+                                data-testid={`project-input-edit-title-${projectQuery.data._id}`}
+                                autoFocus={true}
+                            />
+                            <button
+                                className="btn btn-sm btn-circle btn-ghost hover:btn-accent"
+                                type="submit"
+                            >
+                                <Check className="w-4" />
+                            </button>
+                        </form>
                     </PopoverContent>
                 </Popover>
             </div>
