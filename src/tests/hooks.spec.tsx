@@ -5,7 +5,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 
 import { Project, Task } from '../api';
 import { mockProjects } from '../mocks/fixtures';
-import { handlers } from '../mocks/handlers';
+import { handleCreateProjectTest, handlers } from '../mocks/handlers';
 
 import { createWrapper } from './utils';
 
@@ -18,6 +18,19 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 describe.concurrent('Project', () => {
+    it('should create a new project', async () => {
+        server.use(...handleCreateProjectTest());
+        const newProjectTitle = 'new project';
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+
+        createResult.current.mutate({ title: newProjectTitle });
+
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        expect(createResult.current.data?.title).toBe(newProjectTitle);
+    });
+
     it('should findAll projects of a user', async () => {
         const { result } = renderHook(() => Project.useFindAll(), {
             wrapper: createWrapper(),
