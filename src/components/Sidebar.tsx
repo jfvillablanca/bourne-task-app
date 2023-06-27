@@ -5,6 +5,8 @@ import { UseQueryResult } from '@tanstack/react-query';
 import { ProjectDocument } from '../common';
 import { cn } from '../lib/utils';
 
+import { ProjectAdd } from '.';
+
 interface SidebarProps extends HTMLAttributes<HTMLDivElement> {
     projectQuery: UseQueryResult<ProjectDocument[], unknown> | undefined;
     handleClickedProject: (projectId: string) => void;
@@ -36,6 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         </li>
                     ))}
                 </ul>
+                <ProjectAdd className="mx-2" />
             </div>
         );
     }

@@ -1,5 +1,6 @@
 export { default as CardView } from './CardView';
 export { default as MemberAvatars } from './MemberAvatars';
+export { default as ProjectAdd } from './ProjectAdd';
 export { default as ProjectTitle } from './ProjectTitle';
 export { default as Sidebar } from './Sidebar';
 export { default as TaskCard } from './TaskCard';
