@@ -1,14 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { TaskDocument, UpdateTaskDto } from '../common';
+import { TaskDocument, TaskDto, UpdateTaskDto } from '../common';
 
-import { get, patch } from '.';
+import { get, patch, post } from '.';
 
 export const Task = {
     queryKeys: {
         all: (projectId: string) => ['tasks', projectId] as const,
         byId: (projectId: string, taskId: string) =>
             [...Task.queryKeys.all(projectId), taskId] as const,
+    },
+
+    useCreate: (projectId: string) => {
+        const queryClient = useQueryClient();
+        return useMutation({
+            mutationFn: (createdFields: TaskDto) =>
+                createTask(projectId, createdFields),
+            onSuccess: () => {
+                return queryClient.invalidateQueries({
+                    queryKey: Task.queryKeys.all(projectId),
+                });
+            },
+        });
     },
 
     useFindAll: (projectId: string) =>
@@ -39,6 +52,17 @@ export const Task = {
     filterByTaskState: (allTasks: TaskDocument[], taskState: string) => {
         return allTasks.filter((task) => task.taskState === taskState);
     },
+};
+
+const createTask = async (
+    projectId: string,
+    createdFields: TaskDto,
+): Promise<TaskDocument> => {
+    const response = await post(
+        `/api/projects/${projectId}/tasks`,
+        createdFields,
+    );
+    return response.data;
 };
 
 const getTasks = async (projectId: string): Promise<TaskDocument[]> => {
