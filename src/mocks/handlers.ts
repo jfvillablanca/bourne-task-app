@@ -40,13 +40,12 @@ const getProjectMemberFromStorage = (userId: string) => {
     }
 };
 
-const postProjectToStorage = ({
-    id,
-    payload,
-}: {
+interface IPostProjectToStorage {
     id: string;
     payload: UpdateProjectDto;
-}) => {
+}
+
+const postProjectToStorage = ({ id, payload }: IPostProjectToStorage) => {
     const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
     if (storedData) {
         const parsedData: ProjectDocument[] = JSON.parse(storedData);
@@ -72,9 +71,8 @@ const postProjectToStorage = ({
             return updatedProject;
         }
 
-        // TODO: Should I mock db creation of new project
         // HACK: return first project
-        return parsedData[0];
+        // return parsedData[0];
     }
 };
 
