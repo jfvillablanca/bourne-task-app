@@ -77,38 +77,34 @@ describe.concurrent('Project', () => {
     it('should update project of a user', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const updatedDescription = 'new description';
-        const { result: useMutationResult } = renderHook(
+        const { result: updateResult } = renderHook(
             () => Project.useUpdate(mockProjectId),
             {
                 wrapper: createWrapper(),
             },
         );
 
-        useMutationResult.current.mutate({ description: updatedDescription });
-        await waitFor(() =>
-            expect(useMutationResult.current.data).toBeDefined(),
-        );
+        updateResult.current.mutate({ description: updatedDescription });
+        await waitFor(() => expect(updateResult.current.data).toBeDefined());
         // Expect that PATCH returns the updated document
-        expect(useMutationResult.current.data?.description).toBe(
-            updatedDescription,
-        );
+        expect(updateResult.current.data?.description).toBe(updatedDescription);
 
-        const { result: useQueryResult } = renderHook(
+        const { result: findOneResult } = renderHook(
             () => Project.useFindOne(mockProjectId),
             {
                 wrapper: createWrapper(),
             },
         );
-        await waitFor(() => expect(useQueryResult.current.data).toBeDefined());
+        await waitFor(() => expect(findOneResult.current.data).toBeDefined());
         // Expect that the updated document is actually saved in DB
-        expect(useQueryResult.current.data?.description).toBe(
+        expect(findOneResult.current.data?.description).toBe(
             updatedDescription,
         );
     });
 });
 
 describe.concurrent('Task', () => {
-    it('should findAll projects of a user', async () => {
+    it('should findAll tasks of a user', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const { result } = renderHook(() => Task.useFindAll(mockProjectId), {
             wrapper: createWrapper(),

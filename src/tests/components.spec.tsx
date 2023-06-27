@@ -149,7 +149,7 @@ describe('TaskCard', () => {
     it('should render an avatar for assigned member', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockTask = mockProjects()[0].tasks[0];
-        const mockNoOfAssignedMembers = mockTask.assignedProjMemberId.length;
+        const mockNoOfAssignedMembers = mockTask.assignedProjMemberId?.length;
 
         const result = renderWithClient(
             <TaskCard task={mockTask} projectId={mockProjectId} />,
