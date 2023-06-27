@@ -1,8 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { ProjectDocument, ProjectMember, UpdateProjectDto } from '../common';
+import {
+    ProjectDocument,
+    ProjectDto,
+    ProjectMember,
+    UpdateProjectDto,
+} from '../common';
 
-import { get, patch } from '.';
+import { get, patch, post } from '.';
 
 export const Project = {
     queryKeys: {
@@ -10,6 +15,19 @@ export const Project = {
         byId: (id: string) => [...Project.queryKeys.all, id] as const,
         members: (id: string) =>
             [...Project.queryKeys.byId(id), 'members'] as const,
+    },
+
+    useCreate: () => {
+        const queryClient = useQueryClient();
+        return useMutation({
+            mutationFn: (createdFields: ProjectDto) =>
+                createProject(createdFields),
+            onSuccess: () => {
+                return queryClient.invalidateQueries({
+                    queryKey: Project.queryKeys.all,
+                });
+            },
+        });
     },
 
     useFindAll: () =>
@@ -51,6 +69,13 @@ export const Project = {
 //         Authorization: 'Bearer <token>',
 //     }
 // }
+
+const createProject = async (
+    createdFields: ProjectDto,
+): Promise<ProjectDocument> => {
+    const response = await post(`/api/projects`, createdFields);
+    return response.data;
+};
 
 const getProjects = async (): Promise<ProjectDocument[]> => {
     const response = await get('/api/projects');
