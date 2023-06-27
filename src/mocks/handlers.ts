@@ -1,8 +1,10 @@
 import { HttpStatusCode } from 'axios';
+import ObjectID from 'bson-objectid';
 import { rest } from 'msw';
 
 import {
     ProjectDocument,
+    ProjectDto,
     ProjectMember,
     TaskDocument,
     UpdateProjectDto,
@@ -76,6 +78,48 @@ const postProjectToStorage = ({
     }
 };
 
+interface IAddProjectToStorage {
+    ownerId: string;
+    payload: ProjectDto;
+    testKey?: string;
+}
+
+const addProjectToStorage = ({
+    ownerId,
+    payload,
+    testKey,
+}: IAddProjectToStorage) => {
+    const storedData = localStorage.getItem(testKey ?? PROJECTS_STORAGE_KEY);
+    const newProject: ProjectDocument = {
+        _id: ObjectID().toHexString(),
+        collaborators: [],
+        taskStates: ['todo', 'doing', 'done'],
+        tasks: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ownerId,
+        ...payload,
+    };
+
+    if (storedData) {
+        const parsedData: ProjectDocument[] = JSON.parse(storedData);
+
+        const updatedData = [...parsedData, newProject];
+        localStorage.setItem(
+            testKey ?? PROJECTS_STORAGE_KEY,
+            JSON.stringify(updatedData),
+        );
+        return newProject;
+    }
+
+    const newProjectsData = [newProject];
+    localStorage.setItem(
+        testKey ?? PROJECTS_STORAGE_KEY,
+        JSON.stringify(newProjectsData),
+    );
+    return newProject;
+};
+
 const postTaskToStorage = ({
     projectId,
     taskId,
@@ -113,7 +157,34 @@ const postTaskToStorage = ({
     return projects[0].tasks[0];
 };
 
+export const handleCreateProjectTest = () => {
+    // PERF: create project gets its own localStorage
+    // key to prevent collision with other tests
+    return [
+        rest.post('/api/projects', async (req, res, ctx) => {
+            const interceptedPayload: ProjectDto = await req.json();
+            const project = addProjectToStorage({
+                testKey: 'testKey',
+                ownerId: ObjectID().toHexString(),
+                payload: interceptedPayload,
+            });
+            return res(ctx.json(project), ctx.status(HttpStatusCode.Created));
+        }),
+    ];
+};
+
 export const handlers = [
+    rest.post('/api/projects', async (req, res, ctx) => {
+        const interceptedPayload: ProjectDto = await req.json();
+        const project = addProjectToStorage({
+            // HACK: ownerId is derived from access_token.
+            // This is a placeholder until Authorization is implemented
+            ownerId: ObjectID().toHexString(),
+            payload: interceptedPayload,
+        });
+        return res(ctx.json(project), ctx.status(HttpStatusCode.Created));
+    }),
+
     rest.get('/api/projects', (_req, res, ctx) => {
         const projects = getProjectsFromStorage();
         return res(ctx.json(projects), ctx.status(HttpStatusCode.Ok));
