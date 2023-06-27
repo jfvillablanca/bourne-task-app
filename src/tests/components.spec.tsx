@@ -45,6 +45,25 @@ describe('App', () => {
         expect(projectTitles).toHaveLength(5);
     });
 
+    it('should open a modal to add new project', async () => {
+        const user = userEvent.setup();
+        const result = renderWithClient(<App />);
+        await waitFor(() => result.findByText(/my projects/i));
+        const addNewProjectButton = result.getByTestId('add-new-project');
+
+        await user.click(addNewProjectButton);
+
+        const titleInput = result.getByPlaceholderText(/name your project/i);
+        const descriptionInput =
+            result.getByPlaceholderText(/project summary/i);
+
+        await user.type(titleInput, 'new project');
+
+        expect(titleInput).toBeInTheDocument();
+        expect(descriptionInput).toBeInTheDocument();
+        expect(titleInput).toHaveValue('new project');
+    });
+
     it('should render toast notification on error', async () => {
         server.use(
             rest.get('/api/projects', (_req, res, ctx) => {
