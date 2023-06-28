@@ -1,7 +1,13 @@
+export type SubTask = {
+    title: string;
+    isCompleted: boolean;
+};
+
 export type UpdateTaskDto = {
     title?: string;
     taskState?: string;
     description?: string;
+    subtasks?: SubTask[];
     assignedProjMemberId?: string[];
 };
 
@@ -9,6 +15,7 @@ export type TaskDto = {
     title: string;
     taskState: string;
     description?: string;
+    subtasks?: SubTask[];
     assignedProjMemberId?: string[];
 };
 
