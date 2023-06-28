@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import { Project } from './api';
 import { CardView, ProjectTitle, Sidebar, ToastContainer } from './components';
@@ -8,13 +9,12 @@ function App() {
     const projectsQuery = Project.useFindAll();
     const projects = projectsQuery.data;
 
-    useEffect(() => {
+    useEffectOnce(() => {
         if (projects) {
             const initialProjectId = projects[0]._id;
             setSelectedProject(() => initialProjectId);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    });
 
     const handleClickedProject = (projectId: string) => {
         setSelectedProject(() => projectId);
