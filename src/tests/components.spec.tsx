@@ -8,7 +8,13 @@ import userEvent from '@testing-library/user-event';
 
 import App from '../App';
 import { TaskDocument } from '../common';
-import { CardView, ProjectTitle, TaskCard, TaskModal } from '../components';
+import {
+    CardView,
+    ProjectTitle,
+    TaskCard,
+    TaskCardGroup,
+    TaskModal,
+} from '../components';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 
@@ -164,6 +170,30 @@ describe('CardView', () => {
                 expect(screen.getByText(taskState)).toBeInTheDocument();
             });
         });
+    });
+});
+
+describe('TaskCardGroup', () => {
+    it('should be able to add new task', async () => {
+        const user = userEvent.setup();
+        const mockProjectId = mockProjects()[0]._id;
+        const mockProjectTaskState = mockProjects()[0].taskStates[0];
+
+        const result = renderWithClient(
+            <TaskCardGroup
+                projectId={mockProjectId}
+                taskState={mockProjectTaskState}
+            />,
+        );
+        await waitFor(() => {
+            expect(screen.getByText(mockProjectTaskState)).toBeInTheDocument();
+        });
+        const addTaskButton = result.getByTestId('add-task-button');
+
+        await user.click(addTaskButton);
+
+        const titleInput = result.getByPlaceholderText(/enter new task name/i);
+        expect(titleInput).toBeInTheDocument();
     });
 });
 
