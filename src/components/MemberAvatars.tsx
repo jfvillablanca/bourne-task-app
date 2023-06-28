@@ -1,6 +1,7 @@
 import { HTMLAttributes } from 'react';
 
 import { Project } from '../api';
+import { ProjectMember } from '../common';
 import { cn } from '../lib/utils';
 
 const diceBearArtStyle = [
@@ -35,27 +36,52 @@ const MemberAvatars: React.FC<UserAvatarProps> = ({
               )
             : projectMembers;
 
+        const renderAvatar = (avatar?: ProjectMember) => {
+            const avatarClass = !avatar ? 'placeholder' : '';
+            const avatarCount = !avatar
+                ? `+${avatarsToDisplay.length - 2}`
+                : '';
+
+            return (
+                <li
+                    className={`avatar border-none ${avatarClass}`}
+                    key={avatar?._id ?? 'placeholder'}
+                >
+                    <div
+                        className={cn(
+                            'w-full h-10 m-1 bg-base-300 rounded-full border-2 border-accent-content',
+                            className,
+                        )}
+                    >
+                        {avatar ? (
+                            <img
+                                src={generateAvatarURL(avatar.email)}
+                                alt={avatar.email}
+                            />
+                        ) : (
+                            <span className="text-md">{avatarCount}</span>
+                        )}
+                    </div>
+                </li>
+            );
+        };
+
+        const avatarsToRender =
+            avatarsToDisplay.length < 3
+                ? avatarsToDisplay
+                : avatarsToDisplay.slice(0, 2);
+
+        const renderedAvatars = avatarsToRender.map((avatar) =>
+            renderAvatar(avatar),
+        );
+
+        if (avatarsToDisplay.length > 2) {
+            renderedAvatars.push(renderAvatar(undefined));
+        }
+
         return (
             <div className={cn('', className)} {...props}>
-                <ul className="avatar-group -space-x-5">
-                    {avatarsToDisplay.map((avatar) => {
-                        return (
-                            <li className="avatar border-none" key={avatar._id}>
-                                <div
-                                    className={cn(
-                                        'w-full h-8 m-1 bg-base-300 rounded-full border-2 border-accent-content',
-                                        className,
-                                    )}
-                                >
-                                    <img
-                                        src={generateAvatarURL(avatar.email)}
-                                        alt={avatar.email}
-                                    />
-                                </div>
-                            </li>
-                        );
-                    })}
-                </ul>
+                <ul className="avatar-group -space-x-5">{renderedAvatars}</ul>
             </div>
         );
     }
