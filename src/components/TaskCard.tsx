@@ -1,3 +1,4 @@
+import { Pencil } from 'lucide-react';
 import { HTMLAttributes } from 'react';
 
 import { TaskDocument } from '../common';
@@ -29,7 +30,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <h3 className="text-xl font-semibold flex-1 self-center">
                     {task.title}
                 </h3>
-                <TaskModal task={task} projectId={projectId} />
+                <TaskModal task={task} projectId={projectId}>
+                    <button className="btn btn-sm btn-circle btn-ghost ml-3 self-start">
+                        <Pencil className="w-4" />
+                    </button>
+                </TaskModal>
             </div>
             {task.description && <div className="divider mt-0 mb-2"></div>}
             <div className="">

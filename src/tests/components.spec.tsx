@@ -216,7 +216,9 @@ describe('TaskModal', () => {
         const mockTask = mockProjects()[0].tasks[0];
         const mockTaskId = mockTask._id;
         const result = renderWithClient(
-            <TaskModal task={mockTask} projectId={mockProjectId} />,
+            <TaskModal task={mockTask} projectId={mockProjectId}>
+                <button></button>
+            </TaskModal>,
         );
         const taskCardEditButton = result.getByTestId(
             `open-task-modal-${mockTaskId}`,
@@ -229,7 +231,9 @@ describe('TaskModal', () => {
             ).toBeInTheDocument(),
         );
 
-        const titleInput = result.getByTestId(`task-edit-title-${mockTaskId}`);
+        const titleInput = result.getByPlaceholderText(
+            /what are we working on?/i,
+        );
         await user.type(titleInput, ': Electric Boogaloo');
 
         expect(titleInput).toHaveValue(`${mockTask.title}: Electric Boogaloo`);

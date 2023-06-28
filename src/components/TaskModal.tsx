@@ -1,5 +1,10 @@
-import { Check, Pencil } from 'lucide-react';
-import { HTMLAttributes, useEffect, useState } from 'react';
+import { Check } from 'lucide-react';
+import React, {
+    HTMLAttributes,
+    ReactElement,
+    useEffect,
+    useState,
+} from 'react';
 
 import { Task } from '../api';
 import { TaskDocument, UpdateTaskDto } from '../common';
@@ -15,12 +20,14 @@ import {
 import { MemberAvatars } from '.';
 
 interface TaskModalProps extends HTMLAttributes<HTMLDivElement> {
+    children: ReactElement;
     task: TaskDocument;
     projectId: string;
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({
     className,
+    children,
     task,
     projectId,
     ...props
@@ -64,17 +71,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
         taskMutation.mutate(editTaskForm);
     };
 
+    const button = React.cloneElement(children, {
+        'data-testid': `open-task-modal-${task._id}`,
+        onClick: () => setOpen((v) => !v),
+    });
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <button
-                    className="btn btn-sm btn-circle btn-ghost ml-3 self-start"
-                    data-testid={`open-task-modal-${task._id}`}
-                    onClick={() => setOpen((v) => !v)}
-                >
-                    <Pencil className="w-4" />
-                </button>
-            </DialogTrigger>
+            <DialogTrigger asChild>{button}</DialogTrigger>
             <DialogContent
                 className={cn(
                     'h-1/2 w-1/3 p-5 bg-base-100 border rounded-lg',
@@ -105,7 +109,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                 required
                                 value={editTaskForm.title}
                                 onChange={handleChange}
-                                data-testid={`task-edit-title-${task._id}`}
                             />
                         </div>
                         <ExitButton className="ml-2">
