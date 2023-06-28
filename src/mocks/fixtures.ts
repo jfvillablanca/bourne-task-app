@@ -27,18 +27,22 @@ export const mockProjects = (): ProjectDocument[] => {
             title: 'Customer Feedback Implementation',
             ownerId: '64956dead2af038ec229278a',
             collaborators: [
+                '648f629dc9ce700ba3f9ede0',
+                '64956dead2af038ec2292788',
+                '64956dead2af038ec229278a',
                 '64956dead2af038ec229278c',
                 '64956dead2af038ec229278g',
                 '64956dead2af038ec229278h',
             ],
-            taskStates: ['todo', 'doing', 'done'],
+            taskStates: ['todo', 'doing', 'done', 'archived'],
             tasks: [
                 {
                     title: 'Optimize Matrix Multiplication Algorithm',
-                    taskState: 'done',
+                    taskState: 'archived',
                     description:
                         'Improve the efficiency of multiplying two matrices.',
-                    assignedProjMemberId: ['64956dead2af038ec229278a'],
+                    subtasks: [],
+                    assignedProjMemberId: ['648f629dc9ce700ba3f9ede0'],
                     _id: '648f63abc9ce700ba3f9edef',
                 },
                 {
@@ -46,13 +50,35 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Determine whether every positive integer will eventually reach 1.',
-                    assignedProjMemberId: ['64956dead2af038ec229278g'],
+                    subtasks: [
+                        { title: 'Find Waldo', isCompleted: false },
+                        {
+                            title: "Solve Fermat's Last Theorem",
+                            isCompleted: true,
+                        },
+                        { title: 'Write a Novel', isCompleted: false },
+                    ],
+                    assignedProjMemberId: [
+                        '648f629dc9ce700ba3f9ede0',
+                        '64956dead2af038ec2292788',
+                        '64956dead2af038ec229278c',
+                        '64956dead2af038ec229278g',
+                        '64956dead2af038ec229278h',
+                    ],
                     _id: '648f63abc9ce700ba3f9edf0',
                 },
                 {
                     title: 'Implement Depth-First Search Algorithm',
                     taskState: 'doing',
                     description: 'Traverse a graph in depth-first order.',
+                    subtasks: [
+                        { title: 'Find Waldo', isCompleted: false },
+                        {
+                            title: "Solve Fermat's Last Theorem",
+                            isCompleted: true,
+                        },
+                        { title: 'Write a Novel', isCompleted: false },
+                    ],
                     assignedProjMemberId: ['64956dead2af038ec229278g'],
                     _id: '648f63abc9ce700ba3f9edf1',
                 },
@@ -61,6 +87,14 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Write a function to sort an array using the QuickSort algorithm.',
+                    subtasks: [
+                        { title: 'Find Waldo', isCompleted: false },
+                        {
+                            title: "Solve Fermat's Last Theorem",
+                            isCompleted: true,
+                        },
+                        { title: 'Write a Novel', isCompleted: false },
+                    ],
                     assignedProjMemberId: ['64956dead2af038ec229278g'],
                     _id: '648f63abc9ce700ba3f9edf6',
                 },
@@ -106,6 +140,14 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Write a function to perform binary search on a sorted array.',
+                    subtasks: [
+                        { title: 'Find Waldo', isCompleted: false },
+                        {
+                            title: "Solve Fermat's Last Theorem",
+                            isCompleted: true,
+                        },
+                        { title: 'Write a Novel', isCompleted: false },
+                    ],
                     assignedProjMemberId: ['64956dead2af038ec229278h'],
                     _id: '648f63abc9ce700ba3f9eded',
                 },
@@ -114,6 +156,14 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'doing',
                     description:
                         'Find the shortest possible route that visits each city exactly once.',
+                    subtasks: [
+                        { title: 'Find Waldo', isCompleted: false },
+                        {
+                            title: "Solve Fermat's Last Theorem",
+                            isCompleted: true,
+                        },
+                        { title: 'Write a Novel', isCompleted: false },
+                    ],
                     assignedProjMemberId: [
                         '64956dead2af038ec229278h',
                         '64956dead2af038ec229278h',
