@@ -216,9 +216,7 @@ describe('TaskModal', () => {
         const mockTask = mockProjects()[0].tasks[0];
         const mockTaskId = mockTask._id;
         const result = renderWithClient(
-            <TaskModal taskId={mockTaskId} projectId={mockProjectId}>
-                <button></button>
-            </TaskModal>,
+            <TaskModal taskId={mockTaskId} projectId={mockProjectId} />,
         );
         const taskCardEditButton = result.getByTestId(
             `open-task-modal-${mockTaskId}`,

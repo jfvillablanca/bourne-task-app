@@ -1,10 +1,5 @@
-import { Check } from 'lucide-react';
-import React, {
-    HTMLAttributes,
-    ReactElement,
-    useEffect,
-    useState,
-} from 'react';
+import { Check, Pencil } from 'lucide-react';
+import React, { HTMLAttributes, useEffect, useState } from 'react';
 
 import { Task } from '../api';
 import { UpdateTaskDto } from '../common';
@@ -20,14 +15,12 @@ import {
 import { MemberAvatars } from '.';
 
 interface TaskModalProps extends HTMLAttributes<HTMLDivElement> {
-    children: ReactElement;
     taskId: string;
     projectId: string;
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({
     className,
-    children,
     taskId,
     projectId,
     ...props
@@ -71,14 +64,17 @@ const TaskModal: React.FC<TaskModalProps> = ({
         taskMutation.mutate(editTaskForm);
     };
 
-    const button = React.cloneElement(children, {
-        'data-testid': `open-task-modal-${taskId}`,
-        onClick: () => setOpen((v) => !v),
-    });
-
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{button}</DialogTrigger>
+            <DialogTrigger asChild>
+                <button
+                    className="btn btn-sm btn-circle btn-ghost ml-3 self-start"
+                    data-testid={`open-task-modal-${taskId}`}
+                    onClick={() => setOpen((v) => !v)}
+                >
+                    <Pencil className="w-4" />
+                </button>
+            </DialogTrigger>
             <DialogContent
                 className={cn(
                     'h-1/2 w-1/3 p-5 bg-base-100 border rounded-lg',
