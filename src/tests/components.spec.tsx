@@ -216,7 +216,7 @@ describe('TaskModal', () => {
         const mockTask = mockProjects()[0].tasks[0];
         const mockTaskId = mockTask._id;
         const result = renderWithClient(
-            <TaskModal task={mockTask} projectId={mockProjectId}>
+            <TaskModal taskId={mockTaskId} projectId={mockProjectId}>
                 <button></button>
             </TaskModal>,
         );

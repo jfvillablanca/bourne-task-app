@@ -30,7 +30,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <h3 className="text-xl font-semibold flex-1 self-center">
                     {task.title}
                 </h3>
-                <TaskModal task={task} projectId={projectId}>
+                <TaskModal taskId={task._id} projectId={projectId}>
                     <button className="btn btn-sm btn-circle btn-ghost ml-3 self-start">
                         <Pencil className="w-4" />
                     </button>

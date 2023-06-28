@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 
 import { Task } from '../api';
-import { TaskDocument, UpdateTaskDto } from '../common';
+import { UpdateTaskDto } from '../common';
 import { cn } from '../lib/utils';
 
 import {
@@ -21,14 +21,14 @@ import { MemberAvatars } from '.';
 
 interface TaskModalProps extends HTMLAttributes<HTMLDivElement> {
     children: ReactElement;
-    task: TaskDocument;
+    taskId: string;
     projectId: string;
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({
     className,
     children,
-    task,
+    taskId,
     projectId,
     ...props
 }) => {
@@ -39,8 +39,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
     });
     const [editTaskForm, setEditTaskForm] = useState<UpdateTaskDto>(taskForm);
 
-    const taskQuery = Task.useFindOne(projectId, task._id);
-    const taskMutation = Task.useUpdate(projectId, task._id);
+    const taskQuery = Task.useFindOne(projectId, taskId);
+    const taskMutation = Task.useUpdate(projectId, taskId);
 
     useEffect(() => {
         if (taskQuery.isSuccess) {
@@ -72,7 +72,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     };
 
     const button = React.cloneElement(children, {
-        'data-testid': `open-task-modal-${task._id}`,
+        'data-testid': `open-task-modal-${taskId}`,
         onClick: () => setOpen((v) => !v),
     });
 
@@ -84,7 +84,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                     'h-1/2 w-1/3 p-5 bg-base-100 border rounded-lg',
                     className,
                 )}
-                data-testid={`task-modal-${task._id}`}
+                data-testid={`task-modal-${taskId}`}
                 {...props}
             >
                 <form
@@ -115,10 +115,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             <DialogClose />
                         </ExitButton>
                     </div>
-                    {task.description && (
-                        <div className="divider mt-0 mb-2"></div>
-                    )}
-                    <div className="flex flex-col gap-2 flex-1">
+                    <div className="flex flex-col gap-2 flex-1 mt-1">
                         <label htmlFor="description">
                             <span className="label-text font-semibold">
                                 Summary:
@@ -141,7 +138,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             <MemberAvatars
                                 className="h-11 w-full"
                                 projectId={projectId}
-                                taskMemberIds={task.assignedProjMemberId}
+                                taskMemberIds={
+                                    taskQuery.data?.assignedProjMemberId
+                                }
                             />
                         </div>
                     </div>
