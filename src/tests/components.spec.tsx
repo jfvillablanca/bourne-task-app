@@ -121,9 +121,7 @@ describe('ProjectTitle', () => {
 
         await user.click(titleHeader);
 
-        const titleInput = result.getByTestId(
-            `project-input-edit-title-${mockProjectId}`,
-        );
+        const titleInput = result.getByPlaceholderText(/new project name/i);
         expect(titleInput).toBeInTheDocument();
         expect(titleInput).toHaveFocus();
     });

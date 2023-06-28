@@ -91,7 +91,6 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                                         handleMutation();
                                     }
                                 }}
-                                data-testid={`project-input-edit-title-${projectQuery.data._id}`}
                                 autoFocus={true}
                             />
                             <button
