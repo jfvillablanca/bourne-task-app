@@ -4,7 +4,7 @@ import { HTMLAttributes, useEffect, useState } from 'react';
 import { Project } from '../api';
 import { cn } from '../lib/utils';
 
-import { Popover, PopoverContent, PopoverTrigger } from './ui';
+import { Popover, PopoverContent, PopoverTrigger, Skeleton } from './ui';
 
 interface ProjectTitleProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
@@ -106,7 +106,7 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
         );
     }
 
-    return <h2>Loading...</h2>;
+    return <Skeleton className={cn('h-11 max-w-md', className)} />;
 };
 
 export default ProjectTitle;

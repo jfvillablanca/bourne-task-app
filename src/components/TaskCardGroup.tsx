@@ -3,6 +3,7 @@ import { HTMLAttributes } from 'react';
 import { Task } from '../api';
 import { cn } from '../lib/utils';
 
+import { Skeleton } from './ui';
 import { TaskCard, TaskCardDropdown } from '.';
 interface TaskCardGroupProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
@@ -47,11 +48,11 @@ const TaskCardGroup: React.FC<TaskCardGroupProps> = ({
 
     return (
         <div className={cn('', className)} {...props}>
-            <ul>
-                <li>Loading...</li>
-                <li>Loading...</li>
-                <li>Loading...</li>
-            </ul>
+            <div className="flex justify-between">
+                <Skeleton className="h-7 w-36 mb-3" />
+                <Skeleton className="h-7 w-7 rounded-full" />
+            </div>
+            <Skeleton className="h-40 min-w-[16rem]" />
         </div>
     );
 };

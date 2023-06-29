@@ -86,7 +86,15 @@ const MemberAvatars: React.FC<UserAvatarProps> = ({
         );
     }
 
-    return <div className="loading loading-spinner loading-xs"></div>;
+    return (
+        <div className={cn('', className)} {...props}>
+            <div
+                aria-disabled
+                aria-label="loading"
+                className="loading loading-spinner loading-lg"
+            ></div>
+        </div>
+    );
 };
 
 export default MemberAvatars;
