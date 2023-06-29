@@ -43,15 +43,24 @@ afterAll(() => server.close());
 
 describe('App', () => {
     it('should render all project titles', async () => {
+        const mockProjectTitle = mockProjects()[0].title;
         const result = renderWithClient(<App />);
 
-        await waitFor(() => result.findByText(/my projects/i));
+        await waitFor(() => result.findByText(mockProjectTitle));
 
         const projectTitles = screen
             .getAllByRole('listitem')
             .map((project) => project.textContent);
 
         expect(projectTitles).toHaveLength(5);
+    });
+
+    it('should render skeletons if projects are still being fetched', async () => {
+        const result = renderWithClient(<App />);
+
+        const skeletons = result.getAllByLabelText('loading');
+
+        expect(skeletons).toHaveLength(3);
     });
 
     it('should open a modal to add new project', async () => {
