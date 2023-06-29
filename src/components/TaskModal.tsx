@@ -92,19 +92,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 >
                     <div className="flex justify-between">
                         <div className="flex flex-col gap-1 flex-1">
-                            <label htmlFor="title">
-                                <span className="label-text font-semibold">
-                                    Task:
-                                </span>
-                            </label>
-                            <input
-                                className="input focus:input-accent text-xl w-full resize-none"
-                                id="title"
-                                name="title"
-                                placeholder="What are we working on?"
-                                required
-                                value={editTaskForm.title}
-                                onChange={handleChange}
+                            <FormTaskTitle
+                                title={editTaskForm.title ?? ''}
+                                handleChange={handleChange}
                             />
                         </div>
                         <ExitButton className="ml-2">
@@ -112,33 +102,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
                         </ExitButton>
                     </div>
                     <div className="flex flex-col gap-2 flex-1 mt-1">
-                        <label htmlFor="description">
-                            <span className="label-text font-semibold">
-                                Summary:
-                            </span>
-                        </label>
-                        <textarea
-                            className="textarea textarea-md border-base-content focus:textarea-accent mt-1 resize-none"
-                            id="description"
-                            name="description"
-                            placeholder="Give a quick summary of the task"
-                            value={editTaskForm.description}
-                            onChange={handleChange}
+                        <FormTaskDescription
+                            description={editTaskForm.description ?? ''}
+                            handleChange={handleChange}
                         />
-                        <div>
-                            <label htmlFor="description">
-                                <span className="label-text font-semibold">
-                                    Assigned:
-                                </span>
-                            </label>
-                            <MemberAvatars
-                                className="h-11 w-full"
-                                projectId={projectId}
-                                taskMemberIds={
-                                    taskQuery.data?.assignedProjMemberId
-                                }
-                            />
-                        </div>
+                        <FormTaskMembers
+                            projectId={projectId}
+                            members={taskQuery.data?.assignedProjMemberId ?? []}
+                        />
                     </div>
                     <button
                         className="btn btn-ghost hover:btn-accent self-end"
@@ -150,6 +121,78 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 </form>
             </DialogContent>
         </Dialog>
+    );
+};
+
+const FormTaskTitle = ({
+    title,
+    handleChange,
+}: {
+    title: string;
+    handleChange: (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => void;
+}) => {
+    return (
+        <>
+            <label htmlFor="title">
+                <span className="label-text font-semibold">Task:</span>
+            </label>
+            <input
+                className="input focus:input-accent text-xl w-full resize-none"
+                id="title"
+                name="title"
+                placeholder="What are we working on?"
+                required
+                value={title}
+                onChange={handleChange}
+            />
+        </>
+    );
+};
+
+const FormTaskDescription = ({
+    description,
+    handleChange,
+}: {
+    description: string;
+    handleChange: (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => void;
+}) => {
+    return (
+        <>
+            <label htmlFor="description">
+                <span className="label-text font-semibold">Summary:</span>
+            </label>
+            <textarea
+                className="textarea textarea-md border-base-content focus:textarea-accent mt-1 resize-none"
+                id="description"
+                name="description"
+                placeholder="Give a quick summary of the task"
+                value={description}
+                onChange={handleChange}
+            />
+        </>
+    );
+};
+
+const FormTaskMembers = ({
+    projectId,
+    members,
+}: {
+    projectId: string;
+    members: string[];
+}) => {
+    return (
+        <>
+            <div className="label-text font-semibold">Assigned:</div>
+            <MemberAvatars
+                className="h-11 w-full"
+                projectId={projectId}
+                taskMemberIds={members}
+            />
+        </>
     );
 };
 
