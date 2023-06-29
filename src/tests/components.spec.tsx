@@ -96,6 +96,8 @@ describe('App', () => {
             ).toBeInTheDocument(),
         );
     });
+
+    it.todo('should render toast notification on PATCH update task error');
 });
 
 describe('ProjectTitle', () => {
@@ -110,6 +112,17 @@ describe('ProjectTitle', () => {
         await waitFor(() =>
             expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
         );
+    });
+
+    it('should render skeleton if project is still being fetched', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const result = renderWithClient(
+            <ProjectTitle projectId={mockProjectId} />,
+        );
+
+        const skeletons = result.getByLabelText('loading');
+
+        expect(skeletons).toBeInTheDocument();
     });
 
     it('should toggle project title header to a form input', async () => {
@@ -166,6 +179,15 @@ describe('CardView', () => {
         });
     });
 
+    it('should render skeletons if project is still being fetched', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const result = renderWithClient(<CardView projectId={mockProjectId} />);
+
+        const skeletons = result.getAllByLabelText('loading');
+
+        expect(skeletons).toHaveLength(3);
+    });
+
     it('should correctly group tasks to the correct task card group', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockProjectTaskStates = mockProjects()[0].taskStates;
@@ -201,6 +223,21 @@ describe('TaskCardGroup', () => {
 
         const titleInput = result.getByPlaceholderText(/enter new task name/i);
         expect(titleInput).toBeInTheDocument();
+    });
+
+    it('should render skeletons if tasks are still being fetched', async () => {
+        const mockProjectId = mockProjects()[0]._id;
+        const mockProjectTaskState = mockProjects()[0].taskStates[0];
+        const result = renderWithClient(
+            <TaskCardGroup
+                projectId={mockProjectId}
+                taskState={mockProjectTaskState}
+            />,
+        );
+
+        const skeletons = result.getAllByLabelText('loading');
+
+        expect(skeletons).toHaveLength(3);
     });
 });
 
