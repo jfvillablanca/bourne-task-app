@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -46,6 +48,13 @@ export const Project = {
         useQuery({
             queryKey: Project.queryKeys.members(projectId),
             queryFn: () => getProjectMembers(projectId),
+        }),
+
+    useGetTaskStates: (projectId: string) =>
+        useQuery({
+            queryKey: Project.queryKeys.byId(projectId),
+            queryFn: () => getProjectById(projectId),
+            select: useCallback((data: ProjectDocument) => data.taskStates, []),
         }),
 
     useUpdate: (projectId: string) => {
