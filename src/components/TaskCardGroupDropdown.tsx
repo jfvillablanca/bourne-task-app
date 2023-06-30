@@ -11,7 +11,7 @@ interface TaskCardDropdownProps extends HTMLAttributes<HTMLDivElement> {
     taskState: string;
 }
 
-const TaskCardDropdown: React.FC<TaskCardDropdownProps> = ({
+const TaskCardGroupDropdown: React.FC<TaskCardDropdownProps> = ({
     taskState,
     projectId,
 }) => {
@@ -65,7 +65,7 @@ const AddTaskButton: React.FC<TaskCardDropdownProps> = ({
                     data-testid={`add-task-button`}
                     onClick={() => setOpen((v) => !v)}
                 >
-                    Add task
+                    Add new task
                 </button>
             </PopoverTrigger>
             <PopoverContent>
@@ -102,4 +102,4 @@ const AddTaskButton: React.FC<TaskCardDropdownProps> = ({
         </Popover>
     );
 };
-export default TaskCardDropdown;
+export default TaskCardGroupDropdown;

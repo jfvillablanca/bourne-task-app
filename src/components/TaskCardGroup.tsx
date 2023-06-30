@@ -4,7 +4,7 @@ import { Task } from '../api';
 import { cn } from '../lib/utils';
 
 import { Skeleton } from './ui';
-import { TaskCard, TaskCardDropdown } from '.';
+import { TaskCard, TaskCardGroupDropdown } from '.';
 interface TaskCardGroupProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
     taskState: string;
@@ -28,7 +28,7 @@ const TaskCardGroup: React.FC<TaskCardGroupProps> = ({
                     <h2 className="text-xl capitalize font-semibold tracking-tight mb-3 cursor-default">
                         {taskState}
                     </h2>
-                    <TaskCardDropdown
+                    <TaskCardGroupDropdown
                         projectId={projectId}
                         taskState={taskState}
                     />
