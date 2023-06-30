@@ -310,4 +310,32 @@ describe('TaskModal', () => {
 
         expect(titleInput).toHaveValue(`${mockTask.title}: Electric Boogaloo`);
     });
+
+    it('should render dropdown to change task state', async () => {
+        const user = userEvent.setup();
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTask = mockProjects()[0].tasks[0];
+        const mockTaskId = mockTask._id;
+        const result = renderWithClient(
+            <TaskModal taskId={mockTaskId} projectId={mockProjectId} />,
+        );
+        const taskCardEditButton = result.getByTestId(
+            `open-task-modal-${mockTaskId}`,
+        );
+        await user.click(taskCardEditButton);
+
+        await waitFor(() =>
+            expect(
+                result.getByTestId(`task-modal-${mockTaskId}`),
+            ).toBeInTheDocument(),
+        );
+
+        const editTaskStateButton = result.getByTestId(
+            'open-select-task-state',
+        );
+        const selectTaskState = result.getByRole('combobox');
+        await user.click(editTaskStateButton);
+
+        expect(selectTaskState).toBeVisible();
+    });
 });

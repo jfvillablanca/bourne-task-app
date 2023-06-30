@@ -173,6 +173,7 @@ const FormTaskState = ({
         <div className="dropdown dropdown-right w-min">
             <button
                 className="btn btn-ghost border border-base-content p-2 mr-2"
+                data-testid="open-select-task-state"
                 onClick={(e) => e.preventDefault()}
             >
                 {currentTaskState}
