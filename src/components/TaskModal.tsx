@@ -1,7 +1,7 @@
 import { Check, Pencil } from 'lucide-react';
 import React, { HTMLAttributes, useEffect, useState } from 'react';
 
-import { Task } from '../api';
+import { Project, Task } from '../api';
 import { UpdateTaskDto } from '../common';
 import { cn } from '../lib/utils';
 
@@ -13,6 +13,8 @@ import {
     ExitButton,
 } from './ui';
 import { MemberAvatars } from '.';
+
+type FormElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
 interface TaskModalProps extends HTMLAttributes<HTMLDivElement> {
     taskId: string;
@@ -29,28 +31,30 @@ const TaskModal: React.FC<TaskModalProps> = ({
     const [taskForm, setTaskForm] = useState<UpdateTaskDto>({
         title: '',
         description: '',
+        taskState: '',
     });
     const [editTaskForm, setEditTaskForm] = useState<UpdateTaskDto>(taskForm);
 
     const taskQuery = Task.useFindOne(projectId, taskId);
     const taskMutation = Task.useUpdate(projectId, taskId);
+    const projQueryTaskStates = Project.useGetTaskStates(projectId);
 
     useEffect(() => {
         if (taskQuery.isSuccess) {
             setTaskForm(() => ({
                 title: taskQuery.data.title,
                 description: taskQuery.data.description,
+                taskState: taskQuery.data.taskState,
             }));
             setEditTaskForm(() => ({
                 title: taskQuery.data.title,
                 description: taskQuery.data.description,
+                taskState: taskQuery.data.taskState,
             }));
         }
     }, [taskQuery.isSuccess, taskQuery.data]);
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    ) => {
+    const handleChange = (e: React.ChangeEvent<FormElement>) => {
         const { name, value } = e.target;
         setEditTaskForm((prev) => ({
             ...prev,
@@ -102,6 +106,11 @@ const TaskModal: React.FC<TaskModalProps> = ({
                         </ExitButton>
                     </div>
                     <div className="flex flex-col gap-2 flex-1 mt-1">
+                        <FormTaskState
+                            currentTaskState={editTaskForm.taskState ?? ''}
+                            taskStates={projQueryTaskStates.data ?? []}
+                            handleChange={handleChange}
+                        />
                         <FormTaskDescription
                             description={editTaskForm.description ?? ''}
                             handleChange={handleChange}
@@ -148,6 +157,47 @@ const FormTaskTitle = ({
                 onChange={handleChange}
             />
         </>
+    );
+};
+
+const FormTaskState = ({
+    currentTaskState,
+    taskStates,
+    handleChange,
+}: {
+    currentTaskState: string;
+    taskStates: string[];
+    handleChange: (e: React.ChangeEvent<FormElement>) => void;
+}) => {
+    return (
+        <div className="dropdown dropdown-right w-min">
+            <button
+                className="btn btn-ghost border border-base-content p-2 mr-2"
+                onClick={(e) => e.preventDefault()}
+            >
+                {currentTaskState}
+            </button>
+            <select
+                className="select select-accent dropdown-content z-[1] p-2 text-lg capitalize"
+                tabIndex={0}
+                name="taskState"
+                value={currentTaskState}
+                onChange={handleChange}
+            >
+                {taskStates.map((taskState, i) => {
+                    return (
+                        <option
+                            key={i}
+                            className="join-item"
+                            value={taskState}
+                            disabled={currentTaskState === taskState}
+                        >
+                            {taskState}
+                        </option>
+                    );
+                })}
+            </select>
+        </div>
     );
 };
 
