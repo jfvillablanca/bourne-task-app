@@ -1,5 +1,7 @@
-import { Check, Pencil } from 'lucide-react';
+import { clsx } from 'clsx';
+import { Check, Pencil, PlusCircle } from 'lucide-react';
 import React, { HTMLAttributes, useEffect, useState } from 'react';
+import Select, { ActionMeta, MultiValue } from 'react-select';
 
 import { Project, Task } from '../api';
 import { ProjectMember, SubTask, UpdateTaskDto } from '../common';
@@ -38,12 +40,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
         title: '',
         description: '',
         taskState: '',
+        assignedProjMemberId: [],
     });
     const [editTaskForm, setEditTaskForm] = useState<UpdateTaskDto>(taskForm);
 
     const taskQuery = Task.useFindOne(projectId, taskId);
     const taskMutation = Task.useUpdate(projectId, taskId);
     const projQueryTaskStates = Project.useGetTaskStates(projectId);
+    const projQueryMembers = Project.useGetProjectMembers(projectId);
 
     useEffect(() => {
         if (taskQuery.isSuccess) {
@@ -51,11 +55,13 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 title: taskQuery.data.title,
                 description: taskQuery.data.description,
                 taskState: taskQuery.data.taskState,
+                assignedProjMemberId: taskQuery.data.assignedProjMemberId,
             }));
             setEditTaskForm(() => ({
                 title: taskQuery.data.title,
                 description: taskQuery.data.description,
                 taskState: taskQuery.data.taskState,
+                assignedProjMemberId: taskQuery.data.assignedProjMemberId,
             }));
         }
     }, [taskQuery.isSuccess, taskQuery.data]);
@@ -142,10 +148,25 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             handleChange={handleChange}
                             FormComponent="textarea"
                         />
-                        <FormTaskMembers
-                            projectId={projectId}
-                            members={taskQuery.data?.assignedProjMemberId ?? []}
-                        />
+                        <div className="label-text font-semibold">
+                            Assigned:
+                        </div>
+                        <div className="flex items-center">
+                            <MemberAvatars
+                                className="h-11 w-max mr-1"
+                                projectId={projectId}
+                                taskMemberIds={
+                                    editTaskForm.assignedProjMemberId ?? []
+                                }
+                            />
+                            <FormTaskMembers
+                                projectMembers={projQueryMembers.data ?? []}
+                                value={
+                                    taskQuery.data?.assignedProjMemberId ?? []
+                                }
+                                handleChange={handleChange}
+                            />
+                        </div>
                     </div>
                     <button
                         className="btn btn-ghost hover:btn-accent self-end"
@@ -243,26 +264,77 @@ const FormTaskState = ({
     );
 };
 
+const FormTaskMembers = ({
+    projectMembers,
+    value,
     handleChange,
 }: {
+    projectMembers: ProjectMember[];
+    value: string[];
+    handleChange: (e: FormChangeType) => void;
 }) => {
+    const allProjectMembers = projectMembers.map((member) => {
+        return { label: member.email, value: member.email, _id: member._id };
+    });
 
-const FormTaskMembers = ({
-    projectId,
-    members,
-}: {
-    projectId: string;
-    members: string[];
-}) => {
+    const selectedTaskMembers = projectMembers
+        .filter((member) => value.includes(member._id))
+        .map((member) => {
+            return {
+                label: member.email,
+                value: member.email,
+                _id: member._id,
+            };
+        });
+
+    const handleMenuChange = (
+        selectedOptions: MultiValue<{
+            label: string;
+            value: string;
+            _id: string;
+        }>,
+        actionMeta: ActionMeta<{ label: string; value: string; _id: string }>,
+    ) => {
+        const selectedValues: string[] = Array.isArray(selectedOptions)
+            ? selectedOptions.map((option) => option._id)
+            : [];
+        if (
+            actionMeta.action === 'select-option' ||
+            actionMeta.action === 'remove-value'
+        ) {
+            handleChange({
+                name: 'assignedProjMemberId',
+                value: selectedValues,
+            });
+        }
+    };
+
     return (
-        <>
-            <div className="label-text font-semibold">Assigned:</div>
-            <MemberAvatars
-                className="h-11 w-full"
-                projectId={projectId}
-                taskMemberIds={members}
+        <div className="dropdown">
+            <button
+                className="btn btn-ghost rounded-full text-neutral-content hover:text-accent transition-colors"
+                onClick={(e) => e.preventDefault()}
+            >
+                <PlusCircle className="" />
+            </button>
+
+            <Select
+                className="select h-20 min-w-[10rem] dropdown-content z-[1] p-2"
+                classNames={{
+                    control: ({ isFocused }) =>
+                        clsx(
+                            'border w-max rounded-lg',
+                            isFocused ? 'border-accent' : 'border-base-content',
+                        ),
+                }}
+                defaultValue={selectedTaskMembers}
+                options={allProjectMembers}
+                isMulti
+                // unstyled
+                name="assignedProjMemberId"
+                onChange={handleMenuChange}
             />
-        </>
+        </div>
     );
 };
 
