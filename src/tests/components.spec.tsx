@@ -340,4 +340,37 @@ describe('TaskModal', () => {
 
         expect(selectTaskState).toBeVisible();
     });
+
+    it('should render select dropdown to change update assigned task members', async () => {
+        const user = userEvent.setup();
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTask = mockProjects()[0].tasks[0];
+        const mockTaskId = mockTask._id;
+        const result = renderWithClient(
+            <TaskModal taskId={mockTaskId} projectId={mockProjectId} />,
+        );
+        const taskCardEditButton = result.getByTestId(
+            `open-task-modal-${mockTaskId}`,
+        );
+        await user.click(taskCardEditButton);
+
+        await waitFor(() =>
+            expect(
+                result.getByTestId(`task-modal-${mockTaskId}`),
+            ).toBeInTheDocument(),
+        );
+
+        const editAssignedMembersButton = result.getByTestId(
+            'open-select-update-assigned',
+        );
+
+        await user.click(editAssignedMembersButton);
+
+        const selectAssignedMembers = result.getByLabelText(
+            'select to assign project members to this task',
+        );
+
+        expect(selectAssignedMembers).toBeInTheDocument();
+        expect(selectAssignedMembers).toBeVisible();
+    });
 });
