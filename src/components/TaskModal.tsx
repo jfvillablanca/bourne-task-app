@@ -134,9 +134,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                 FormComponent="input"
                             />
                         </div>
-                        <ExitButton className="ml-2">
-                            <DialogClose />
-                        </ExitButton>
+                        <DialogClose className="flex ml-2 h-min">
+                            <ExitButton />
+                        </DialogClose>
                     </div>
                     <div className="flex flex-col gap-2 flex-1">
                         <FormTaskState
