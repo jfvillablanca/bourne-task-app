@@ -167,9 +167,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             />
                             <FormTaskMembers
                                 projectMembers={projQueryMembers.data ?? []}
-                                value={
-                                    taskQuery.data?.assignedProjMemberId ?? []
-                                }
+                                value={editTaskForm.assignedProjMemberId ?? []}
                                 handleChange={handleChange}
                             />
                         </div>
