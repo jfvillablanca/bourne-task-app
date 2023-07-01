@@ -4,20 +4,24 @@ import Select, { ActionMeta, MultiValue } from 'react-select';
 
 import { FormChangeType, ProjectMember } from '../common';
 
+type OptionType = { label: string; value: string; _id: string };
+
+interface FormTaskMembersProps {
+    projectMembers: ProjectMember[];
+    value: string[];
+    handleChange: (e: FormChangeType) => void;
+}
+
 const FormTaskMembers = ({
     projectMembers,
     value,
     handleChange,
-}: {
-    projectMembers: ProjectMember[];
-    value: string[];
-    handleChange: (e: FormChangeType) => void;
-}) => {
-    const allProjectMembers = projectMembers.map((member) => {
+}: FormTaskMembersProps) => {
+    const allProjectMembers: OptionType[] = projectMembers.map((member) => {
         return { label: member.email, value: member.email, _id: member._id };
     });
 
-    const selectedTaskMembers = projectMembers
+    const selectedTaskMembers: OptionType[] = projectMembers
         .filter((member) => value.includes(member._id))
         .map((member) => {
             return {
@@ -28,23 +32,16 @@ const FormTaskMembers = ({
         });
 
     const handleMenuChange = (
-        selectedOptions: MultiValue<{
-            label: string;
-            value: string;
-            _id: string;
-        }>,
-        actionMeta: ActionMeta<{ label: string; value: string; _id: string }>,
+        selectedOptions: MultiValue<OptionType>,
+        actionMeta: ActionMeta<OptionType>,
     ) => {
-        const selectedValues: string[] = Array.isArray(selectedOptions)
-            ? selectedOptions.map((option) => option._id)
-            : [];
         if (
             actionMeta.action === 'select-option' ||
             actionMeta.action === 'remove-value'
         ) {
             handleChange({
                 name: 'assignedProjMemberId',
-                value: selectedValues,
+                value: selectedOptions.map((option) => option._id),
             });
         }
     };
@@ -73,7 +70,6 @@ const FormTaskMembers = ({
                 options={allProjectMembers}
                 isMulti
                 // unstyled
-                name="assignedProjMemberId"
                 onChange={handleMenuChange}
                 aria-label="select to assign project members to this task"
             />
