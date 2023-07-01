@@ -49,7 +49,7 @@ const MemberAvatars: React.FC<UserAvatarProps> = ({
                 >
                     <div
                         className={cn(
-                            'w-full h-10 m-1 bg-base-300 rounded-full border-2 border-accent-content',
+                            'w-full h-10 bg-base-300 rounded-full border-2 border-accent-content',
                             className,
                         )}
                     >

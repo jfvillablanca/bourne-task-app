@@ -50,3 +50,11 @@ export type ProjectMember = {
     _id: string;
     email: string;
 };
+
+export type FormElementType =
+    | HTMLInputElement
+    | HTMLTextAreaElement
+    | HTMLSelectElement;
+export type FormChangeType =
+    | React.ChangeEvent<FormElementType>
+    | { name: string; value: string[] };

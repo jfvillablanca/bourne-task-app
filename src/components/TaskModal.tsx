@@ -1,10 +1,13 @@
-import { clsx } from 'clsx';
-import { Check, Pencil, PlusCircle } from 'lucide-react';
+import { Check, Pencil } from 'lucide-react';
 import React, { HTMLAttributes, useEffect, useState } from 'react';
-import Select, { ActionMeta, MultiValue } from 'react-select';
 
 import { Project, Task } from '../api';
-import { ProjectMember, SubTask, UpdateTaskDto } from '../common';
+import {
+    FormChangeType,
+    FormElementType,
+    SubTask,
+    UpdateTaskDto,
+} from '../common';
 import { cn } from '../lib/utils';
 
 import {
@@ -14,15 +17,18 @@ import {
     DialogTrigger,
     ExitButton,
 } from './ui';
-import { MemberAvatars } from '.';
+import { FormTaskMembers, MemberAvatars } from '.';
 
-type FormElementType =
-    | HTMLInputElement
-    | HTMLTextAreaElement
-    | HTMLSelectElement;
-type FormChangeType =
-    | React.ChangeEvent<FormElementType>
-    | { name: string; value: string[] };
+interface FormElementProps extends HTMLAttributes<FormElementType> {
+    label: string;
+    id: string;
+    name: string;
+    placeholder: string;
+    required?: boolean;
+    value: string;
+    handleChange: (e: FormChangeType) => void;
+    FormComponent: React.ElementType;
+}
 
 interface TaskModalProps extends HTMLAttributes<HTMLDivElement> {
     taskId: string;
@@ -181,17 +187,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
     );
 };
 
-interface FormElementProps extends HTMLAttributes<FormElementType> {
-    label: string;
-    id: string;
-    name: string;
-    placeholder: string;
-    required?: boolean;
-    value: string;
-    handleChange: (e: FormChangeType) => void;
-    FormComponent: React.ElementType;
-}
-
 const FormElement = ({
     label,
     className,
@@ -260,80 +255,6 @@ const FormTaskState = ({
                     );
                 })}
             </select>
-        </div>
-    );
-};
-
-const FormTaskMembers = ({
-    projectMembers,
-    value,
-    handleChange,
-}: {
-    projectMembers: ProjectMember[];
-    value: string[];
-    handleChange: (e: FormChangeType) => void;
-}) => {
-    const allProjectMembers = projectMembers.map((member) => {
-        return { label: member.email, value: member.email, _id: member._id };
-    });
-
-    const selectedTaskMembers = projectMembers
-        .filter((member) => value.includes(member._id))
-        .map((member) => {
-            return {
-                label: member.email,
-                value: member.email,
-                _id: member._id,
-            };
-        });
-
-    const handleMenuChange = (
-        selectedOptions: MultiValue<{
-            label: string;
-            value: string;
-            _id: string;
-        }>,
-        actionMeta: ActionMeta<{ label: string; value: string; _id: string }>,
-    ) => {
-        const selectedValues: string[] = Array.isArray(selectedOptions)
-            ? selectedOptions.map((option) => option._id)
-            : [];
-        if (
-            actionMeta.action === 'select-option' ||
-            actionMeta.action === 'remove-value'
-        ) {
-            handleChange({
-                name: 'assignedProjMemberId',
-                value: selectedValues,
-            });
-        }
-    };
-
-    return (
-        <div className="dropdown">
-            <button
-                className="btn btn-ghost rounded-full text-neutral-content hover:text-accent transition-colors"
-                onClick={(e) => e.preventDefault()}
-            >
-                <PlusCircle className="" />
-            </button>
-
-            <Select
-                className="select h-20 min-w-[10rem] dropdown-content z-[1] p-2"
-                classNames={{
-                    control: ({ isFocused }) =>
-                        clsx(
-                            'border w-max rounded-lg',
-                            isFocused ? 'border-accent' : 'border-base-content',
-                        ),
-                }}
-                defaultValue={selectedTaskMembers}
-                options={allProjectMembers}
-                isMulti
-                // unstyled
-                name="assignedProjMemberId"
-                onChange={handleMenuChange}
-            />
         </div>
     );
 };
