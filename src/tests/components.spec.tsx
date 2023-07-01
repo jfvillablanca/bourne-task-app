@@ -333,7 +333,9 @@ describe('TaskModal', () => {
         const editTaskStateButton = result.getByTestId(
             'open-select-task-state',
         );
-        const selectTaskState = result.getByRole('combobox');
+        const selectTaskState = result.getByTestId(
+            'select-task-state-combobox',
+        );
         await user.click(editTaskStateButton);
 
         expect(selectTaskState).toBeVisible();
