@@ -1,5 +1,6 @@
 export { default as CardView } from './CardView';
 export { default as FormTaskMembers } from './FormTaskMembers';
+export { default as Header } from './Header';
 export { default as MemberAvatars } from './MemberAvatars';
 export { default as ProjectAdd } from './ProjectAdd';
 export { default as ProjectTitle } from './ProjectTitle';
