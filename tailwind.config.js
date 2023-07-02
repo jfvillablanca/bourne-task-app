@@ -5,4 +5,7 @@ export default {
         extend: {},
     },
     plugins: [require('tailwindcss-animate'), require("daisyui")],
+    daisyui: {
+        themes: ['luxury'],
+    }
 };
