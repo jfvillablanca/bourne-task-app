@@ -55,7 +55,7 @@ const FormTaskMembers = ({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <button
-                    className="btn btn-ghost rounded-full text-neutral-content hover:text-accent transition-colors"
+                    className="p-3 rounded-full border border-dashed border-neutral-content/50 text-neutral-content/50 hover:text-accent-content hover:border-accent-content transition-colors"
                     data-testid={'open-select-update-assigned'}
                     onClick={(e) => {
                         e.preventDefault();
@@ -66,7 +66,7 @@ const FormTaskMembers = ({
                 </button>
             </DialogTrigger>
             <DialogContent
-                className="relative z-10 bg-base-100 h-max transition"
+                className="relative z-10 h-max transition"
                 overlayClassName="backdrop-blur-[2px]"
             >
                 <Select
@@ -74,14 +74,14 @@ const FormTaskMembers = ({
                     data-testid={'select-update-assigned'}
                     autoFocus
                     classNames={{
-                        control: ({ isFocused }) =>
+                        control: () =>
                             cn(
-                                'bg-neutral text-neutral-content h-full rounded border rounded-lg rounded-br-none',
-                                isFocused
-                                    ? 'border-accent'
-                                    : 'border-neutral-content',
+                                'bg-base-100 text-neutral-content h-full rounded rounded-lg rounded-br-none',
                             ),
-                        valueContainer: () => cn('py-3 px-2'),
+                        valueContainer: () =>
+                            cn(
+                                'border border-neutral-content border-r-0 rounded rounded-lg rounded-r-none py-3 px-2',
+                            ),
                         input: () => cn('m-0.5 py-0.5 text-md font-semibold'),
                         multiValue: () =>
                             cn(
@@ -92,7 +92,10 @@ const FormTaskMembers = ({
                             cn(
                                 'rounded-r-md px-1 hover:bg-error hover:text-error-content',
                             ),
-                        indicatorsContainer: () => cn('flex w-20 min-w-[4rem]'),
+                        indicatorsContainer: () =>
+                            cn(
+                                'border border-neutral-content rounded-tr-lg flex w-20 min-w-[4rem]',
+                            ),
                         clearIndicator: ({ isFocused }) =>
                             cn(
                                 'flex-1 p-2 h-full justify-center place-items-center',
@@ -100,10 +103,9 @@ const FormTaskMembers = ({
                                     ? 'text-warning hover:bg-warning hover:text-warning-content'
                                     : '',
                             ),
-                        indicatorSeparator: () => cn('bg-neutral-content'),
                         dropdownIndicator: ({ isFocused }) =>
                             cn(
-                                'flex-1 p-2 h-full justify-center place-items-center rounded-r-lg',
+                                'flex-1 p-2 h-full justify-center place-items-center rounded-tr-lg',
                                 isFocused
                                     ? 'text-info hover:bg-info hover:text-info-content'
                                     : '',
@@ -133,7 +135,7 @@ const FormTaskMembers = ({
                     closeMenuOnSelect={false}
                     aria-label="select to assign project members to this task"
                 />
-                <DialogClose className="absolute -bottom-7 right-0 w-20 min-w-[4rem] pt-2 z-0 flex justify-center rounded-b-lg bg-neutral text-neutral-content hover:bg-success hover:text-success-content">
+                <DialogClose className="absolute -bottom-9 right-0 w-20 min-w-[4rem] pt-2 pb-1 z-0 flex justify-center rounded-b-lg border border-neutral-content bg-base-100 text-neutral-content hover:bg-success hover:text-success-content">
                     <Check className="mr-1" />
                 </DialogClose>
             </DialogContent>

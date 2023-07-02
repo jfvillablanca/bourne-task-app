@@ -37,7 +37,7 @@ const MemberAvatars: React.FC<UserAvatarProps> = ({
             : projectMembers;
 
         const renderAvatar = (avatar?: ProjectMember) => {
-            const avatarClass = !avatar ? 'placeholder' : '';
+            const avatarClass = !avatar ? 'placeholder font-semibold' : '';
             const avatarCount = !avatar
                 ? `+${avatarsToDisplay.length - 2}`
                 : '';
