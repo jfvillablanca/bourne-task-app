@@ -65,7 +65,10 @@ const FormTaskMembers = ({
                     <PlusCircle />
                 </button>
             </DialogTrigger>
-            <DialogContent className="relative z-10 bg-base-100 h-max transition">
+            <DialogContent
+                className="relative z-10 bg-base-100 h-max transition"
+                overlayClassName="backdrop-blur-[2px]"
+            >
                 <Select
                     className="max-w-[50rem] w-fit z-10 min-w-[30rem] min-h-[2rem]"
                     data-testid={'select-update-assigned'}

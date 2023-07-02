@@ -110,6 +110,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                     'h-1/2 w-1/3 p-5 bg-base-100 border rounded-lg',
                     className,
                 )}
+                overlayClassName="bg-base-100/50"
                 data-testid={`task-modal-${taskId}`}
                 {...props}
             >
