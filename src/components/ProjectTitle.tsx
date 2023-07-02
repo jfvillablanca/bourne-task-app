@@ -95,7 +95,7 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                     </PopoverTrigger>
                     <PopoverContent className="min-w-[20rem]">
                         <form
-                            className="form-control rounded-lg p-2 bg-neutral shadow-md shadow-accent/20"
+                            className="form-control border rounded-lg p-4 backdrop-filter backdrop-blur-xl"
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 handleMutation();

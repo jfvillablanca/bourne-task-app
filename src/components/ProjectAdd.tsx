@@ -60,29 +60,27 @@ const ProjectAdd: React.FC<HTMLAttributes<HTMLButtonElement>> = ({
                     }}
                 >
                     <label htmlFor="title">
-                        <span className="label-text font-semibold">
-                            Project Name:
-                        </span>
+                        <span className="label-text font-semibold">Title:</span>
                     </label>
                     <input
                         className="input focus:input-accent text-lg w-full resize-none"
                         id="title"
                         name="title"
-                        placeholder="Name your project"
+                        placeholder="New project name"
                         required
                         value={editTaskForm.title}
                         onChange={handleChange}
                     />
                     <label htmlFor="description">
                         <span className="label-text font-semibold">
-                            Quick project description:
+                            Summary:
                         </span>
                     </label>
                     <textarea
                         className="textarea textarea-md border-base-content focus:textarea-accent mt-1 resize-none"
                         id="description"
                         name="description"
-                        placeholder={`(Optional) Project summary`}
+                        placeholder="Optional: Give a short summary of the project"
                         value={editTaskForm.description}
                         onChange={handleChange}
                     />

@@ -71,9 +71,10 @@ describe('App', () => {
 
         await user.click(addNewProjectButton);
 
-        const titleInput = result.getByPlaceholderText(/name your project/i);
-        const descriptionInput =
-            result.getByPlaceholderText(/project summary/i);
+        const titleInput = result.getByPlaceholderText(/new project name/i);
+        const descriptionInput = result.getByPlaceholderText(
+            /short summary of the project/i,
+        );
 
         await user.type(titleInput, 'new project');
 
