@@ -13,6 +13,8 @@ import {
     useRole,
 } from '@floating-ui/react';
 
+import { cn } from '../../lib/utils';
+
 interface DialogOptions {
     initialOpen?: boolean;
     open?: boolean;
@@ -141,22 +143,27 @@ export const DialogTrigger = React.forwardRef<
 
 export const DialogContent = React.forwardRef<
     HTMLDivElement,
-    React.HTMLProps<HTMLDivElement>
+    React.HTMLProps<HTMLDivElement> & { overlayClassName?: string }
 >(function DialogContent(props, propRef) {
     const { context: floatingContext, ...context } = useDialogContext();
     const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
     if (!floatingContext.open) return null;
 
+    const { overlayClassName, ...otherProps } = props;
+
     return (
         <FloatingPortal>
-            <FloatingOverlay className="grid place-items-center" lockScroll>
+            <FloatingOverlay
+                className={cn('grid place-items-center', overlayClassName)}
+                lockScroll
+            >
                 <FloatingFocusManager context={floatingContext}>
                     <div
                         ref={ref}
                         aria-labelledby={context.labelId}
                         aria-describedby={context.descriptionId}
-                        {...context.getFloatingProps(props)}
+                        {...context.getFloatingProps(otherProps)}
                     >
                         {props.children}
                     </div>
