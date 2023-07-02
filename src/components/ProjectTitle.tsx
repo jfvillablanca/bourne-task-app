@@ -59,7 +59,7 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
             <div className={cn('flex items-center gap-2 h-14', className)}>
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                        <button
+                        <div
                             className="btn btn-ghost flex gap-3 items-center data-[state=open]:bg-neutral"
                             data-testid={`project-title-${projectQuery.data._id}`}
                             onClick={() => setOpen((v) => !v)}
@@ -68,7 +68,7 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                                 {title}
                             </h2>
                             <Pencil className="w-4" />
-                        </button>
+                        </div>
                     </PopoverTrigger>
                     <PopoverContent>
                         <form
