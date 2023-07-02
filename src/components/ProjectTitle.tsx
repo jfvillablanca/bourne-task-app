@@ -2,6 +2,7 @@ import { Check, Pencil } from 'lucide-react';
 import { HTMLAttributes, useEffect, useState } from 'react';
 
 import { Project } from '../api';
+import { ProjectDto } from '../common';
 import { cn } from '../lib/utils';
 
 import { Popover, PopoverContent, PopoverTrigger, Skeleton } from './ui';
@@ -35,24 +36,41 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
     projectId,
 }) => {
     const [open, setOpen] = useState(false);
-    const [title, setTitle] = useState('');
-    const [editTitle, setEditTitle] = useState(title);
+    const [projectMeta, setProjectMeta] = useState<ProjectDto>({
+        title: '',
+        description: '',
+    });
+    const [editProjectMeta, setEditProjectMeta] = useState(projectMeta);
 
     const projectQuery = Project.useFindOne(projectId);
     const projectMutation = Project.useUpdate(projectId);
 
     const handleMutation = () => {
-        setTitle(editTitle);
+        setProjectMeta(editProjectMeta);
         setOpen(false);
-        projectMutation.mutate({ title: editTitle.trim() });
+        projectMutation.mutate({
+            title: editProjectMeta.title.trim(),
+            description: editProjectMeta.description?.trim(),
+        });
     };
 
     useEffect(() => {
         if (projectQuery.isSuccess) {
-            setTitle(() => projectQuery.data.title);
-            setEditTitle(() => projectQuery.data.title);
+            setProjectMeta(() => projectQuery.data);
+            setEditProjectMeta(() => projectQuery.data);
         }
     }, [projectQuery.isSuccess, projectQuery.data]);
+
+    const handleFormInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+        const { name, value } = e.target;
+
+        setEditProjectMeta((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
     if (projectQuery.data) {
         return (
@@ -65,27 +83,36 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                             onClick={() => setOpen((v) => !v)}
                         >
                             <h2 className="text-2xl font-medium tracking-tight normal-case">
-                                {title}
+                                {projectMeta.title}
                             </h2>
                             <Pencil className="w-4" />
                         </div>
+                        {projectMeta.description && (
+                            <h3 className="pl-4 flex justify-start text-sm">
+                                {projectMeta.description}
+                            </h3>
+                        )}
                     </PopoverTrigger>
-                    <PopoverContent>
+                    <PopoverContent className="min-w-[20rem]">
                         <form
-                            className="flex gap-3 w-full max-w-sm items-center rounded-lg p-2 bg-neutral shadow-md shadow-accent/20"
+                            className="form-control rounded-lg p-2 bg-neutral shadow-md shadow-accent/20"
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 handleMutation();
                             }}
                         >
+                            <label className="label" htmlFor="title">
+                                <span className="label-text font-semibold">
+                                    Title:
+                                </span>
+                            </label>
                             <input
-                                className="input input-bordered input-accent w-full"
+                                className="input input-accent w-full"
                                 placeholder="New project name"
                                 required
-                                value={editTitle}
-                                onChange={(e) => {
-                                    setEditTitle(() => e.target.value);
-                                }}
+                                name="title"
+                                value={editProjectMeta.title}
+                                onChange={handleFormInputChange}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                         handleMutation();
@@ -93,11 +120,29 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                                 }}
                                 autoFocus={true}
                             />
+                            <label className="label" htmlFor="description">
+                                <span className="label-text font-semibold">
+                                    Summary:
+                                </span>
+                            </label>
+                            <textarea
+                                className="textarea textarea-accent h-full w-full resize-none mb-4"
+                                placeholder="Optional: Give a short summary of the project"
+                                name="description"
+                                value={editProjectMeta.description}
+                                onChange={handleFormInputChange}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleMutation();
+                                    }
+                                }}
+                            />
                             <button
-                                className="btn btn-sm btn-circle btn-ghost hover:btn-accent"
+                                className="self-end btn btn-sm btn-ghost hover:btn-accent flex"
                                 type="submit"
                             >
                                 <Check className="w-4" />
+                                Submit
                             </button>
                         </form>
                     </PopoverContent>
