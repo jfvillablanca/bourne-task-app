@@ -40,7 +40,8 @@ const FormTaskMembers = ({
     ) => {
         if (
             actionMeta.action === 'select-option' ||
-            actionMeta.action === 'remove-value'
+            actionMeta.action === 'remove-value' ||
+            actionMeta.action === 'clear'
         ) {
             handleChange({
                 name: 'assignedProjMemberId',
