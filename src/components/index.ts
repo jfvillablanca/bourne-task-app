@@ -1,3 +1,4 @@
+export { default as AuthenticationModal } from './AuthenticationModal';
 export { default as CardView } from './CardView';
 export { default as FormTaskMembers } from './FormTaskMembers';
 export { default as Header } from './Header';
