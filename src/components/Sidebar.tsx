@@ -20,16 +20,16 @@ const Sidebar: React.FC<SidebarProps> = ({
     ...props
 }) => {
     return (
-        <div className={cn('flex flex-col px-3', className)} {...props}>
+        <div className={cn('flex flex-col', className)} {...props}>
             <h2 className="font-bold text-2xl self-center tracking-wider cursor-default">
                 My Projects
             </h2>
-            <div className="divider my-1"></div>
+            <div className="divider my-1 mx-4"></div>
             <ul className="menu gap-2">
                 {projectQuery && projectQuery.data
                     ? projectQuery.data.map((project) => (
                           <li
-                              className="btn btn-ghost text-lg font-semibold capitalize h-min"
+                              className="btn btn-ghost items-start text-lg font-semibold capitalize h-min"
                               key={project._id}
                               onClick={() => {
                                   handleClickedProject(project._id);

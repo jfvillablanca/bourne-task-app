@@ -30,23 +30,19 @@ function App() {
     return (
         <>
             <ToastContainer />
-            <div className="grid auto-rows-min h-screen text-lg">
-                <Header className="row-start-1 col-span-2 border-b border-base-300 -mb-[1px]" />
+            <div className="grid auto-rows-min h-screen text-lg bg-base-200">
+                <Header className="row-start-1 col-span-2 border-b border-base-300" />
                 <Sidebar
-                    className="row-start-3 row-span-2"
+                    className="row-start-2 row-span-1 w-max px-2 py-4 border-r border-base-300"
                     projectQuery={projectsQuery}
                     handleClickedProject={handleClickedProject}
                 />
-                <ProjectTitle
-                    className="row-start-2 row-span-1 col-start-2 mb-4"
-                    projectId={selectedProject}
-                />
-                {selectedProject && (
-                    <CardView
-                        className="row-start-3 row-span-1 h-full"
-                        projectId={selectedProject}
-                    />
-                )}
+                <div className="row-start-2 col-start-2 bg-base-100 overflow-x-auto">
+                    <ProjectTitle className="m-4" projectId={selectedProject} />
+                    {selectedProject && (
+                        <CardView className="p-4" projectId={selectedProject} />
+                    )}
+                </div>
             </div>
         </>
     );
