@@ -98,7 +98,25 @@ describe('App', () => {
         );
     });
 
-    it.todo('should render toast notification on PATCH update task error');
+    it('should open the user auth modal on click of avatar on the header', async () => {
+        const user = userEvent.setup();
+        const result = renderWithClient(<App />);
+        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+
+        await user.click(userAuthButton);
+
+        const emailInput = result.getByPlaceholderText(/name@example.com/i);
+        const passwordInput = result.getByPlaceholderText('Password');
+        const confirmPasswordInput =
+            result.getByPlaceholderText('Confirm password');
+
+        await user.type(emailInput, 'iam@teapot.com');
+
+        expect(emailInput).toBeInTheDocument();
+        expect(passwordInput).toBeInTheDocument();
+        expect(confirmPasswordInput).toBeInTheDocument();
+        expect(emailInput).toHaveValue('iam@teapot.com');
+    });
 });
 
 describe('ProjectTitle', () => {
