@@ -1,4 +1,4 @@
-import { ProjectDocument, ProjectMember } from '../common';
+import { ProjectDocument, User } from '../common';
 
 export const mockTokens = () => {
     return {
@@ -7,17 +7,67 @@ export const mockTokens = () => {
     };
 };
 
-export const mockUsers = (): ProjectMember[] => [
-    { _id: '648f629dc9ce700ba3f9ede0', email: 'lisa.miller@yahoo.com' },
-    { _id: '64956dead2af038ec2292788', email: 'samantha.turner@outlook.com' },
-    { _id: '64956dead2af038ec229278a', email: 'michael.white@example.com' },
-    { _id: '64956dead2af038ec229278c', email: 'robert.jackson@gmail.com' },
-    { _id: '64956dead2af038ec229278d', email: 'john.doe@example.com' },
-    { _id: '64956dead2af038ec229278e', email: 'jennifer.smith@gmail.com' },
-    { _id: '64956dead2af038ec229278f', email: 'david123@yahoo.com' },
-    { _id: '64956dead2af038ec229278g', email: 'emily.jones@outlook.com' },
-    { _id: '64956dead2af038ec229278h', email: 'alexanderbrown@hotmail.com' },
-    { _id: '64956dead2af038ec229278i', email: 'sarah.wilson@example.org' },
+export const mockUsers = (): User[] => [
+    {
+        _id: '648f629dc9ce700ba3f9ede0',
+        email: 'lisa.miller@yahoo.com',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
+    {
+        _id: '64956dead2af038ec2292788',
+        email: 'samantha.turner@outlook.com',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
+    {
+        _id: '64956dead2af038ec229278a',
+        email: 'michael.white@example.com',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
+    {
+        _id: '64956dead2af038ec229278c',
+        email: 'robert.jackson@gmail.com',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
+    {
+        _id: '64956dead2af038ec229278d',
+        email: 'john.doe@example.com',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
+    {
+        _id: '64956dead2af038ec229278e',
+        email: 'jennifer.smith@gmail.com',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
+    {
+        _id: '64956dead2af038ec229278f',
+        email: 'david123@yahoo.com',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
+    {
+        _id: '64956dead2af038ec229278g',
+        email: 'emily.jones@outlook.com',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
+    {
+        _id: '64956dead2af038ec229278h',
+        email: 'alexanderbrown@hotmail.com',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
+    {
+        _id: '64956dead2af038ec229278i',
+        email: 'sarah.wilson@example.org',
+        hashed_password: 'fake_hash',
+        refresh_token: 'fake_token',
+    },
 ];
 
 export const mockProjects = (): ProjectDocument[] => {
@@ -25,11 +75,11 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62d3c9ce700ba3f9ede4',
             title: 'Customer Feedback Implementation',
+            description: 'Add CTA form at end of lifecycle',
             ownerId: '64956dead2af038ec229278a',
             collaborators: [
                 '648f629dc9ce700ba3f9ede0',
                 '64956dead2af038ec2292788',
-                '64956dead2af038ec229278a',
                 '64956dead2af038ec229278c',
                 '64956dead2af038ec229278g',
                 '64956dead2af038ec229278h',

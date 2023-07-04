@@ -46,9 +46,17 @@ export type ProjectDocument = ProjectDto & {
     updatedAt: string;
 };
 
-export type ProjectMember = {
+export type AuthToken = { access_token: string; refresh_token: string };
+
+export type AuthDto = Pick<User, 'email'> & { password: string };
+
+export type ProjectMember = Pick<User, '_id' | 'email'>;
+
+export type User = {
     _id: string;
     email: string;
+    hashed_password: string;
+    refresh_token: string;
 };
 
 export type FormElementType =
