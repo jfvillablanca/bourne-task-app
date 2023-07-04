@@ -6,6 +6,6 @@ export default {
     },
     plugins: [require('tailwindcss-animate'), require("daisyui")],
     daisyui: {
-        themes: ['luxury'],
+        themes: ['black'],
     }
 };
