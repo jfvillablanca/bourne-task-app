@@ -1,8 +1,11 @@
 import { HttpStatusCode } from 'axios';
 import ObjectID from 'bson-objectid';
+import { SignJWT } from 'jose';
 import { rest } from 'msw';
 
 import {
+    AuthDto,
+    AuthToken,
     ProjectDocument,
     ProjectDto,
     ProjectMember,
@@ -10,6 +13,7 @@ import {
     TaskDto,
     UpdateProjectDto,
     UpdateTaskDto,
+    User,
 } from '../common';
 
 import { mockProjects, mockUsers } from './fixtures';
@@ -17,6 +21,7 @@ import { mockProjects, mockUsers } from './fixtures';
 
 const PROJECTS_STORAGE_KEY = 'projects';
 const USERS_STORAGE_KEY = 'users';
+const JWT_SECRET = new TextEncoder().encode('super-secret');
 
 const getUserFromStorage = (userId: string) => {
     const storedData = localStorage.getItem(USERS_STORAGE_KEY);
@@ -30,7 +35,46 @@ const getUserFromStorage = (userId: string) => {
     }
 };
 
+const generateJwtToken = async (
+    payload: Pick<User, '_id' | 'email'>,
+    type: 'access_token' | 'refresh_token',
+) => {
+    const jwtPayload = { sub: payload._id, email: payload.email };
+    const signedJwt = await new SignJWT({ ...jwtPayload })
+        .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+        .setIssuedAt()
+        .setExpirationTime(type === 'access_token' ? '15m' : '7d')
+        .sign(JWT_SECRET);
+    return signedJwt;
+};
+
+const addUserToStorage = async ({ email, password }: AuthDto) => {
     const storedData = localStorage.getItem(USERS_STORAGE_KEY);
+
+    const _id = ObjectID().toHexString();
+    const generatedTokens: AuthToken = {
+        access_token: await generateJwtToken({ _id, email }, 'access_token'),
+        refresh_token: await generateJwtToken({ _id, email }, 'refresh_token'),
+    };
+    const newUser: User = {
+        _id,
+        email,
+        hashed_password: password,
+        refresh_token: generatedTokens.refresh_token,
+    };
+
+    if (storedData) {
+        const parsedData: User[] = JSON.parse(storedData);
+
+        const updatedData = [...parsedData, newUser];
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedData));
+        return generatedTokens;
+    }
+
+    const newUsersData = [newUser];
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(newUsersData));
+    return generatedTokens;
+};
 
 const getProjectsFromStorage = (): ProjectDocument[] => {
     const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
@@ -199,6 +243,14 @@ export const handleCreateProjectTest = () => {
 };
 
 export const handlers = [
+    rest.post('/api/auth/local/register', async (req, res, ctx) => {
+        const interceptedPayload: AuthDto = await req.json();
+        const tokens = await addUserToStorage({
+            email: interceptedPayload.email,
+            password: interceptedPayload.password,
+        });
+        return res(ctx.json(tokens), ctx.status(HttpStatusCode.Created));
+    }),
     rest.post('/api/projects', async (req, res, ctx) => {
         const interceptedPayload: ProjectDto = await req.json();
         const project = addProjectToStorage({
