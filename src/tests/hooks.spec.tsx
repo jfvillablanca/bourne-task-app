@@ -1,9 +1,11 @@
+import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { describe, it } from 'vitest';
 
 import { renderHook, waitFor } from '@testing-library/react';
 
-import { Project, Task } from '../api';
+import { Auth, Project, Task } from '../api';
+import { AuthDto } from '../common';
 import { mockProjects } from '../mocks/fixtures';
 import { handleCreateProjectTest, handlers } from '../mocks/handlers';
 
@@ -19,6 +21,25 @@ afterEach(() => {
 });
 
 afterAll(() => server.close());
+
+describe.concurrent('Auth', () => {
+    it('should create a new user', async () => {
+        const newUser: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result } = renderHook(() => Auth.useRegisterLocal(), {
+            wrapper: createWrapper(),
+        });
+
+        result.current.mutate(newUser);
+
+        await waitFor(() => expect(result.current.data).toBeDefined());
+        const generatedTokens = result.current.data;
+        expect(generatedTokens?.access_token).toBeDefined();
+        expect(generatedTokens?.refresh_token).toBeDefined();
+    });
+});
 
 describe.concurrent('Project', () => {
     it('should create a new project', async () => {
