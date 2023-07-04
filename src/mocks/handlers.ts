@@ -18,6 +18,20 @@ import { mockProjects, mockUsers } from './fixtures';
 const PROJECTS_STORAGE_KEY = 'projects';
 const USERS_STORAGE_KEY = 'users';
 
+const getUserFromStorage = (userId: string) => {
+    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
+    if (storedData) {
+        const userList: User[] = JSON.parse(storedData);
+        return userList.find((user) => user._id === userId);
+    } else {
+        const initialData = mockUsers();
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(initialData));
+        return initialData.find((user) => user._id === userId);
+    }
+};
+
+    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
+
 const getProjectsFromStorage = (): ProjectDocument[] => {
     const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
     if (storedData) {
@@ -26,18 +40,6 @@ const getProjectsFromStorage = (): ProjectDocument[] => {
         const initialData = mockProjects();
         localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(initialData));
         return initialData;
-    }
-};
-
-const getProjectMemberFromStorage = (userId: string) => {
-    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
-    if (storedData) {
-        const userList: ProjectMember[] = JSON.parse(storedData);
-        return userList.find((user) => user._id === userId);
-    } else {
-        const initialData = mockUsers();
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(initialData));
-        return initialData.find((user) => user._id === userId);
     }
 };
 
@@ -231,7 +233,12 @@ export const handlers = [
             : [];
 
         const projectMembers = projectMemberIds.map((id) => {
-            return getProjectMemberFromStorage(id);
+            const user = getUserFromStorage(id);
+            if (!user) {
+                throw res(ctx.status(HttpStatusCode.NotFound));
+            }
+            const member: ProjectMember = { _id: user._id, email: user.email };
+            return member;
         });
 
         return res(ctx.json(projectMembers), ctx.status(HttpStatusCode.Ok));
