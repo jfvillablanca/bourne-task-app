@@ -117,6 +117,74 @@ describe('App', () => {
         expect(confirmPasswordInput).toBeInTheDocument();
         expect(emailInput).toHaveValue('iam@teapot.com');
     });
+
+    it('should notify on invalid email input', async () => {
+        const user = userEvent.setup();
+        const result = renderWithClient(<App />);
+        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+
+        await user.click(userAuthButton);
+
+        const emailInput = result.getByPlaceholderText(/name@example.com/i);
+
+        await user.type(emailInput, 'erroneousEmail');
+
+        expect(result.getByText(/invalid email address/i)).toBeInTheDocument();
+    });
+
+    it('should notify on mismatched passwords', async () => {
+        const user = userEvent.setup();
+        const result = renderWithClient(<App />);
+        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+
+        await user.click(userAuthButton);
+
+        const passwordInput = result.getByPlaceholderText('Password');
+        const confirmPasswordInput =
+            result.getByPlaceholderText('Confirm password');
+
+        await user.type(passwordInput, 'password');
+        await user.type(confirmPasswordInput, 'mismatchingpassword');
+
+        expect(result.getByText(/passwords do not match/i)).toBeInTheDocument();
+    });
+
+    it('should notify on mismatched passwords', async () => {
+        const user = userEvent.setup();
+        const result = renderWithClient(<App />);
+        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+
+        await user.click(userAuthButton);
+
+        const passwordInput = result.getByPlaceholderText('Password');
+        const confirmPasswordInput =
+            result.getByPlaceholderText('Confirm password');
+
+        await user.type(passwordInput, 'password');
+        await user.type(confirmPasswordInput, 'mismatchingpassword');
+
+        expect(result.getByText(/passwords do not match/i)).toBeInTheDocument();
+    });
+
+    it('should notify that all fields are required onSubmit', async () => {
+        const user = userEvent.setup();
+        const result = renderWithClient(<App />);
+        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+
+        await user.click(userAuthButton);
+
+        const submitButton = result.getByRole('button', {
+            name: 'Sign up with email',
+        });
+
+        await user.click(submitButton);
+
+        expect(result.getByText('Email is required')).toBeInTheDocument();
+        expect(result.getByText('Password is required')).toBeInTheDocument();
+        expect(
+            result.getByText('Confirm password is required'),
+        ).toBeInTheDocument();
+    });
 });
 
 describe('ProjectTitle', () => {
