@@ -16,7 +16,9 @@ export const Auth = {
         const queryClient = useQueryClient();
         return useMutation<AuthToken, AxiosError, AuthDto>({
             mutationFn: (credentials: AuthDto) => registerLocal(credentials),
-            onSuccess: () => {
+            onSuccess: (data) => {
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('refresh_token', data.refresh_token);
                 toast.success("You're all set! 🥳");
                 return queryClient.invalidateQueries({
                     queryKey: Auth.queryKeys.all,
