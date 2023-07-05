@@ -9,6 +9,7 @@ import userEvent from '@testing-library/user-event';
 import App from '../App';
 import { TaskDocument } from '../common';
 import {
+    AuthenticationModal,
     CardView,
     ProjectTitle,
     TaskCard,
@@ -97,10 +98,12 @@ describe('App', () => {
             ).toBeInTheDocument(),
         );
     });
+});
 
+describe('AuthenticationModal', () => {
     it('should open the user auth modal on click of avatar on the header', async () => {
         const user = userEvent.setup();
-        const result = renderWithClient(<App />);
+        const result = renderWithClient(<AuthenticationModal />);
         const userAuthButton = result.getByTestId('open-user-auth-dialog');
 
         await user.click(userAuthButton);
@@ -120,7 +123,7 @@ describe('App', () => {
 
     it('should notify on invalid email input', async () => {
         const user = userEvent.setup();
-        const result = renderWithClient(<App />);
+        const result = renderWithClient(<AuthenticationModal />);
         const userAuthButton = result.getByTestId('open-user-auth-dialog');
 
         await user.click(userAuthButton);
@@ -134,7 +137,7 @@ describe('App', () => {
 
     it('should notify on mismatched passwords', async () => {
         const user = userEvent.setup();
-        const result = renderWithClient(<App />);
+        const result = renderWithClient(<AuthenticationModal />);
         const userAuthButton = result.getByTestId('open-user-auth-dialog');
 
         await user.click(userAuthButton);
@@ -151,7 +154,7 @@ describe('App', () => {
 
     it('should notify on mismatched passwords', async () => {
         const user = userEvent.setup();
-        const result = renderWithClient(<App />);
+        const result = renderWithClient(<AuthenticationModal />);
         const userAuthButton = result.getByTestId('open-user-auth-dialog');
 
         await user.click(userAuthButton);
@@ -168,7 +171,7 @@ describe('App', () => {
 
     it('should notify that all fields are required onSubmit', async () => {
         const user = userEvent.setup();
-        const result = renderWithClient(<App />);
+        const result = renderWithClient(<AuthenticationModal />);
         const userAuthButton = result.getByTestId('open-user-auth-dialog');
 
         await user.click(userAuthButton);
