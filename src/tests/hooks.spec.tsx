@@ -72,10 +72,8 @@ describe('Auth', () => {
 
         await waitFor(() => {
             expect(result.current.error).toBeDefined();
-            expect(result.current.error?.response?.status).toBe(
-                HttpStatusCode.Conflict,
-            );
-            expect(result.current.error?.response?.statusText).toBe(
+            expect(result.current.error?.status).toBe(HttpStatusCode.Conflict);
+            expect(result.current.error?.statusText).toBe(
                 'Email is already taken',
             );
         });
