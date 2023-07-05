@@ -18,6 +18,16 @@ import {
 
 import { mockProjects, mockUsers } from './fixtures';
 
+interface AddProjectToStorage {
+    ownerId: string;
+    payload: ProjectDto;
+    localStorageKey?: string;
+}
+
+interface PostProjectToStorage {
+    id: string;
+    payload: UpdateProjectDto;
+}
 
 const PROJECTS_STORAGE_KEY = 'projects';
 const USERS_STORAGE_KEY = 'users';
@@ -87,12 +97,7 @@ const getProjectsFromStorage = (): ProjectDocument[] => {
     }
 };
 
-interface IPostProjectToStorage {
-    id: string;
-    payload: UpdateProjectDto;
-}
-
-const postProjectToStorage = ({ id, payload }: IPostProjectToStorage) => {
+const postProjectToStorage = ({ id, payload }: PostProjectToStorage) => {
     const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
     if (storedData) {
         const parsedData: ProjectDocument[] = JSON.parse(storedData);
@@ -120,18 +125,12 @@ const postProjectToStorage = ({ id, payload }: IPostProjectToStorage) => {
     }
 };
 
-interface IAddProjectToStorage {
-    ownerId: string;
-    payload: ProjectDto;
-    testKey?: string;
-}
-
 const addProjectToStorage = ({
     ownerId,
     payload,
-    testKey,
-}: IAddProjectToStorage) => {
-    const storedData = localStorage.getItem(testKey ?? PROJECTS_STORAGE_KEY);
+    localStorageKey = PROJECTS_STORAGE_KEY,
+}: AddProjectToStorage) => {
+    const storedData = localStorage.getItem(localStorageKey);
     const newProject: ProjectDocument = {
         _id: ObjectID().toHexString(),
         collaborators: [],
@@ -147,18 +146,12 @@ const addProjectToStorage = ({
         const parsedData: ProjectDocument[] = JSON.parse(storedData);
 
         const updatedData = [...parsedData, newProject];
-        localStorage.setItem(
-            testKey ?? PROJECTS_STORAGE_KEY,
-            JSON.stringify(updatedData),
-        );
+        localStorage.setItem(localStorageKey, JSON.stringify(updatedData));
         return newProject;
     }
 
     const newProjectsData = [newProject];
-    localStorage.setItem(
-        testKey ?? PROJECTS_STORAGE_KEY,
-        JSON.stringify(newProjectsData),
-    );
+    localStorage.setItem(localStorageKey, JSON.stringify(newProjectsData));
     return newProject;
 };
 
@@ -233,7 +226,7 @@ export const handleCreateProjectTest = () => {
         rest.post('/api/projects', async (req, res, ctx) => {
             const interceptedPayload: ProjectDto = await req.json();
             const project = addProjectToStorage({
-                testKey: 'testKey',
+                localStorageKey: 'testKey',
                 ownerId: ObjectID().toHexString(),
                 payload: interceptedPayload,
             });
