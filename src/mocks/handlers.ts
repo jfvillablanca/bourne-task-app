@@ -76,6 +76,13 @@ const addUserToStorage = async ({ email, password }: AuthDto) => {
     if (storedData) {
         const parsedData: User[] = JSON.parse(storedData);
 
+        const isExistingEmail = parsedData
+            .map((x) => x.email)
+            .includes(newUser.email);
+        if (isExistingEmail) {
+            return new Error('Email is already taken');
+        }
+
         const updatedData = [...parsedData, newUser];
         localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedData));
         return generatedTokens;
@@ -242,6 +249,11 @@ export const handlers = [
             email: interceptedPayload.email,
             password: interceptedPayload.password,
         });
+
+        if (tokens instanceof Error) {
+            return res(ctx.status(HttpStatusCode.Conflict, tokens.message));
+        }
+
         return res(ctx.json(tokens), ctx.status(HttpStatusCode.Created));
     }),
     rest.post('/api/projects', async (req, res, ctx) => {
