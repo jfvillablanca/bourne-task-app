@@ -216,6 +216,43 @@ describe('AuthenticationModal', () => {
             result.getByText('Confirm password is required'),
         ).toBeInTheDocument();
     });
+
+    it('should fail on attempt to register with an already registered email', async () => {
+        server.use(
+            rest.post('/api/auth/local/register', async (_req, res, ctx) => {
+                return res(
+                    ctx.status(
+                        HttpStatusCode.Conflict,
+                        'Email is already taken',
+                    ),
+                );
+            }),
+        );
+        const user = userEvent.setup();
+        const result = renderWithClient(<AuthenticationModal />);
+        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+
+        await user.click(userAuthButton);
+
+        const emailInput = result.getByPlaceholderText(/name@example.com/i);
+        const passwordInput = result.getByPlaceholderText('Password');
+        const confirmPasswordInput =
+            result.getByPlaceholderText('Confirm password');
+        const submitButton = result.getByRole('button', {
+            name: 'Sign up with email',
+        });
+
+        await user.type(emailInput, 'iam@teapot.com');
+        await user.type(passwordInput, 'password');
+        await user.type(confirmPasswordInput, 'password');
+        await user.click(submitButton);
+
+        await waitFor(() => {
+            expect(
+                result.getByText('Email is already taken'),
+            ).toBeInTheDocument();
+        });
+    });
 });
 
 describe('ProjectTitle', () => {
