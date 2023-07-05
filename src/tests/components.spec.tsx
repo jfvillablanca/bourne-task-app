@@ -98,6 +98,34 @@ describe('App', () => {
             ).toBeInTheDocument(),
         );
     });
+
+    it('should render toast on successful registration', async () => {
+        const user = userEvent.setup();
+        const result = renderWithClient(<App />);
+        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+
+        await user.click(userAuthButton);
+
+        const emailInput = result.getByPlaceholderText(/name@example.com/i);
+        const passwordInput = result.getByPlaceholderText('Password');
+        const confirmPasswordInput =
+            result.getByPlaceholderText('Confirm password');
+        const submitButton = result.getByRole('button', {
+            name: 'Sign up with email',
+        });
+
+        await user.type(emailInput, 'iam@teapot.com');
+        await user.type(passwordInput, 'password');
+        await user.type(confirmPasswordInput, 'password');
+        await user.click(submitButton);
+        await waitFor(() =>
+            expect(result.getByRole('alert')).toBeInTheDocument(),
+        );
+
+        const successToast = result.getByRole('alert');
+        expect(successToast).toBeInTheDocument();
+        expect(successToast).toHaveTextContent("You're all set! 🥳");
+    });
 });
 
 describe('AuthenticationModal', () => {
