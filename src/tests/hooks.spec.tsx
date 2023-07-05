@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 import { setupServer } from 'msw/node';
-import { describe, it } from 'vitest';
+import { describe, it, vi } from 'vitest';
 
 import { renderHook, waitFor } from '@testing-library/react';
 
@@ -24,6 +24,7 @@ afterAll(() => server.close());
 
 describe('Auth', () => {
     it('should create a new user', async () => {
+        const setItemMock = vi.spyOn(Storage.prototype, 'setItem');
         const newUser: AuthDto = {
             email: 'iam@teapot.com',
             password: 'swordfish',
@@ -38,6 +39,16 @@ describe('Auth', () => {
         const generatedTokens = result.current.data;
         expect(generatedTokens?.access_token).toBeDefined();
         expect(generatedTokens?.refresh_token).toBeDefined();
+        expect(setItemMock).toHaveBeenCalledWith(
+            'access_token',
+            generatedTokens?.access_token,
+        );
+        expect(setItemMock).toHaveBeenCalledWith(
+            'refresh_token',
+            generatedTokens?.refresh_token,
+        );
+
+        setItemMock.mockRestore();
     });
 
     it('should handle a 409 status code if email is already taken', async () => {
