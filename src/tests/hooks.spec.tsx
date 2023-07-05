@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+import { HttpStatusCode } from 'axios';
 import { setupServer } from 'msw/node';
 import { describe, it } from 'vitest';
 
@@ -22,7 +22,7 @@ afterEach(() => {
 
 afterAll(() => server.close());
 
-describe.concurrent('Auth', () => {
+describe('Auth', () => {
     it('should create a new user', async () => {
         const newUser: AuthDto = {
             email: 'iam@teapot.com',
@@ -38,6 +38,36 @@ describe.concurrent('Auth', () => {
         const generatedTokens = result.current.data;
         expect(generatedTokens?.access_token).toBeDefined();
         expect(generatedTokens?.refresh_token).toBeDefined();
+    });
+
+    it('should handle a 409 status code if email is already taken', async () => {
+        const newUser: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+
+        const duplicateUser: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'blobfish',
+        };
+
+        const { result } = renderHook(() => Auth.useRegisterLocal(), {
+            wrapper: createWrapper(),
+        });
+
+        result.current.mutate(newUser);
+        await waitFor(() => expect(result.current.data).toBeDefined());
+        result.current.mutate(duplicateUser);
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.response?.status).toBe(
+                HttpStatusCode.Conflict,
+            );
+            expect(result.current.error?.response?.statusText).toBe(
+                'Email is already taken',
+            );
+        });
     });
 });
 
