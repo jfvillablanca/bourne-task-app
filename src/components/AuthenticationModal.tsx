@@ -11,6 +11,9 @@ type Inputs = {
 
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import { Auth } from '../api';
+import { AuthDto } from '../common';
+
 import { Dialog, DialogContent, DialogTrigger } from './ui';
 
 const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
@@ -22,6 +25,7 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
         register,
         handleSubmit,
         getValues,
+        reset,
         formState: { errors },
     } = useForm<Inputs>({
         mode: 'onChange',
@@ -32,7 +36,17 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
         },
     });
 
-    const onSubmit: SubmitHandler<Inputs> = (formData) => console.log(formData);
+    const registerMutation = Auth.useRegisterLocal();
+
+    const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+        const authDto: AuthDto = {
+            email: formData.email,
+            password: formData.password,
+        };
+        registerMutation.mutate(authDto);
+        reset();
+        setOpen(false);
+    };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -131,8 +145,13 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                         <button
                             className="btn btn-outline text-lg normal-case"
                             type="submit"
+                            disabled={registerMutation.isLoading}
                         >
-                            Sign up with email
+                            {registerMutation.isLoading ? (
+                                <div className="loading loading-infinity loading-lg"></div>
+                            ) : (
+                                'Sign up with email'
+                            )}
                         </button>
                     </div>
                 </form>
