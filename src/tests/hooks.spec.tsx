@@ -7,7 +7,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { Auth, Project, Task } from '../api';
 import { AuthDto } from '../common';
 import { mockProjects } from '../mocks/fixtures';
-import { handleCreateProjectTest, handlers } from '../mocks/handlers';
+import { handlers } from '../mocks/handlers';
 
 import { createWrapper } from './utils';
 
@@ -71,9 +71,8 @@ describe('Auth', () => {
     });
 });
 
-describe.concurrent('Project', () => {
+describe('Project - Create', () => {
     it('should create a new project', async () => {
-        server.use(...handleCreateProjectTest());
         const newProjectTitle = 'new project';
         const { result: createResult } = renderHook(() => Project.useCreate(), {
             wrapper: createWrapper(),
@@ -84,7 +83,9 @@ describe.concurrent('Project', () => {
         await waitFor(() => expect(createResult.current.data).toBeDefined());
         expect(createResult.current.data?.title).toBe(newProjectTitle);
     });
+});
 
+describe.concurrent('Project', () => {
     it('should findAll projects of a user', async () => {
         const { result } = renderHook(() => Project.useFindAll(), {
             wrapper: createWrapper(),

@@ -21,7 +21,6 @@ import { mockProjects, mockUsers } from './fixtures';
 interface AddProjectToStorage {
     ownerId: string;
     payload: ProjectDto;
-    localStorageKey?: string;
 }
 
 interface PostProjectToStorage {
@@ -132,12 +131,8 @@ const postProjectToStorage = ({ id, payload }: PostProjectToStorage) => {
     }
 };
 
-const addProjectToStorage = ({
-    ownerId,
-    payload,
-    localStorageKey = PROJECTS_STORAGE_KEY,
-}: AddProjectToStorage) => {
-    const storedData = localStorage.getItem(localStorageKey);
+const addProjectToStorage = ({ ownerId, payload }: AddProjectToStorage) => {
+    const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
     const newProject: ProjectDocument = {
         _id: ObjectID().toHexString(),
         collaborators: [],
@@ -153,12 +148,12 @@ const addProjectToStorage = ({
         const parsedData: ProjectDocument[] = JSON.parse(storedData);
 
         const updatedData = [...parsedData, newProject];
-        localStorage.setItem(localStorageKey, JSON.stringify(updatedData));
+        localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(updatedData));
         return newProject;
     }
 
     const newProjectsData = [newProject];
-    localStorage.setItem(localStorageKey, JSON.stringify(newProjectsData));
+    localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(newProjectsData));
     return newProject;
 };
 
@@ -224,22 +219,6 @@ const addTaskToStorage = ({
         localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(updatedData));
         return newTask;
     }
-};
-
-export const handleCreateProjectTest = () => {
-    // PERF: create project gets its own localStorage
-    // key to prevent collision with other tests
-    return [
-        rest.post('/api/projects', async (req, res, ctx) => {
-            const interceptedPayload: ProjectDto = await req.json();
-            const project = addProjectToStorage({
-                localStorageKey: 'testKey',
-                ownerId: ObjectID().toHexString(),
-                payload: interceptedPayload,
-            });
-            return res(ctx.json(project), ctx.status(HttpStatusCode.Created));
-        }),
-    ];
 };
 
 export const handlers = [
