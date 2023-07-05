@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { AuthDto, AuthToken } from '../common';
@@ -11,7 +13,7 @@ export const Auth = {
 
     useRegisterLocal: () => {
         const queryClient = useQueryClient();
-        return useMutation({
+        return useMutation<AuthToken, AxiosError, AuthDto>({
             mutationFn: (credentials: AuthDto) => registerLocal(credentials),
             onSuccess: () => {
                 return queryClient.invalidateQueries({

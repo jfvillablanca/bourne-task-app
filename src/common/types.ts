@@ -56,7 +56,7 @@ export type User = {
     _id: string;
     email: string;
     hashed_password: string;
-    refresh_token: string;
+    refresh_token?: string;
 };
 
 export type FormElementType =
