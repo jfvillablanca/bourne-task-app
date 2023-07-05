@@ -14,7 +14,7 @@ export const Auth = {
 
     useRegisterLocal: () => {
         const queryClient = useQueryClient();
-        return useMutation<AuthToken, AxiosError, AuthDto>({
+        return useMutation<AuthToken, AxiosError['response'], AuthDto>({
             mutationFn: (credentials: AuthDto) => registerLocal(credentials),
             onSuccess: (data) => {
                 localStorage.setItem('access_token', data.access_token);
@@ -23,6 +23,9 @@ export const Auth = {
                 return queryClient.invalidateQueries({
                     queryKey: Auth.queryKeys.all,
                 });
+            },
+            meta: {
+                isErrorHandledLocally: true,
             },
         });
     },

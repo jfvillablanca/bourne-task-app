@@ -1,5 +1,5 @@
 import { CircleDotIcon } from 'lucide-react';
-import { HTMLAttributes, useState } from 'react';
+import { HTMLAttributes, useEffect, useState } from 'react';
 
 import { cn } from '../lib/utils';
 
@@ -44,9 +44,14 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
             password: formData.password,
         };
         registerMutation.mutate(authDto);
-        reset();
-        setOpen(false);
     };
+
+    useEffect(() => {
+        if (registerMutation.isSuccess) {
+            reset();
+            setOpen(false);
+        }
+    }, [reset, registerMutation.isSuccess]);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -88,7 +93,9 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                                 Email
                             </label>
                             <input
-                                className="input input-bordered focus:input-accent placeholder:text-sm"
+                                className={`input input-primary focus:input-accent placeholder:text-sm ${
+                                    registerMutation.error ? 'input-error' : ''
+                                }`}
                                 id="email"
                                 type="email"
                                 placeholder="name@example.com"
@@ -98,6 +105,7 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                                         value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                                         message: 'Invalid email address',
                                     },
+                                    onChange: () => registerMutation.reset(),
                                 })}
                             />
                             {errors.email && (
@@ -105,10 +113,15 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                                     {errors.email.message}
                                 </span>
                             )}
+                            {registerMutation.error && (
+                                <span className="text-error">
+                                    {registerMutation.error.statusText}
+                                </span>
+                            )}
                         </div>
                         <div className="grid gap-1">
                             <input
-                                className="input input-bordered focus:input-accent placeholder:text-sm"
+                                className="input input-primary focus:input-accent placeholder:text-sm"
                                 type="password"
                                 placeholder="Password"
                                 {...register('password', {
@@ -123,7 +136,7 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                         </div>
                         <div className="grid gap-1">
                             <input
-                                className="input input-bordered focus:input-accent placeholder:text-sm"
+                                className="input input-primary focus:input-accent placeholder:text-sm"
                                 type="password"
                                 placeholder="Confirm password"
                                 {...register('confirmPassword', {
