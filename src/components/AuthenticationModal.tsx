@@ -1,5 +1,5 @@
 import { CircleDotIcon } from 'lucide-react';
-import { HTMLAttributes, useEffect, useState } from 'react';
+import { HTMLAttributes, useEffect } from 'react';
 
 import { cn } from '../lib/utils';
 
@@ -10,6 +10,7 @@ type Inputs = {
 };
 
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { useToggle } from 'usehooks-ts';
 
 import { Auth } from '../api';
 import { AuthDto } from '../common';
@@ -20,7 +21,6 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
     className,
     ...props
 }) => {
-    const [open, setOpen] = useState(false);
 
     const {
         errors,
@@ -30,6 +30,7 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
         register,
         registerMutation,
     } = useRegister({ setOpen });
+    const [open, toggleOpen, setOpen] = useToggle();
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -37,7 +38,7 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                 <button
                     className="ml-auto mr-2"
                     data-testid="open-user-auth-dialog"
-                    onClick={() => setOpen((v) => !v)}
+                    onClick={toggleOpen}
                 >
                     <div className="avatar flex items-center">
                         {/* TODO: This is a placeholder */}
