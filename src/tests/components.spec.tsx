@@ -126,6 +126,51 @@ describe('App', () => {
         expect(successToast).toBeInTheDocument();
         expect(successToast).toHaveTextContent("You're all set! 🥳");
     });
+
+    it('should render toast on successful login', async () => {
+        // Register a user
+        const user = userEvent.setup();
+        const result = renderWithClient(<App />);
+        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+
+        await user.click(userAuthButton);
+
+        const emailRegisterInput =
+            result.getByPlaceholderText(/name@example.com/i);
+        const passwordRegisterInput = result.getByPlaceholderText('Password');
+        const confirmPasswordInput =
+            result.getByPlaceholderText('Confirm password');
+        const submitRegisterButton = result.getByRole('button', {
+            name: 'Sign up with email',
+        });
+
+        await user.type(emailRegisterInput, 'iam@teapot.com');
+        await user.type(passwordRegisterInput, 'password');
+        await user.type(confirmPasswordInput, 'password');
+        await user.click(submitRegisterButton);
+        await waitFor(() =>
+            expect(result.getByText("You're all set! 🥳")).toBeInTheDocument(),
+        );
+
+        // Login
+        await user.click(userAuthButton);
+        const loginTab = result.getByLabelText('login tab');
+        await user.click(loginTab);
+
+        const emailLoginInput =
+            result.getByPlaceholderText(/name@example.com/i);
+        const passwordLoginInput = result.getByPlaceholderText('Password');
+        const submitLoginButton = result.getByRole('button', {
+            name: 'Login',
+        });
+
+        await user.type(emailLoginInput, 'iam@teapot.com');
+        await user.type(passwordLoginInput, 'password');
+        await user.click(submitLoginButton);
+        await waitFor(() => {
+            expect(result.getByText('Welcome back! 😊')).toBeInTheDocument();
+        });
+    });
 });
 
 describe('AuthenticationModal', () => {
