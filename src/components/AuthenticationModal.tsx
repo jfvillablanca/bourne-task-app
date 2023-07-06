@@ -21,37 +21,15 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
     ...props
 }) => {
     const [open, setOpen] = useState(false);
+
     const {
-        register,
-        handleSubmit,
+        errors,
         getValues,
-        reset,
-        formState: { errors },
-    } = useForm<Inputs>({
-        mode: 'onChange',
-        defaultValues: {
-            email: '',
-            password: '',
-            confirmPassword: '',
-        },
-    });
-
-    const registerMutation = Auth.useRegisterLocal();
-
-    const onSubmit: SubmitHandler<Inputs> = async (formData) => {
-        const authDto: AuthDto = {
-            email: formData.email,
-            password: formData.password,
-        };
-        registerMutation.mutate(authDto);
-    };
-
-    useEffect(() => {
-        if (registerMutation.isSuccess) {
-            reset();
-            setOpen(false);
-        }
-    }, [reset, registerMutation.isSuccess]);
+        handleSubmit,
+        onSubmit,
+        register,
+        registerMutation,
+    } = useRegister({ setOpen });
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -171,6 +149,53 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
             </DialogContent>
         </Dialog>
     );
+};
+
+const useRegister = ({
+    setOpen,
+}: {
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+    const {
+        register,
+        handleSubmit,
+        getValues,
+        reset,
+        formState: { errors },
+    } = useForm<Inputs>({
+        mode: 'onChange',
+        defaultValues: {
+            email: '',
+            password: '',
+            confirmPassword: '',
+        },
+    });
+
+    const registerMutation = Auth.useRegisterLocal();
+
+    const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+        const authDto: AuthDto = {
+            email: formData.email,
+            password: formData.password,
+        };
+        registerMutation.mutate(authDto);
+    };
+
+    useEffect(() => {
+        if (registerMutation.isSuccess) {
+            reset();
+            setOpen(false);
+        }
+    }, [reset, registerMutation.isSuccess, setOpen]);
+
+    return {
+        errors,
+        getValues,
+        handleSubmit,
+        onSubmit,
+        register,
+        registerMutation,
+    };
 };
 
 export default AuthenticationModal;
