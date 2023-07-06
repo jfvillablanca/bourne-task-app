@@ -57,6 +57,54 @@ const generateJwtToken = async (
     return signedJwt;
 };
 
+const logUserIn = async ({ email, password }: AuthDto) => {
+    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
+
+    if (storedData) {
+        const parsedData: User[] = JSON.parse(storedData);
+
+        const existingUserIndex = parsedData.findIndex(
+            (x) => x.email === email,
+        );
+        if (existingUserIndex < 0) {
+            return new Error('Invalid credentials: user does not exist');
+        }
+        const existingUser = parsedData[existingUserIndex];
+
+        const isValidPassword = existingUser.hashed_password === password;
+        if (!isValidPassword) {
+            return new Error('Invalid password');
+        }
+
+        const generatedTokens: AuthToken = {
+            access_token: await generateJwtToken(
+                { _id: existingUser._id, email: existingUser.email },
+                'access_token',
+            ),
+            refresh_token: await generateJwtToken(
+                { _id: existingUser._id, email: existingUser.email },
+                'refresh_token',
+            ),
+        };
+
+        const updatedUser: User = {
+            ...existingUser,
+            refresh_token: generatedTokens.refresh_token,
+        };
+
+        const updatedData = parsedData.map((user, index) => {
+            if (index === existingUserIndex) {
+                return updatedUser;
+            }
+            return user;
+        });
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedData));
+        return generatedTokens;
+    }
+
+    return new Error('Invalid credentials: user does not exist');
+};
+
 const addUserToStorage = async ({ email, password }: AuthDto) => {
     const storedData = localStorage.getItem(USERS_STORAGE_KEY);
 
@@ -235,6 +283,21 @@ export const handlers = [
 
         return res(ctx.json(tokens), ctx.status(HttpStatusCode.Created));
     }),
+
+    rest.post('/api/auth/local/login', async (req, res, ctx) => {
+        const interceptedPayload: AuthDto = await req.json();
+        const tokens = await logUserIn({
+            email: interceptedPayload.email,
+            password: interceptedPayload.password,
+        });
+
+        if (tokens instanceof Error) {
+            return res(ctx.status(HttpStatusCode.Forbidden, tokens.message));
+        }
+
+        return res(ctx.json(tokens), ctx.status(HttpStatusCode.Ok));
+    }),
+
     rest.post('/api/projects', async (req, res, ctx) => {
         const interceptedPayload: ProjectDto = await req.json();
         const project = addProjectToStorage({
