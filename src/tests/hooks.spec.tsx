@@ -78,6 +78,98 @@ describe('Auth', () => {
             );
         });
     });
+
+    it('should log a user in', async () => {
+        const setItemMock = vi.spyOn(Storage.prototype, 'setItem');
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(user);
+        await waitFor(() => expect(loginResult.current.data).toBeDefined());
+
+        const generatedTokens = loginResult.current.data;
+        expect(generatedTokens?.access_token).toBeDefined();
+        expect(generatedTokens?.refresh_token).toBeDefined();
+        expect(setItemMock).toHaveBeenCalledWith(
+            'access_token',
+            generatedTokens?.access_token,
+        );
+        expect(setItemMock).toHaveBeenCalledWith(
+            'refresh_token',
+            generatedTokens?.refresh_token,
+        );
+
+        setItemMock.mockRestore();
+    });
+
+    it('should handle a 403 status code if user does not exist', async () => {
+        const nonExistentUser: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+
+        const { result } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+
+        result.current.mutate(nonExistentUser);
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(HttpStatusCode.Forbidden);
+            expect(result.current.error?.statusText).toBe(
+                'Invalid credentials: user does not exist',
+            );
+        });
+    });
+
+    it('should handle a 403 status code if password is invalid', async () => {
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const userWithInvalidPassword: AuthDto = {
+            ...user,
+            password: 'blobfish',
+        };
+
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(userWithInvalidPassword);
+
+        await waitFor(() => {
+            expect(loginResult.current.error).toBeDefined();
+            expect(loginResult.current.error?.status).toBe(
+                HttpStatusCode.Forbidden,
+            );
+            expect(loginResult.current.error?.statusText).toBe(
+                'Invalid password',
+            );
+        });
+    });
 });
 
 describe('Project - Create', () => {
