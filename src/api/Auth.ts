@@ -29,9 +29,32 @@ export const Auth = {
             },
         });
     },
+
+    useLoginLocal: () => {
+        const queryClient = useQueryClient();
+        return useMutation<AuthToken, AxiosError['response'], AuthDto>({
+            mutationFn: (credentials: AuthDto) => loginLocal(credentials),
+            onSuccess: (data) => {
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('refresh_token', data.refresh_token);
+                toast.success('Welcome back! 😊');
+                return queryClient.invalidateQueries({
+                    queryKey: Auth.queryKeys.all,
+                });
+            },
+            meta: {
+                isErrorHandledLocally: true,
+            },
+        });
+    },
 };
 
 const registerLocal = async (credentials: AuthDto): Promise<AuthToken> => {
     const response = await post(`/api/auth/local/register`, credentials);
+    return response.data;
+};
+
+const loginLocal = async (credentials: AuthDto): Promise<AuthToken> => {
+    const response = await post(`/api/auth/local/login`, credentials);
     return response.data;
 };
