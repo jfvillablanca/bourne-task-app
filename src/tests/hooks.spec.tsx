@@ -133,6 +133,7 @@ describe('Auth', () => {
             expect(result.current.error?.statusText).toBe(
                 'Invalid credentials: user does not exist',
             );
+            expect(result.current.error?.type).toBe('user');
         });
     });
 
@@ -168,6 +169,7 @@ describe('Auth', () => {
             expect(loginResult.current.error?.statusText).toBe(
                 'Invalid password',
             );
+            expect(loginResult.current.error?.type).toBe('password');
         });
     });
 });

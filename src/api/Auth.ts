@@ -32,8 +32,20 @@ export const Auth = {
 
     useLoginLocal: () => {
         const queryClient = useQueryClient();
-        return useMutation<AuthToken, AxiosError['response'], AuthDto>({
+        return useMutation<
+            AuthToken,
+            AxiosError['response'] & { type: 'password' | 'user' },
+            AuthDto
+        >({
             mutationFn: (credentials: AuthDto) => loginLocal(credentials),
+            onError: (error) => {
+                if (error?.statusText === 'Invalid password') {
+                    error.type = 'password';
+                    return error;
+                }
+                error.type = 'user';
+                return error;
+            },
             onSuccess: (data) => {
                 localStorage.setItem('access_token', data.access_token);
                 localStorage.setItem('refresh_token', data.refresh_token);
