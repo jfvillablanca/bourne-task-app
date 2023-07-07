@@ -46,7 +46,7 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                 overlayClassName="bg-base-100/80"
                 {...props}
             >
-                <div className="tabs">
+                <div className="tabs absolute top-0 mt-5">
                     <a
                         className={`tab tab-bordered ${
                             isLogin ? '' : 'tab-active'
@@ -66,14 +66,24 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                         Login
                     </a>
                 </div>
-                <LoginForm
-                    setOpen={setOpen}
-                    className={isLogin ? '' : 'hidden'}
-                />
-                <RegisterForm
-                    setOpen={setOpen}
-                    className={isLogin ? 'hidden' : ''}
-                />
+                <div
+                    className={`flex ${
+                        isLogin ? 'flex-row-reverse' : ''
+                    } overflow-x-clip`}
+                >
+                    <RegisterForm
+                        setOpen={setOpen}
+                        className={`transition ${
+                            isLogin ? 'translate-x-full w-0' : ''
+                        }`}
+                    />
+                    <LoginForm
+                        setOpen={setOpen}
+                        className={`transition ${
+                            isLogin ? '' : '-translate-x-full w-0'
+                        }`}
+                    />
+                </div>
             </DialogContent>
         </Dialog>
     );
