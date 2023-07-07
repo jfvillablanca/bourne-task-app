@@ -150,7 +150,9 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
                     </label>
                     <input
                         className={`input input-primary focus:input-accent placeholder:text-sm ${
-                            registerMutation.error ? 'input-error' : ''
+                            registerMutation.error || errors.email
+                                ? 'input-error'
+                                : ''
                         }`}
                         id="email"
                         type="email"
@@ -181,7 +183,9 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
                         Password
                     </label>
                     <input
-                        className="input input-primary focus:input-accent placeholder:text-sm"
+                        className={`input input-primary focus:input-accent placeholder:text-sm ${
+                            errors.password ? 'input-error' : ''
+                        }`}
                         id="password"
                         type="password"
                         aria-label="register password input"
@@ -201,7 +205,9 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
                         Confirm Password
                     </label>
                     <input
-                        className="input input-primary focus:input-accent placeholder:text-sm"
+                        className={`input input-primary focus:input-accent placeholder:text-sm ${
+                            errors.password ? 'input-error' : ''
+                        }`}
                         id="confirmpassword"
                         type="password"
                         aria-label="register confirm password input"
@@ -293,7 +299,7 @@ const LoginForm = ({ className, setOpen }: AuthFormProps) => {
                     </label>
                     <input
                         className={`input input-primary focus:input-accent placeholder:text-sm ${
-                            loginMutation.error?.type === 'user'
+                            loginMutation.error?.type === 'user' || errors.email
                                 ? 'input-error'
                                 : ''
                         }`}
@@ -327,7 +333,8 @@ const LoginForm = ({ className, setOpen }: AuthFormProps) => {
                     </label>
                     <input
                         className={`input input-primary focus:input-accent placeholder:text-sm ${
-                            loginMutation.error?.type === 'password'
+                            loginMutation.error?.type === 'password' ||
+                            errors.password
                                 ? 'input-error'
                                 : ''
                         }`}
