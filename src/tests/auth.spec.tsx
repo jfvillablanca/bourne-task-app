@@ -127,6 +127,34 @@ async function setup(jsx: JSX.Element) {
     };
 }
 
+describe('AppWide', () => {
+    it('should render toast on successful registration', async () => {
+        const toastSuccessSpy = vi
+            .spyOn(toast, 'success')
+            .mockImplementation(() => "You're all set! 🥳");
+
+        const { registerSuccessfully } = await setup(<App />);
+        await registerSuccessfully();
+
+        expect(toastSuccessSpy).toHaveBeenCalled();
+        expect(toastSuccessSpy).toHaveReturnedWith("You're all set! 🥳");
+        toastSuccessSpy.mockRestore();
+    });
+
+    it('should render toast on successful login', async () => {
+        const toastSuccessSpy = vi
+            .spyOn(toast, 'success')
+            .mockImplementation(() => 'Welcome back! 😊');
+
+        const { registerSuccessfully, loginSuccessfully } = await setup(
+            <App />,
+        );
+        await registerSuccessfully();
+        await loginSuccessfully();
+
+        expect(toastSuccessSpy).toHaveBeenCalled();
+        expect(toastSuccessSpy).toHaveReturnedWith('Welcome back! 😊');
+        toastSuccessSpy.mockRestore();
     });
 });
 
