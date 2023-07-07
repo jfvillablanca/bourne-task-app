@@ -159,86 +159,32 @@ describe('AppWide', () => {
 });
 
 describe('AuthenticationModal', () => {
-    it('should open the user auth modal on click of avatar on the header', async () => {
-        const user = userEvent.setup();
-        const result = renderWithClient(<AuthenticationModal />);
-        const userAuthButton = result.getByTestId('open-user-auth-dialog');
-
-        await user.click(userAuthButton);
-
-        const emailInput = result.getByPlaceholderText(/name@example.com/i);
-        const passwordInput = result.getByPlaceholderText('Password');
-        const confirmPasswordInput =
-            result.getByPlaceholderText('Confirm password');
-
-        await user.type(emailInput, 'iam@teapot.com');
-
-        expect(emailInput).toBeInTheDocument();
-        expect(passwordInput).toBeInTheDocument();
-        expect(confirmPasswordInput).toBeInTheDocument();
-        expect(emailInput).toHaveValue('iam@teapot.com');
-    });
-
     it('should notify on invalid email input', async () => {
-        const user = userEvent.setup();
-        const result = renderWithClient(<AuthenticationModal />);
-        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+        const { typeEmailRegister, ...result } = await setup(
+            <AuthenticationModal />,
+        );
 
-        await user.click(userAuthButton);
-
-        const emailInput = result.getByPlaceholderText(/name@example.com/i);
-
-        await user.type(emailInput, 'erroneousEmail');
+        await typeEmailRegister('erroneousEmail');
 
         expect(result.getByText(/invalid email address/i)).toBeInTheDocument();
     });
 
     it('should notify on mismatched passwords', async () => {
-        const user = userEvent.setup();
-        const result = renderWithClient(<AuthenticationModal />);
-        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+        const { typePasswordRegister, typeConfirmPasswordRegister, ...result } =
+            await setup(<AuthenticationModal />);
 
-        await user.click(userAuthButton);
-
-        const passwordInput = result.getByPlaceholderText('Password');
-        const confirmPasswordInput =
-            result.getByPlaceholderText('Confirm password');
-
-        await user.type(passwordInput, 'password');
-        await user.type(confirmPasswordInput, 'mismatchingpassword');
-
-        expect(result.getByText(/passwords do not match/i)).toBeInTheDocument();
-    });
-
-    it('should notify on mismatched passwords', async () => {
-        const user = userEvent.setup();
-        const result = renderWithClient(<AuthenticationModal />);
-        const userAuthButton = result.getByTestId('open-user-auth-dialog');
-
-        await user.click(userAuthButton);
-
-        const passwordInput = result.getByPlaceholderText('Password');
-        const confirmPasswordInput =
-            result.getByPlaceholderText('Confirm password');
-
-        await user.type(passwordInput, 'password');
-        await user.type(confirmPasswordInput, 'mismatchingpassword');
+        await typePasswordRegister('password');
+        await typeConfirmPasswordRegister('mismatchingpassword');
 
         expect(result.getByText(/passwords do not match/i)).toBeInTheDocument();
     });
 
     it('should notify that all fields are required onSubmit', async () => {
-        const user = userEvent.setup();
-        const result = renderWithClient(<AuthenticationModal />);
-        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+        const { clickSubmitRegister, ...result } = await setup(
+            <AuthenticationModal />,
+        );
 
-        await user.click(userAuthButton);
-
-        const submitButton = result.getByRole('button', {
-            name: 'Sign up with email',
-        });
-
-        await user.click(submitButton);
+        await clickSubmitRegister();
 
         expect(result.getByText('Email is required')).toBeInTheDocument();
         expect(result.getByText('Password is required')).toBeInTheDocument();
@@ -258,24 +204,19 @@ describe('AuthenticationModal', () => {
                 );
             }),
         );
-        const user = userEvent.setup();
-        const result = renderWithClient(<AuthenticationModal />);
-        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+        const {
+            typeEmailRegister,
+            typePasswordRegister,
+            typeConfirmPasswordRegister,
+            clickSubmitRegister,
+            userCredentials,
+            ...result
+        } = await setup(<AuthenticationModal />);
 
-        await user.click(userAuthButton);
-
-        const emailInput = result.getByPlaceholderText(/name@example.com/i);
-        const passwordInput = result.getByPlaceholderText('Password');
-        const confirmPasswordInput =
-            result.getByPlaceholderText('Confirm password');
-        const submitButton = result.getByRole('button', {
-            name: 'Sign up with email',
-        });
-
-        await user.type(emailInput, 'iam@teapot.com');
-        await user.type(passwordInput, 'password');
-        await user.type(confirmPasswordInput, 'password');
-        await user.click(submitButton);
+        await typeEmailRegister(userCredentials.email);
+        await typePasswordRegister(userCredentials.password);
+        await typeConfirmPasswordRegister(userCredentials.password);
+        await clickSubmitRegister();
 
         await waitFor(() => {
             expect(
