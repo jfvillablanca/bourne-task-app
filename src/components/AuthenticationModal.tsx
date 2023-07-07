@@ -66,11 +66,14 @@ const AuthenticationModal: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                         Login
                     </a>
                 </div>
-                {isLogin ? (
-                    <LoginForm setOpen={setOpen} />
-                ) : (
-                    <RegisterForm setOpen={setOpen} />
-                )}
+                <LoginForm
+                    setOpen={setOpen}
+                    className={isLogin ? '' : 'hidden'}
+                />
+                <RegisterForm
+                    setOpen={setOpen}
+                    className={isLogin ? 'hidden' : ''}
+                />
             </DialogContent>
         </Dialog>
     );
@@ -120,6 +123,7 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
                 className,
             )}
             onSubmit={handleSubmit(onSubmit)}
+            data-testid="register-form"
         >
             <div className="flex flex-col space-y-2 mb-3 text-center">
                 <h1 className="text-2xl font-semibold tracking-tight">
@@ -141,6 +145,7 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
                         id="email"
                         type="email"
                         placeholder="name@example.com"
+                        aria-label="register email input"
                         {...register('email', {
                             required: 'Email is required',
                             pattern: {
@@ -165,6 +170,7 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
                     <input
                         className="input input-primary focus:input-accent placeholder:text-sm"
                         type="password"
+                        aria-label="register password input"
                         placeholder="Password"
                         {...register('password', {
                             required: 'Password is required',
@@ -180,6 +186,7 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
                     <input
                         className="input input-primary focus:input-accent placeholder:text-sm"
                         type="password"
+                        aria-label="register confirm password input"
                         placeholder="Confirm password"
                         {...register('confirmPassword', {
                             required: 'Confirm password is required',
@@ -251,6 +258,7 @@ const LoginForm = ({ className, setOpen }: AuthFormProps) => {
                 className,
             )}
             onSubmit={handleSubmit(onSubmit)}
+            data-testid="login-form"
         >
             <div className="flex flex-col space-y-2 mb-3 text-center">
                 <h1 className="text-2xl font-semibold tracking-tight">
@@ -273,6 +281,7 @@ const LoginForm = ({ className, setOpen }: AuthFormProps) => {
                         }`}
                         id="email"
                         type="email"
+                        aria-label="login email input"
                         placeholder="name@example.com"
                         {...register('email', {
                             required: 'Email is required',
@@ -302,6 +311,7 @@ const LoginForm = ({ className, setOpen }: AuthFormProps) => {
                                 : ''
                         }`}
                         type="password"
+                        aria-label="login password input"
                         placeholder="Password"
                         {...register('password', {
                             required: 'Password is required',
