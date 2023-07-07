@@ -51,7 +51,7 @@ const ProjectAdd: React.FC<HTMLAttributes<HTMLButtonElement>> = ({
                     <Plus strokeWidth={3} />
                 </button>
             </PopoverTrigger>
-            <PopoverContent className="w-full max-w-xs items-center border rounded-lg p-4 backdrop-filter backdrop-blur-xl">
+            <PopoverContent className="w-full max-w-xs items-center border p-4 backdrop-filter backdrop-blur-xl">
                 <form
                     className="form-control gap-2"
                     onSubmit={(e) => {

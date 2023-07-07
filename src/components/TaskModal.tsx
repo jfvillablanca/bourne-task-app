@@ -106,10 +106,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 </button>
             </DialogTrigger>
             <DialogContent
-                className={cn(
-                    'h-1/2 w-1/3 p-5 bg-base-100 border rounded-lg',
-                    className,
-                )}
+                className={cn('h-1/2 w-1/3 p-5 bg-base-200', className)}
                 overlayClassName="bg-base-100/50"
                 data-testid={`task-modal-${taskId}`}
                 {...props}

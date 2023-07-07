@@ -14,7 +14,7 @@ const Header: React.FC<HTMLAttributes<HTMLDivElement>> = ({
             className={cn('flex p-4 items-center justify-end', className)}
             {...props}
         >
-            <GanttChart className="h-12 w-max mr-2" />
+            <GanttChart className="h-12 w-max mr-2" strokeLinecap="square" />
             <h2 className="font-bold tracking-wide">Bourne Task App</h2>
             <AuthenticationModal />
         </div>

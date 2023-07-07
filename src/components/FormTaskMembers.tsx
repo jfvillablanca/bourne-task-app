@@ -75,12 +75,10 @@ const FormTaskMembers = ({
                     autoFocus
                     classNames={{
                         control: () =>
-                            cn(
-                                'bg-base-100 text-neutral-content h-full rounded rounded-lg rounded-br-none',
-                            ),
+                            cn('bg-base-100 text-neutral-content h-full'),
                         valueContainer: () =>
                             cn(
-                                'border border-neutral-content border-r-0 rounded rounded-lg rounded-r-none py-3 px-2',
+                                'border border-neutral-content border-r-0 py-3 px-2',
                             ),
                         input: () => cn('m-0.5 py-0.5 text-md font-semibold'),
                         multiValue: () =>
@@ -94,7 +92,7 @@ const FormTaskMembers = ({
                             ),
                         indicatorsContainer: () =>
                             cn(
-                                'border border-neutral-content rounded-tr-lg flex w-20 min-w-[4rem]',
+                                'border border-neutral-content flex w-20 min-w-[4rem]',
                             ),
                         clearIndicator: ({ isFocused }) =>
                             cn(
@@ -105,15 +103,12 @@ const FormTaskMembers = ({
                             ),
                         dropdownIndicator: ({ isFocused }) =>
                             cn(
-                                'flex-1 p-2 h-full justify-center place-items-center rounded-tr-lg',
+                                'flex-1 p-2 h-full justify-center place-items-center',
                                 isFocused
                                     ? 'text-info hover:bg-info hover:text-info-content'
                                     : '',
                             ),
-                        menu: () =>
-                            cn(
-                                'bg-base-300/90 text-base-content rounded-xl my-1',
-                            ),
+                        menu: () => cn('bg-base-300/90 text-base-content my-1'),
                         menuList: () => cn('py-2'),
                         noOptionsMessage: () =>
                             cn('py-2 px-3 font-semibold uppercase'),
@@ -135,7 +130,7 @@ const FormTaskMembers = ({
                     closeMenuOnSelect={false}
                     aria-label="select to assign project members to this task"
                 />
-                <DialogClose className="absolute -bottom-9 right-0 w-20 min-w-[4rem] pt-2 pb-1 z-0 flex justify-center rounded-b-lg border border-neutral-content bg-base-100 text-neutral-content hover:bg-success hover:text-success-content">
+                <DialogClose className="absolute -bottom-9 right-0 w-20 min-w-[4rem] pt-2 pb-1 z-0 flex justify-center border border-neutral-content bg-base-100 text-neutral-content hover:bg-success hover:text-success-content">
                     <Check className="mr-1" />
                 </DialogClose>
             </DialogContent>

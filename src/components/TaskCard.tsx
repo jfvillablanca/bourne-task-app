@@ -18,10 +18,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 }) => {
     return (
         <div
-            className={cn(
-                'flex flex-col gap-2 p-4 rounded-lg bg-base-200',
-                className,
-            )}
+            className={cn('flex flex-col gap-2 p-4 bg-base-200', className)}
             data-testid={`task-card-${task._id}`}
             {...props}
         >
