@@ -167,8 +167,12 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
                     )}
                 </div>
                 <div className="grid gap-1">
+                    <label className="sr-only" htmlFor="password">
+                        Password
+                    </label>
                     <input
                         className="input input-primary focus:input-accent placeholder:text-sm"
+                        id="password"
                         type="password"
                         aria-label="register password input"
                         placeholder="Password"
@@ -183,8 +187,12 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
                     )}
                 </div>
                 <div className="grid gap-1">
+                    <label className="sr-only" htmlFor="confirmpassword">
+                        Confirm Password
+                    </label>
                     <input
                         className="input input-primary focus:input-accent placeholder:text-sm"
+                        id="confirmpassword"
                         type="password"
                         aria-label="register confirm password input"
                         placeholder="Confirm password"
@@ -304,12 +312,16 @@ const LoginForm = ({ className, setOpen }: AuthFormProps) => {
                     )}
                 </div>
                 <div className="grid gap-1">
+                    <label className="sr-only" htmlFor="password">
+                        Password
+                    </label>
                     <input
                         className={`input input-primary focus:input-accent placeholder:text-sm ${
                             loginMutation.error?.type === 'password'
                                 ? 'input-error'
                                 : ''
                         }`}
+                        id="password"
                         type="password"
                         aria-label="login password input"
                         placeholder="Password"
