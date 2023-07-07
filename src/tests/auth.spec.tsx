@@ -1,7 +1,8 @@
 import { HttpStatusCode } from 'axios';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import { describe, it } from 'vitest';
+import { toast } from 'react-toastify';
+import { describe, it, vi } from 'vitest';
 
 import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -25,78 +26,107 @@ afterEach(() => {
 
 afterAll(() => server.close());
 
-describe('AppWide', () => {
-    it('should render toast on successful registration', async () => {
-        const user = userEvent.setup();
-        const result = renderWithClient(<App />);
-        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+async function setup(jsx: JSX.Element) {
+    // setup user event
+    const event = userEvent.setup();
 
-        await user.click(userAuthButton);
+    // default user credentials
+    const userCredentials = { email: 'iam@teapot.com', password: 'password' };
 
-        const emailInput = result.getByPlaceholderText(/name@example.com/i);
-        const passwordInput = result.getByPlaceholderText('Password');
-        const confirmPasswordInput =
-            result.getByPlaceholderText('Confirm password');
-        const submitButton = result.getByRole('button', {
-            name: 'Sign up with email',
-        });
+    // render result
+    const result = renderWithClient(jsx);
 
-        await user.type(emailInput, 'iam@teapot.com');
-        await user.type(passwordInput, 'password');
-        await user.type(confirmPasswordInput, 'password');
-        await user.click(submitButton);
-        await waitFor(() =>
-            expect(result.getByRole('alert')).toBeInTheDocument(),
-        );
+    // open modal
+    const userAuthButton = result.getByTestId('open-user-auth-dialog');
+    await event.click(userAuthButton);
 
-        const successToast = result.getByRole('alert');
-        expect(successToast).toBeInTheDocument();
-        expect(successToast).toHaveTextContent("You're all set! 🥳");
+    // getBy tabs
+    const loginTab = result.getByLabelText('login tab');
+    const registerTab = result.getByLabelText('register tab');
+
+    // getBy register form elements
+    const emailRegisterInput = result.getByLabelText('register email input');
+    const passwordRegisterInput = result.getByLabelText(
+        'register password input',
+    );
+    const confirmPasswordRegisterInput = result.getByLabelText(
+        'register confirm password input',
+    );
+    const submitRegisterButton = result.getByRole('button', {
+        name: 'Sign up with email',
     });
 
-    it('should render toast on successful login', async () => {
-        // Register a user
-        const user = userEvent.setup();
-        const result = renderWithClient(<App />);
-        const userAuthButton = result.getByTestId('open-user-auth-dialog');
+    // user events for register form
+    const typeEmailRegister = async (value: string) =>
+        await event.type(emailRegisterInput, value);
 
-        await user.click(userAuthButton);
+    const typePasswordRegister = async (value: string) => {
+        await event.type(passwordRegisterInput, value);
+    };
+    const typeConfirmPasswordRegister = async (value: string) => {
+        await event.type(confirmPasswordRegisterInput, value);
+    };
+    const clickSubmitRegister = async () => {
+        await event.click(submitRegisterButton);
+    };
 
-        const emailRegisterInput =
-            result.getByPlaceholderText(/name@example.com/i);
-        const passwordRegisterInput = result.getByPlaceholderText('Password');
-        const confirmPasswordInput =
-            result.getByPlaceholderText('Confirm password');
-        const submitRegisterButton = result.getByRole('button', {
-            name: 'Sign up with email',
-        });
+    // getBy login form elements
+    const emailLoginInput = result.getByLabelText('login email input');
+    const passwordLoginInput = result.getByLabelText('login password input');
+    const submitLoginButton = result.getByRole('button', {
+        name: 'Login',
+    });
 
-        await user.type(emailRegisterInput, 'iam@teapot.com');
-        await user.type(passwordRegisterInput, 'password');
-        await user.type(confirmPasswordInput, 'password');
-        await user.click(submitRegisterButton);
-        await waitFor(() =>
-            expect(result.getByText("You're all set! 🥳")).toBeInTheDocument(),
-        );
+    // user events for login form
+    const typeEmailLogin = async (value: string) =>
+        await event.type(emailLoginInput, value);
+    const typePasswordLogin = async (value: string) =>
+        await event.type(passwordLoginInput, value);
+    const clickSubmitLogin = async () => await event.click(submitLoginButton);
 
-        // Login
-        await user.click(userAuthButton);
-        const loginTab = result.getByLabelText('login tab');
-        await user.click(loginTab);
+    const registerSuccessfully = async () => {
+        await event.click(registerTab);
+        await typeEmailRegister(userCredentials.email);
+        await typePasswordRegister(userCredentials.password);
+        await typeConfirmPasswordRegister(userCredentials.password);
+        await clickSubmitRegister();
+    };
 
-        const emailLoginInput =
-            result.getByPlaceholderText(/name@example.com/i);
-        const passwordLoginInput = result.getByPlaceholderText('Password');
-        const submitLoginButton = result.getByRole('button', {
-            name: 'Login',
-        });
+    const loginSuccessfully = async () => {
+        await event.click(loginTab);
+        await typeEmailLogin(userCredentials.email);
+        await typePasswordLogin(userCredentials.password);
+        await clickSubmitLogin();
+    };
 
-        await user.type(emailLoginInput, 'iam@teapot.com');
-        await user.type(passwordLoginInput, 'password');
-        await user.click(submitLoginButton);
-        await waitFor(() => {
-            expect(result.getByText('Welcome back! 😊')).toBeInTheDocument();
-        });
+    return {
+        ...result,
+        event,
+        userAuthButton,
+        userCredentials,
+        loginTab,
+        registerTab,
+
+        emailRegisterInput,
+        passwordRegisterInput,
+        confirmPasswordRegisterInput,
+        submitRegisterButton,
+        typeEmailRegister,
+        typePasswordRegister,
+        typeConfirmPasswordRegister,
+        clickSubmitRegister,
+        registerSuccessfully,
+
+        emailLoginInput,
+        passwordLoginInput,
+        submitLoginButton,
+        typeEmailLogin,
+        typePasswordLogin,
+        clickSubmitLogin,
+        loginSuccessfully,
+    };
+}
+
     });
 });
 
