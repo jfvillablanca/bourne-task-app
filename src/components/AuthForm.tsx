@@ -48,7 +48,7 @@ const AuthForm = ({ className, setOpen, ...props }: AuthFormProps) => {
                 </a>
             </div>
             <div
-                className={`flex ${
+                className={`flex-1 flex ${
                     isLogin ? 'flex-row-reverse' : ''
                 } overflow-x-clip`}
             >
