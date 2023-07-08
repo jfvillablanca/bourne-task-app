@@ -2,6 +2,7 @@ import { HTMLAttributes } from 'react';
 
 import { cn } from '../lib/utils';
 
+import { ParticleBackground } from './ui';
 import { AuthForm } from '.';
 
 const AuthenticationFullPage: React.FC<HTMLAttributes<HTMLDivElement>> = ({
@@ -16,7 +17,8 @@ const AuthenticationFullPage: React.FC<HTMLAttributes<HTMLDivElement>> = ({
             )}
             {...props}
         >
-            <div className="h-[50vh] border p-10">
+            <ParticleBackground />
+            <div className="z-10 h-[50vh] border p-10 bg-base-100">
                 <AuthForm />
             </div>
         </div>
