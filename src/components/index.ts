@@ -1,3 +1,4 @@
+export { default as AuthenticationFullPage } from './AuthenticationFullPage';
 export { default as AuthenticationModal } from './AuthenticationModal';
 export { default as AuthForm } from './AuthForm';
 export { default as CardView } from './CardView';

@@ -8,6 +8,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { worker } from './mocks/browser';
 import App from './App.tsx';
 import { createQueryClient } from './common';
+import { AuthenticationFullPage } from './components';
 
 import './index.css';
 
@@ -16,10 +17,13 @@ async function main() {
         await worker.start();
     }
 
+    // TODO: This is temporary.
+    const accessToken = false;
+
     ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <React.StrictMode>
             <QueryClientProvider client={createQueryClient()}>
-                <App />
+                {!!accessToken ? <App /> : <AuthenticationFullPage />}
                 <ReactQueryDevtools />
             </QueryClientProvider>
         </React.StrictMode>,
