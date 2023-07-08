@@ -7,7 +7,7 @@ import { AuthDto } from '../common';
 import { cn } from '../lib/utils';
 
 interface AuthFormProps extends HTMLAttributes<HTMLDivElement> {
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 type Inputs = {
@@ -98,7 +98,9 @@ const RegisterForm = ({ className, setOpen }: AuthFormProps) => {
     useEffect(() => {
         if (registerMutation.isSuccess) {
             reset();
-            setOpen(false);
+            if (setOpen) {
+                setOpen(false);
+            }
         }
     }, [reset, registerMutation.isSuccess, setOpen]);
 
@@ -249,7 +251,9 @@ const LoginForm = ({ className, setOpen }: AuthFormProps) => {
     useEffect(() => {
         if (loginMutation.isSuccess) {
             reset();
-            setOpen(false);
+            if (setOpen) {
+                setOpen(false);
+            }
         }
     }, [reset, loginMutation.isSuccess, setOpen]);
 
