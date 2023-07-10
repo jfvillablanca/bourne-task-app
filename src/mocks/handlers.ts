@@ -15,6 +15,7 @@ import {
     UpdateProjectDto,
     UpdateTaskDto,
 } from '../common';
+import { decodeAccessToken } from '../lib/utils';
 
 import { mockProjects, mockUsers } from './fixtures';
 
@@ -55,6 +56,22 @@ const generateJwtToken = async (
         .setExpirationTime(type === 'access_token' ? '15m' : '7d')
         .sign(JWT_SECRET);
     return signedJwt;
+};
+
+const logUserOut = (userId: string) => {
+    let storedData = localStorage.getItem(USERS_STORAGE_KEY);
+    if (!storedData) {
+        const initialData = mockUsers();
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(initialData));
+        storedData = localStorage.getItem(USERS_STORAGE_KEY) as string;
+    }
+    const userList: MockedUser[] = JSON.parse(storedData);
+    userList.map((user) => {
+        if (user._id === userId) {
+            user.refresh_token = null;
+        }
+        return user;
+    });
 };
 
 const logUserIn = async ({ email, password }: AuthDto) => {
@@ -296,6 +313,19 @@ export const handlers = [
         }
 
         return res(ctx.json(tokens), ctx.status(HttpStatusCode.Ok));
+    }),
+
+    rest.post('/api/auth/logout', async (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const token = authHeader?.split(' ')[1];
+
+        if (!token) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+        const decodedUserId = decodeAccessToken(token).sub;
+        logUserOut(decodedUserId);
+
+        return res(ctx.status(HttpStatusCode.Ok));
     }),
 
     rest.post('/api/projects', async (req, res, ctx) => {

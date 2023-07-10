@@ -64,7 +64,10 @@ export type User = {
     email: string;
 };
 
-export type MockedUser = User & { hashed_password: string };
+export type MockedUser = User & {
+    hashed_password: string;
+    refresh_token: string | null;
+};
 
 export type FormElementType =
     | HTMLInputElement
