@@ -62,9 +62,9 @@ export type ProjectMember = Pick<User, '_id' | 'email'>;
 export type User = {
     _id: string;
     email: string;
-    hashed_password: string;
-    refresh_token?: string;
 };
+
+export type MockedUser = User & { hashed_password: string };
 
 export type FormElementType =
     | HTMLInputElement

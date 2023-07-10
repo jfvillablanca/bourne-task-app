@@ -6,6 +6,7 @@ import { rest } from 'msw';
 import {
     AuthDto,
     AuthToken,
+    MockedUser,
     ProjectDocument,
     ProjectDto,
     ProjectMember,
@@ -13,7 +14,6 @@ import {
     TaskDto,
     UpdateProjectDto,
     UpdateTaskDto,
-    User,
 } from '../common';
 
 import { mockProjects, mockUsers } from './fixtures';
@@ -35,7 +35,7 @@ const JWT_SECRET = new TextEncoder().encode('super-secret');
 const getUserFromStorage = (userId: string) => {
     const storedData = localStorage.getItem(USERS_STORAGE_KEY);
     if (storedData) {
-        const userList: User[] = JSON.parse(storedData);
+        const userList: MockedUser[] = JSON.parse(storedData);
         return userList.find((user) => user._id === userId);
     } else {
         const initialData = mockUsers();
@@ -45,7 +45,7 @@ const getUserFromStorage = (userId: string) => {
 };
 
 const generateJwtToken = async (
-    payload: Pick<User, '_id' | 'email'>,
+    payload: Pick<MockedUser, '_id' | 'email'>,
     type: 'access_token' | 'refresh_token',
 ) => {
     const jwtPayload = { sub: payload._id, email: payload.email };
@@ -61,7 +61,7 @@ const logUserIn = async ({ email, password }: AuthDto) => {
     const storedData = localStorage.getItem(USERS_STORAGE_KEY);
 
     if (storedData) {
-        const parsedData: User[] = JSON.parse(storedData);
+        const parsedData: MockedUser[] = JSON.parse(storedData);
 
         const existingUserIndex = parsedData.findIndex(
             (x) => x.email === email,
@@ -87,7 +87,7 @@ const logUserIn = async ({ email, password }: AuthDto) => {
             ),
         };
 
-        const updatedUser: User = {
+        const updatedUser: MockedUser = {
             ...existingUser,
             refresh_token: generatedTokens.refresh_token,
         };
@@ -113,7 +113,7 @@ const addUserToStorage = async ({ email, password }: AuthDto) => {
         access_token: await generateJwtToken({ _id, email }, 'access_token'),
         refresh_token: await generateJwtToken({ _id, email }, 'refresh_token'),
     };
-    const newUser: User = {
+    const newUser: MockedUser = {
         _id,
         email,
         hashed_password: password,
@@ -121,7 +121,7 @@ const addUserToStorage = async ({ email, password }: AuthDto) => {
     };
 
     if (storedData) {
-        const parsedData: User[] = JSON.parse(storedData);
+        const parsedData: MockedUser[] = JSON.parse(storedData);
 
         const isExistingEmail = parsedData
             .map((x) => x.email)

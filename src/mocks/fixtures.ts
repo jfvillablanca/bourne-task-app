@@ -1,4 +1,4 @@
-import { ProjectDocument, User } from '../common';
+import { MockedUser, ProjectDocument } from '../common';
 
 export const mockTokens = () => {
     return {
@@ -7,7 +7,7 @@ export const mockTokens = () => {
     };
 };
 
-export const mockUsers = (): User[] => [
+export const mockUsers = (): MockedUser[] => [
     {
         _id: '648f629dc9ce700ba3f9ede0',
         email: 'lisa.miller@yahoo.com',
