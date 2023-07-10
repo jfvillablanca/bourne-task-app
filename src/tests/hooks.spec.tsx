@@ -158,6 +158,36 @@ describe('Auth', () => {
             expect(loginResult.current.error?.type).toBe('password');
         });
     });
+
+    it('should log a user out', async () => {
+        const removeItemMock = vi.spyOn(Storage.prototype, 'removeItem');
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(user);
+        await waitFor(() => expect(loginResult.current.data).toBeDefined());
+
+        const { result: logoutResult } = renderHook(() => Auth.useLogout(), {
+            wrapper: createWrapper(),
+        });
+        logoutResult.current.mutate({});
+
+        expect(removeItemMock).toHaveBeenCalled();
+
+        removeItemMock.mockRestore();
+    });
 });
 
 describe('Project - Create', () => {
