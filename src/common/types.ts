@@ -46,6 +46,13 @@ export type ProjectDocument = ProjectDto & {
     updatedAt: string;
 };
 
+export type DecodedToken = {
+    sub: string;
+    email: string;
+    iat: number;
+    exp: number;
+};
+
 export type AuthToken = { access_token: string; refresh_token: string };
 
 export type AuthDto = Pick<User, 'email'> & { password: string };

@@ -1,7 +1,8 @@
 import { ClassValue, clsx } from 'clsx';
+import jwtDecode from 'jwt-decode';
 import { twMerge } from 'tailwind-merge';
 
-import { AuthToken } from '../common';
+import { AuthToken, DecodedToken } from '../common';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -19,3 +20,7 @@ export const tokenStorage = {
     clearToken: (tokenType: keyof AuthToken) =>
         localStorage.removeItem(tokenType),
 };
+
+export function decodeAccessToken(accessToken: string): DecodedToken {
+    return jwtDecode(accessToken);
+}
