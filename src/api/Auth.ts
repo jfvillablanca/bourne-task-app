@@ -1,28 +1,34 @@
 import { AxiosError } from 'axios';
+import { configureAuth } from 'react-query-auth';
 import { toast } from 'react-toastify';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AuthDto, AuthToken, User } from '../common';
+import { decodeAccessToken, tokenStorage } from '../lib/utils';
 
-import { AuthDto, AuthToken } from '../common';
-import { tokenStorage } from '../lib/utils';
+import { get, post } from '.';
 
-import { post } from '.';
+type AuthError = AxiosError['response'] & { type?: 'password' | 'user' };
+
+const { useRegister, useLogin } = configureAuth<
+    User,
+    AuthError,
+    AuthDto,
+    AuthDto
+>({
+    userFn: () => getUser(),
+    registerFn: (credentials: AuthDto) => registerLocal(credentials),
+    loginFn: (credentials: AuthDto) => loginLocal(credentials),
+    logoutFn: () => logout(),
+});
 
 export const Auth = {
-    queryKeys: {
-        all: ['users'] as const,
-    },
-
     useRegisterLocal: () => {
-        const queryClient = useQueryClient();
-        return useMutation<AuthToken, AxiosError['response'], AuthDto>({
-            mutationFn: (credentials: AuthDto) => registerLocal(credentials),
-            onSuccess: (data) => {
-                tokenStorage.setToken(data);
+        return useRegister({
+            onSuccess: () => {
                 toast.success("You're all set! 🥳");
-                return queryClient.invalidateQueries({
-                    queryKey: Auth.queryKeys.all,
-                });
+            },
+            onError: (error) => {
+                return error;
             },
             meta: {
                 isErrorHandledLocally: true,
@@ -31,13 +37,7 @@ export const Auth = {
     },
 
     useLoginLocal: () => {
-        const queryClient = useQueryClient();
-        return useMutation<
-            AuthToken,
-            AxiosError['response'] & { type: 'password' | 'user' },
-            AuthDto
-        >({
-            mutationFn: (credentials: AuthDto) => loginLocal(credentials),
+        return useLogin({
             onError: (error) => {
                 if (error?.statusText === 'Invalid password') {
                     error.type = 'password';
@@ -46,12 +46,8 @@ export const Auth = {
                 error.type = 'user';
                 return error;
             },
-            onSuccess: (data) => {
-                tokenStorage.setToken(data);
+            onSuccess: () => {
                 toast.success('Welcome back! 😊');
-                return queryClient.invalidateQueries({
-                    queryKey: Auth.queryKeys.all,
-                });
             },
             meta: {
                 isErrorHandledLocally: true,
@@ -60,12 +56,31 @@ export const Auth = {
     },
 };
 
-const registerLocal = async (credentials: AuthDto): Promise<AuthToken> => {
-    const response = await post(`/api/auth/local/register`, credentials);
+async function getUser(): Promise<User> {
+    const response = await get('/api/users/me');
     return response.data;
-};
+}
 
-const loginLocal = async (credentials: AuthDto): Promise<AuthToken> => {
+async function logout() {
+    await post('/api/auth/logout');
+}
+
+async function registerLocal(credentials: AuthDto) {
+    const response = await post(`/api/auth/local/register`, credentials);
+    return handleUserResponse(response.data);
+}
+
+async function loginLocal(credentials: AuthDto) {
     const response = await post(`/api/auth/local/login`, credentials);
-    return response.data;
-};
+    return handleUserResponse(response.data);
+}
+
+function handleUserResponse(data: AuthToken) {
+    tokenStorage.setToken(data);
+    const decodedData = decodeAccessToken(data.access_token);
+    const user: User = {
+        _id: decodedData.sub,
+        email: decodedData.email,
+    };
+    return user;
+}
