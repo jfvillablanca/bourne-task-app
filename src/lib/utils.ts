@@ -10,7 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export const tokenStorage = {
     getToken: (tokenType: keyof AuthToken) => localStorage.getItem(tokenType),
-    setToken: (tokens: AuthToken): void => {
+    setTokens: (tokens: AuthToken): void => {
         localStorage.setItem('access_token', tokens.access_token);
         localStorage.setItem('refresh_token', tokens.refresh_token);
     },

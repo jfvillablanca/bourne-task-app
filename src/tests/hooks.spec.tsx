@@ -73,7 +73,6 @@ describe('Auth', () => {
     });
 
     it('should log a user in', async () => {
-        const setItemMock = vi.spyOn(Storage.prototype, 'setItem');
         const user: AuthDto = {
             email: 'iam@teapot.com',
             password: 'swordfish',
@@ -86,6 +85,7 @@ describe('Auth', () => {
         );
         registerResult.current.mutate(user);
         await waitFor(() => expect(registerResult.current.data).toBeDefined());
+        const setItemMock = vi.spyOn(Storage.prototype, 'setItem');
 
         const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
             wrapper: createWrapper(),

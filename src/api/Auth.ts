@@ -76,7 +76,7 @@ async function loginLocal(credentials: AuthDto) {
 }
 
 function handleUserResponse(data: AuthToken) {
-    tokenStorage.setToken(data);
+    tokenStorage.setTokens(data);
     const decodedData = decodeAccessToken(data.access_token);
     const user: User = {
         _id: decodedData.sub,
