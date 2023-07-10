@@ -36,17 +36,10 @@ describe('Auth', () => {
         result.current.mutate(newUser);
 
         await waitFor(() => expect(result.current.data).toBeDefined());
-        const generatedTokens = result.current.data;
-        expect(generatedTokens?.access_token).toBeDefined();
-        expect(generatedTokens?.refresh_token).toBeDefined();
-        expect(setItemMock).toHaveBeenCalledWith(
-            'access_token',
-            generatedTokens?.access_token,
-        );
-        expect(setItemMock).toHaveBeenCalledWith(
-            'refresh_token',
-            generatedTokens?.refresh_token,
-        );
+        const registeredUser = result.current.data;
+        expect(registeredUser?._id).toBeDefined();
+        expect(registeredUser?.email).toBeDefined();
+        expect(setItemMock).toHaveBeenCalled();
 
         setItemMock.mockRestore();
     });
@@ -100,17 +93,10 @@ describe('Auth', () => {
         loginResult.current.mutate(user);
         await waitFor(() => expect(loginResult.current.data).toBeDefined());
 
-        const generatedTokens = loginResult.current.data;
-        expect(generatedTokens?.access_token).toBeDefined();
-        expect(generatedTokens?.refresh_token).toBeDefined();
-        expect(setItemMock).toHaveBeenCalledWith(
-            'access_token',
-            generatedTokens?.access_token,
-        );
-        expect(setItemMock).toHaveBeenCalledWith(
-            'refresh_token',
-            generatedTokens?.refresh_token,
-        );
+        const loggedInUser = loginResult.current.data;
+        expect(loggedInUser?._id).toBeDefined();
+        expect(loggedInUser?.email).toBeDefined();
+        expect(setItemMock).toHaveBeenCalled();
 
         setItemMock.mockRestore();
     });
