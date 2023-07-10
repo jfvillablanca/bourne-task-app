@@ -9,7 +9,7 @@ import { get, post } from '.';
 
 type AuthError = AxiosError['response'] & { type?: 'password' | 'user' };
 
-const { useRegister, useLogin } = configureAuth<
+const { useRegister, useLogin, useLogout } = configureAuth<
     User,
     AuthError,
     AuthDto,
@@ -54,6 +54,8 @@ export const Auth = {
             },
         });
     },
+
+    useLogout,
 };
 
 async function getUser(): Promise<User> {
@@ -62,6 +64,7 @@ async function getUser(): Promise<User> {
 }
 
 async function logout() {
+    tokenStorage.clearTokens();
     await post('/api/auth/logout');
 }
 

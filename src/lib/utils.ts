@@ -17,7 +17,11 @@ export const tokenStorage = {
     setTokenByKey: (tokenType: keyof AuthToken, token: string): void => {
         localStorage.setItem(tokenType, token);
     },
-    clearToken: (tokenType: keyof AuthToken) =>
+    clearTokens: (): void => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+    },
+    clearTokenByKey: (tokenType: keyof AuthToken) =>
         localStorage.removeItem(tokenType),
 };
 
