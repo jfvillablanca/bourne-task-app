@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { AuthDto, AuthToken } from '../common';
+import { tokenStorage } from '../lib/utils';
 
 import { post } from '.';
 
@@ -17,8 +18,7 @@ export const Auth = {
         return useMutation<AuthToken, AxiosError['response'], AuthDto>({
             mutationFn: (credentials: AuthDto) => registerLocal(credentials),
             onSuccess: (data) => {
-                localStorage.setItem('access_token', data.access_token);
-                localStorage.setItem('refresh_token', data.refresh_token);
+                tokenStorage.setToken(data);
                 toast.success("You're all set! 🥳");
                 return queryClient.invalidateQueries({
                     queryKey: Auth.queryKeys.all,
@@ -47,8 +47,7 @@ export const Auth = {
                 return error;
             },
             onSuccess: (data) => {
-                localStorage.setItem('access_token', data.access_token);
-                localStorage.setItem('refresh_token', data.refresh_token);
+                tokenStorage.setToken(data);
                 toast.success('Welcome back! 😊');
                 return queryClient.invalidateQueries({
                     queryKey: Auth.queryKeys.all,
