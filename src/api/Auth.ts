@@ -9,7 +9,7 @@ import { get, post } from '.';
 
 type AuthError = AxiosError['response'] & { type?: 'password' | 'user' };
 
-const { useRegister, useLogin, useLogout } = configureAuth<
+const { useUser, useRegister, useLogin, useLogout } = configureAuth<
     User,
     AuthError,
     AuthDto,
@@ -22,6 +22,8 @@ const { useRegister, useLogin, useLogout } = configureAuth<
 });
 
 export const Auth = {
+    useUser,
+
     useRegisterLocal: () => {
         return useRegister({
             onSuccess: () => {
