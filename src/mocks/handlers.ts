@@ -14,6 +14,7 @@ import {
     TaskDto,
     UpdateProjectDto,
     UpdateTaskDto,
+    User,
 } from '../common';
 import { decodeAccessToken } from '../lib/utils';
 
@@ -33,18 +34,6 @@ const PROJECTS_STORAGE_KEY = 'projects';
 const USERS_STORAGE_KEY = 'users';
 const JWT_SECRET = new TextEncoder().encode('super-secret');
 
-const getUserFromStorage = (userId: string) => {
-    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
-    if (storedData) {
-        const userList: MockedUser[] = JSON.parse(storedData);
-        return userList.find((user) => user._id === userId);
-    } else {
-        const initialData = mockUsers();
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(initialData));
-        return initialData.find((user) => user._id === userId);
-    }
-};
-
 const generateJwtToken = async (
     payload: Pick<MockedUser, '_id' | 'email'>,
     type: 'access_token' | 'refresh_token',
@@ -58,12 +47,26 @@ const generateJwtToken = async (
     return signedJwt;
 };
 
-const logUserOut = (userId: string) => {
+const getUserFromStorage = (userId: string) => {
     let storedData = localStorage.getItem(USERS_STORAGE_KEY);
     if (!storedData) {
+        // TODO: must change tests that depend on mockUsers
         const initialData = mockUsers();
         localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(initialData));
         storedData = localStorage.getItem(USERS_STORAGE_KEY) as string;
+    }
+    const userList: MockedUser[] = JSON.parse(storedData);
+    const mockUser = userList.find((user) => user._id === userId);
+    if (mockUser) {
+        const user: User = { _id: mockUser._id, email: mockUser.email };
+        return user;
+    }
+};
+
+const logUserOut = (userId: string) => {
+    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
+    if (!storedData) {
+        return;
     }
     const userList: MockedUser[] = JSON.parse(storedData);
     userList.map((user) => {
