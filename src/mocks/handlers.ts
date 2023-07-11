@@ -318,6 +318,19 @@ export const handlers = [
         return res(ctx.json(tokens), ctx.status(HttpStatusCode.Ok));
     }),
 
+    rest.get('/api/users/me', (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const token = authHeader?.split(' ')[1];
+
+        if (!token) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+        const userId = decodeAccessToken(token).sub;
+        const user = getUserFromStorage(userId);
+
+        return res(ctx.json(user), ctx.status(HttpStatusCode.Ok));
+    }),
+
     rest.post('/api/auth/logout', async (req, res, ctx) => {
         const authHeader = req.headers.get('Authorization');
         const token = authHeader?.split(' ')[1];
