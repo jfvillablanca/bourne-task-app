@@ -12,5 +12,14 @@ export default defineConfig({
         environment: 'jsdom',
         include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
         setupFiles: './setupTests.ts',
+        deps: {
+            inline: ['vitest-canvas-mock'],
+        },
+        threads: false,
+        environmentOptions: {
+            jsdom: {
+                resources: 'usable',
+            }
+        }
     },
 });

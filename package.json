@@ -70,7 +70,8 @@
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.2",
     "vite": "^4.3.9",
-    "vitest": "^0.32.2"
+    "vitest": "^0.32.2",
+    "vitest-canvas-mock": "^0.3.2"
   },
   "msw": {
     "workerDirectory": "public"
