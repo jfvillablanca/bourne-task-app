@@ -10,7 +10,11 @@ import userEvent from '@testing-library/user-event';
 import App from '../App';
 import { AuthenticationModal } from '../components';
 import { handlers } from '../mocks/handlers';
-import { populateMockUsers } from '../mocks/mockUsersTestUtils';
+import {
+    clearTestAccessTokenFromLocalStorage,
+    populateMockUsers,
+    setTestAccessTokenToLocalStorage,
+} from '../mocks/mockUsersTestUtils';
 
 import { renderWithClient } from './utils';
 
@@ -133,6 +137,14 @@ async function setup(jsx: JSX.Element) {
 }
 
 describe('AppWide', () => {
+    beforeAll(() => {
+        setTestAccessTokenToLocalStorage();
+    });
+
+    afterAll(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
     it('should render toast on successful registration', async () => {
         const toastSuccessSpy = vi
             .spyOn(toast, 'success')

@@ -8,7 +8,11 @@ import { Auth, Project, Task } from '../api';
 import { AuthDto } from '../common';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
-import { populateMockUsers } from '../mocks/mockUsersTestUtils';
+import {
+    clearTestAccessTokenFromLocalStorage,
+    populateMockUsers,
+    setTestAccessTokenToLocalStorage,
+} from '../mocks/mockUsersTestUtils';
 
 import { createWrapper } from './utils';
 
@@ -223,6 +227,14 @@ describe('Auth', () => {
 });
 
 describe('Project - Create', () => {
+    beforeAll(() => {
+        setTestAccessTokenToLocalStorage();
+    });
+
+    afterAll(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
     it('should create a new project', async () => {
         const newProjectTitle = 'new project';
         const { result: createResult } = renderHook(() => Project.useCreate(), {
@@ -237,6 +249,14 @@ describe('Project - Create', () => {
 });
 
 describe.concurrent('Project', () => {
+    beforeAll(() => {
+        setTestAccessTokenToLocalStorage();
+    });
+
+    afterAll(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
     it('should findAll projects of a user', async () => {
         const { result } = renderHook(() => Project.useFindAll(), {
             wrapper: createWrapper(),
