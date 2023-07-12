@@ -154,6 +154,11 @@ const getProjectsFromStorage = (): ProjectDocument[] => {
     }
 };
 
+const getProjectsOfOwnerId = (ownerId: string): ProjectDocument[] => {
+    const projects = getProjectsFromStorage();
+    return projects.filter((project) => project.ownerId === ownerId);
+};
+
 const postProjectToStorage = ({ id, payload }: PostProjectToStorage) => {
     const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
     if (storedData) {
@@ -272,6 +277,15 @@ const addTaskToStorage = ({
     }
 };
 
+const authGuard = (header: string | null) => {
+    const token = header?.split(' ')[1];
+    if (!token) {
+        return 'none';
+    }
+    const id = decodeAccessToken(token).sub ?? 'none';
+    return id;
+};
+
 export const handlers = [
     rest.post('/api/auth/local/register', async (req, res, ctx) => {
         const interceptedPayload: AuthDto = await req.json();
@@ -303,12 +317,11 @@ export const handlers = [
 
     rest.get('/api/users/me', (req, res, ctx) => {
         const authHeader = req.headers.get('Authorization');
-        const token = authHeader?.split(' ')[1];
+        const userId = authGuard(authHeader);
 
-        if (!token) {
+        if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-        const userId = decodeAccessToken(token).sub;
         const user = getUserFromStorage(userId);
 
         return res(ctx.json(user), ctx.status(HttpStatusCode.Ok));
@@ -328,18 +341,29 @@ export const handlers = [
     }),
 
     rest.post('/api/projects', async (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
         const interceptedPayload: ProjectDto = await req.json();
         const project = addProjectToStorage({
-            // HACK: ownerId is derived from access_token.
-            // This is a placeholder until Authorization is implemented
-            ownerId: ObjectID().toHexString(),
+            ownerId: userId,
             payload: interceptedPayload,
         });
         return res(ctx.json(project), ctx.status(HttpStatusCode.Created));
     }),
 
-    rest.get('/api/projects', (_req, res, ctx) => {
-        const projects = getProjectsFromStorage();
+    rest.get('/api/projects', (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+
+        const projects = getProjectsOfOwnerId(userId);
         return res(ctx.json(projects), ctx.status(HttpStatusCode.Ok));
     }),
 
