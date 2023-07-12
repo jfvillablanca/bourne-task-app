@@ -18,7 +18,7 @@ import {
 import { decodeAccessToken, generateJwtToken } from '../lib/utils';
 
 import { PROJECTS_STORAGE_KEY, USERS_STORAGE_KEY } from './constants';
-import { mockProjects, mockUsers } from './fixtures';
+import { mockProjects } from './fixtures';
 
 interface AddProjectToStorage {
     ownerId: string;
@@ -31,12 +31,9 @@ interface PostProjectToStorage {
 }
 
 const getUserFromStorage = (userId: string) => {
-    let storedData = localStorage.getItem(USERS_STORAGE_KEY);
+    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
     if (!storedData) {
-        // TODO: must change tests that depend on mockUsers
-        const initialData = mockUsers();
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(initialData));
-        storedData = localStorage.getItem(USERS_STORAGE_KEY) as string;
+        return;
     }
     const userList: MockedUser[] = JSON.parse(storedData);
     const mockUser = userList.find((user) => user._id === userId);

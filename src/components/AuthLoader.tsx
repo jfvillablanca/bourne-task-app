@@ -4,11 +4,6 @@ import { Auth } from '../api';
 
 import AuthenticationFullPage from './AuthenticationFullPage';
 
-// interface AuthLoaderProps extends HTMLAttributes<HTMLDivElement> {
-//     // renderLoading: () => JSX.Element;
-//     renderUnauthenticated: () => JSX.Element;
-// }
-
 const AuthLoader: React.FC<HTMLAttributes<HTMLDivElement>> = ({ children }) => {
     const { isError, isLoading, data, refetch } = Auth.useUser();
 

@@ -71,14 +71,6 @@ export const Project = {
     },
 };
 
-// TODO: add authorization tokens to config argument to these verbs wherever necessary
-// const config = {
-//     headers: {
-//         'Content-Type': 'application/json',
-//         Authorization: 'Bearer <token>',
-//     }
-// }
-
 const createProject = async (
     createdFields: ProjectDto,
 ): Promise<ProjectDocument> => {
