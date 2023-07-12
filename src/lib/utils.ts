@@ -1,8 +1,10 @@
 import { ClassValue, clsx } from 'clsx';
+import { SignJWT } from 'jose';
 import jwtDecode from 'jwt-decode';
 import { twMerge } from 'tailwind-merge';
 
-import { AuthToken, DecodedToken } from '../common';
+import { AuthToken, DecodedToken, MockedUser } from '../common';
+import { JWT_SECRET } from '../mocks/constants';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -27,4 +29,17 @@ export const tokenStorage = {
 
 export function decodeAccessToken(accessToken: string): DecodedToken {
     return jwtDecode(accessToken);
+}
+
+export async function generateJwtToken(
+    payload: Pick<MockedUser, '_id' | 'email'>,
+    type: 'access_token' | 'refresh_token',
+) {
+    const jwtPayload = { sub: payload._id, email: payload.email };
+    const signedJwt = await new SignJWT({ ...jwtPayload })
+        .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+        .setIssuedAt()
+        .setExpirationTime(type === 'access_token' ? '15m' : '7d')
+        .sign(JWT_SECRET);
+    return signedJwt;
 }

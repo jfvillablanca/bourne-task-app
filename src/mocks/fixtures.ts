@@ -1,12 +1,12 @@
 import { MockedUser, ProjectDocument } from '../common';
 
-import { testOwnerId } from './mockUsersTestUtils';
+import { testOwner } from './mockUsersTestUtils';
 
 export const mockUsers = (): MockedUser[] => [
     {
-        _id: testOwnerId,
-        email: 'test@owner.com',
-        hashed_password: 'arstneio',
+        _id: testOwner._id,
+        email: testOwner.email,
+        hashed_password: testOwner.password,
         refresh_token: 'fake_token',
     },
     {
@@ -71,7 +71,7 @@ export const mockProjects = (): ProjectDocument[] => {
             _id: '648f62d3c9ce700ba3f9ede4',
             title: 'Customer Feedback Implementation',
             description: 'Add CTA form at end of lifecycle',
-            ownerId: testOwnerId,
+            ownerId: testOwner._id,
             collaborators: [
                 '64956dead2af038ec2292788',
                 '64956dead2af038ec229278c',
@@ -148,7 +148,7 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62e3c9ce700ba3f9ede7',
             title: 'Code Refactoring',
-            ownerId: testOwnerId,
+            ownerId: testOwner._id,
             collaborators: [
                 '64956dead2af038ec229278h',
                 '64956dead2af038ec229278g',
@@ -171,7 +171,7 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648fi2d3c9ce700ba3f9ede4',
             title: 'Performance Optimization',
-            ownerId: testOwnerId,
+            ownerId: testOwner._id,
             collaborators: [
                 '64956dead2af038ec229278h',
                 '64956dead2af038ec229278g',
@@ -228,7 +228,7 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62d3c9ce700ba3f9ede5',
             title: 'Test Automation',
-            ownerId: testOwnerId,
+            ownerId: testOwner._id,
             collaborators: [
                 '64956dead2af038ec229278h',
                 '64956dead2af038ec229278a',
@@ -276,7 +276,7 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62d3c9ce700ba3f9kde9',
             title: 'UI/UX Enhancements',
-            ownerId: testOwnerId,
+            ownerId: testOwner._id,
             collaborators: ['64956dead2af038ec229278a'],
             taskStates: ['todo', 'doing', 'done'],
             tasks: [

@@ -1,6 +1,5 @@
 import { HttpStatusCode } from 'axios';
 import ObjectID from 'bson-objectid';
-import { SignJWT } from 'jose';
 import { rest } from 'msw';
 
 import {
@@ -16,13 +15,9 @@ import {
     UpdateTaskDto,
     User,
 } from '../common';
-import { decodeAccessToken } from '../lib/utils';
+import { decodeAccessToken, generateJwtToken } from '../lib/utils';
 
-import {
-    JWT_SECRET,
-    PROJECTS_STORAGE_KEY,
-    USERS_STORAGE_KEY,
-} from './constants';
+import { PROJECTS_STORAGE_KEY, USERS_STORAGE_KEY } from './constants';
 import { mockProjects, mockUsers } from './fixtures';
 
 interface AddProjectToStorage {
@@ -34,19 +29,6 @@ interface PostProjectToStorage {
     id: string;
     payload: UpdateProjectDto;
 }
-
-const generateJwtToken = async (
-    payload: Pick<MockedUser, '_id' | 'email'>,
-    type: 'access_token' | 'refresh_token',
-) => {
-    const jwtPayload = { sub: payload._id, email: payload.email };
-    const signedJwt = await new SignJWT({ ...jwtPayload })
-        .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
-        .setIssuedAt()
-        .setExpirationTime(type === 'access_token' ? '15m' : '7d')
-        .sign(JWT_SECRET);
-    return signedJwt;
-};
 
 const getUserFromStorage = (userId: string) => {
     let storedData = localStorage.getItem(USERS_STORAGE_KEY);
