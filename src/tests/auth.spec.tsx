@@ -10,6 +10,7 @@ import userEvent from '@testing-library/user-event';
 import App from '../App';
 import { AuthenticationModal } from '../components';
 import { handlers } from '../mocks/handlers';
+import { populateMockUsers } from '../mocks/mockUsersTestUtils';
 
 import { renderWithClient } from './utils';
 
@@ -17,6 +18,10 @@ const server = setupServer(...handlers);
 
 beforeAll(() => {
     server.listen();
+});
+
+beforeEach(() => {
+    populateMockUsers();
 });
 
 afterEach(() => {

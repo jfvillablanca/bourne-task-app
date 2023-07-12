@@ -18,6 +18,11 @@ import {
 } from '../common';
 import { decodeAccessToken } from '../lib/utils';
 
+import {
+    JWT_SECRET,
+    PROJECTS_STORAGE_KEY,
+    USERS_STORAGE_KEY,
+} from './constants';
 import { mockProjects, mockUsers } from './fixtures';
 
 interface AddProjectToStorage {
@@ -29,10 +34,6 @@ interface PostProjectToStorage {
     id: string;
     payload: UpdateProjectDto;
 }
-
-const PROJECTS_STORAGE_KEY = 'projects';
-const USERS_STORAGE_KEY = 'users';
-const JWT_SECRET = new TextEncoder().encode('super-secret');
 
 const generateJwtToken = async (
     payload: Pick<MockedUser, '_id' | 'email'>,

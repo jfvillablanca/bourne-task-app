@@ -17,6 +17,7 @@ import {
 } from '../components';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
+import { populateMockUsers } from '../mocks/mockUsersTestUtils';
 
 import { renderWithClient } from './utils';
 
@@ -33,6 +34,10 @@ beforeAll(() => {
         }));
 
     server.listen();
+});
+
+beforeEach(() => {
+    populateMockUsers();
 });
 
 afterEach(() => {

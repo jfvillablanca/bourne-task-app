@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // @ts-expect-error Used by mockServiceWorker and has no declaration file
 import { worker } from './mocks/browser';
+import { populateMockUsers } from './mocks/mockUsersTestUtils.ts';
 import App from './App.tsx';
 import { createQueryClient } from './common';
 import { AuthenticationFullPage } from './components';
@@ -14,6 +15,7 @@ import './index.css';
 
 async function main() {
     if (import.meta.env.DEV) {
+        populateMockUsers();
         await worker.start();
     }
 

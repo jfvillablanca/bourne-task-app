@@ -8,12 +8,17 @@ import { Auth, Project, Task } from '../api';
 import { AuthDto } from '../common';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
+import { populateMockUsers } from '../mocks/mockUsersTestUtils';
 
 import { createWrapper } from './utils';
 
 const server = setupServer(...handlers);
 
 beforeAll(() => server.listen());
+
+beforeEach(() => {
+    populateMockUsers();
+});
 
 afterEach(() => {
     localStorage.clear();

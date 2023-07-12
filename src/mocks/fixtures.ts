@@ -1,17 +1,12 @@
 import { MockedUser, ProjectDocument } from '../common';
 
-export const mockTokens = () => {
-    return {
-        access_token: 'qwfpluy;',
-        refresh_token: 'arsnteio',
-    };
-};
+import { testOwnerId } from './mockUsersTestUtils';
 
 export const mockUsers = (): MockedUser[] => [
     {
-        _id: '648f629dc9ce700ba3f9ede0',
-        email: 'lisa.miller@yahoo.com',
-        hashed_password: 'fake_hash',
+        _id: testOwnerId,
+        email: 'test@owner.com',
+        hashed_password: 'arstneio',
         refresh_token: 'fake_token',
     },
     {
@@ -76,9 +71,8 @@ export const mockProjects = (): ProjectDocument[] => {
             _id: '648f62d3c9ce700ba3f9ede4',
             title: 'Customer Feedback Implementation',
             description: 'Add CTA form at end of lifecycle',
-            ownerId: '64956dead2af038ec229278a',
+            ownerId: testOwnerId,
             collaborators: [
-                '648f629dc9ce700ba3f9ede0',
                 '64956dead2af038ec2292788',
                 '64956dead2af038ec229278c',
                 '64956dead2af038ec229278g',
@@ -92,7 +86,7 @@ export const mockProjects = (): ProjectDocument[] => {
                     description:
                         'Improve the efficiency of multiplying two matrices.',
                     subtasks: [],
-                    assignedProjMemberId: ['648f629dc9ce700ba3f9ede0'],
+                    assignedProjMemberId: ['64956dead2af038ec229278g'],
                     _id: '648f63abc9ce700ba3f9edef',
                 },
                 {
@@ -109,7 +103,6 @@ export const mockProjects = (): ProjectDocument[] => {
                         { title: 'Write a Novel', isCompleted: false },
                     ],
                     assignedProjMemberId: [
-                        '648f629dc9ce700ba3f9ede0',
                         '64956dead2af038ec2292788',
                         '64956dead2af038ec229278c',
                         '64956dead2af038ec229278g',
@@ -155,7 +148,7 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62e3c9ce700ba3f9ede7',
             title: 'Code Refactoring',
-            ownerId: '64956dead2af038ec229278e',
+            ownerId: testOwnerId,
             collaborators: [
                 '64956dead2af038ec229278h',
                 '64956dead2af038ec229278g',
@@ -178,7 +171,7 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648fi2d3c9ce700ba3f9ede4',
             title: 'Performance Optimization',
-            ownerId: '64956dead2af038ec229278e',
+            ownerId: testOwnerId,
             collaborators: [
                 '64956dead2af038ec229278h',
                 '64956dead2af038ec229278g',
@@ -235,7 +228,7 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62d3c9ce700ba3f9ede5',
             title: 'Test Automation',
-            ownerId: '64956dead2af038ec229278d',
+            ownerId: testOwnerId,
             collaborators: [
                 '64956dead2af038ec229278h',
                 '64956dead2af038ec229278a',
@@ -283,7 +276,7 @@ export const mockProjects = (): ProjectDocument[] => {
         {
             _id: '648f62d3c9ce700ba3f9kde9',
             title: 'UI/UX Enhancements',
-            ownerId: '64956dead2af038ec229278c',
+            ownerId: testOwnerId,
             collaborators: ['64956dead2af038ec229278a'],
             taskStates: ['todo', 'doing', 'done'],
             tasks: [
