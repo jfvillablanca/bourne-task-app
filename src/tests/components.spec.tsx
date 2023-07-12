@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import { describe, it, vi } from 'vitest';
+import { describe, it } from 'vitest';
 
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -28,15 +28,6 @@ import { renderWithClient } from './utils';
 const server = setupServer(...handlers);
 
 beforeAll(() => {
-    // For tests involving modals, ResizeObserver needs to be mocked
-    window.ResizeObserver =
-        window.ResizeObserver ||
-        vi.fn().mockImplementation(() => ({
-            disconnect: vi.fn(),
-            observe: vi.fn(),
-            unobserve: vi.fn(),
-        }));
-
     server.listen();
 });
 
