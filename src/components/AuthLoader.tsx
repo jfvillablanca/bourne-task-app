@@ -13,13 +13,17 @@ const AuthLoader: React.FC<HTMLAttributes<HTMLDivElement>> = ({ children }) => {
         }
     }, [isError, refetch]);
 
-    if (isLoading) {
-        // TODO: return a blurred <AuthFullPage>
-        return <div>Loading...</div>;
-    }
-
-    if (isError || !data) {
-        return <AuthenticationFullPage />;
+    if (isError || !data || isLoading) {
+        return (
+            <div className="relative">
+                {isLoading && (
+                    <div className="absolute z-10 h-screen w-screen backdrop-blur-[4px]" />
+                )}
+                <div className="relative z-0">
+                    <AuthenticationFullPage />;
+                </div>
+            </div>
+        );
     }
 
     return <>{children}</>;
