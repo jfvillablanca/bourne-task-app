@@ -17,7 +17,7 @@ function App() {
     const projects = projectsQuery.data;
 
     useEffectOnce(() => {
-        if (projects) {
+        if (projects && projects.length > 0) {
             const initialProjectId = projects[0]._id;
             setSelectedProject(() => initialProjectId);
         }
