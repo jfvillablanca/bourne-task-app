@@ -22,6 +22,11 @@ const isAxiosErrorResponse = (
 
 const handleError = (error: unknown) => {
     if (error && isAxiosErrorResponse(error)) {
+        if (error.status === HttpStatusCode.Unauthorized) {
+            // TODO: suppress error unless access with expired token
+            // toast.error(`Please login to continue`); // commented for now
+            return;
+        }
         if (error.status === HttpStatusCode.Forbidden) {
             toast.error(`You are forbidden to access this resource`);
             return;

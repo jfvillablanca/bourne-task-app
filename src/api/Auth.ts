@@ -22,7 +22,11 @@ const { useUser, useRegister, useLogin, useLogout } = configureAuth<
 });
 
 export const Auth = {
-    useUser,
+    useUser: () => {
+        return useUser({
+            retry: false,
+        });
+    },
 
     useRegisterLocal: () => {
         return useRegister({
