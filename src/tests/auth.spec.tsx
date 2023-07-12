@@ -7,14 +7,9 @@ import { describe, it, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import App from '../App';
-import { AuthenticationModal } from '../components';
+import { AuthForm, AuthLoader, ToastContainer } from '../components';
 import { handlers } from '../mocks/handlers';
-import {
-    clearTestAccessTokenFromLocalStorage,
-    populateMockUsers,
-    setTestAccessTokenToLocalStorage,
-} from '../mocks/mockUsersTestUtils';
+import { populateMockUsers } from '../mocks/mockUsersTestUtils';
 
 import { renderWithClient } from './utils';
 
@@ -45,9 +40,9 @@ async function setup(jsx: JSX.Element) {
     // render result
     const result = renderWithClient(jsx);
 
-    // open modal
-    const userAuthButton = result.getByTestId('open-user-auth-dialog');
-    await event.click(userAuthButton);
+    await waitFor(() =>
+        expect(result.getByText(/create an account/i)).toBeInTheDocument(),
+    );
 
     // getBy tabs
     const loginTab = result.getByLabelText('login tab');
@@ -111,7 +106,6 @@ async function setup(jsx: JSX.Element) {
     return {
         ...result,
         event,
-        userAuthButton,
         userCredentials,
         loginTab,
         registerTab,
@@ -136,21 +130,26 @@ async function setup(jsx: JSX.Element) {
     };
 }
 
-describe('AppWide', () => {
-    beforeAll(() => {
-        setTestAccessTokenToLocalStorage();
-    });
+function MockApp() {
+    return (
+        <>
+            <ToastContainer />
+            <div>Mocked App</div>
+        </>
+    );
+}
 
-    afterAll(() => {
-        clearTestAccessTokenFromLocalStorage();
-    });
-
+describe('AuthLoader', () => {
     it('should render toast on successful registration', async () => {
         const toastSuccessSpy = vi
             .spyOn(toast, 'success')
             .mockImplementation(() => "You're all set! 🥳");
 
-        const { registerSuccessfully } = await setup(<App />);
+        const { registerSuccessfully } = await setup(
+            <AuthLoader>
+                <MockApp />
+            </AuthLoader>,
+        );
         await registerSuccessfully();
 
         expect(toastSuccessSpy).toHaveBeenCalled();
@@ -164,7 +163,9 @@ describe('AppWide', () => {
             .mockImplementation(() => 'Welcome back! 😊');
 
         const { registerSuccessfully, loginSuccessfully } = await setup(
-            <App />,
+            <AuthLoader>
+                <MockApp />
+            </AuthLoader>,
         );
         await registerSuccessfully();
         await loginSuccessfully();
@@ -175,11 +176,9 @@ describe('AppWide', () => {
     });
 });
 
-describe('AuthenticationModal', () => {
+describe('AuthForm', () => {
     it('should notify on invalid email input', async () => {
-        const { typeEmailRegister, ...result } = await setup(
-            <AuthenticationModal />,
-        );
+        const { typeEmailRegister, ...result } = await setup(<AuthForm />);
 
         await typeEmailRegister('erroneousEmail');
 
@@ -188,7 +187,7 @@ describe('AuthenticationModal', () => {
 
     it('should notify on mismatched passwords', async () => {
         const { typePasswordRegister, typeConfirmPasswordRegister, ...result } =
-            await setup(<AuthenticationModal />);
+            await setup(<AuthForm />);
 
         await typePasswordRegister('password');
         await typeConfirmPasswordRegister('mismatchingpassword');
@@ -197,9 +196,7 @@ describe('AuthenticationModal', () => {
     });
 
     it('should notify that all fields are required onSubmit', async () => {
-        const { clickSubmitRegister, ...result } = await setup(
-            <AuthenticationModal />,
-        );
+        const { clickSubmitRegister, ...result } = await setup(<AuthForm />);
 
         await clickSubmitRegister();
 
@@ -228,7 +225,7 @@ describe('AuthenticationModal', () => {
             clickSubmitRegister,
             userCredentials,
             ...result
-        } = await setup(<AuthenticationModal />);
+        } = await setup(<AuthForm />);
 
         await typeEmailRegister(userCredentials.email);
         await typePasswordRegister(userCredentials.password);
