@@ -4,10 +4,10 @@ import { setupServer } from 'msw/node';
 import { toast } from 'react-toastify';
 import { describe, it, vi } from 'vitest';
 
-import { waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { AuthForm, AuthLoader, ToastContainer } from '../components';
+import { AuthForm, AuthLoader, Header, ToastContainer } from '../components';
 import { handlers } from '../mocks/handlers';
 import { populateMockUsers } from '../mocks/mockUsersTestUtils';
 
@@ -134,6 +134,7 @@ function MockApp() {
     return (
         <>
             <ToastContainer />
+            <Header />
             <div>Mocked App</div>
         </>
     );
@@ -173,6 +174,26 @@ describe('AuthLoader', () => {
         expect(toastSuccessSpy).toHaveBeenCalled();
         expect(toastSuccessSpy).toHaveReturnedWith('Welcome back! 😊');
         toastSuccessSpy.mockRestore();
+    });
+
+    it('should be able to logout back to auth screen', async () => {
+        const { registerSuccessfully, loginSuccessfully, event } = await setup(
+            <AuthLoader>
+                <MockApp />
+            </AuthLoader>,
+        );
+        await registerSuccessfully();
+        await loginSuccessfully();
+        await waitFor(() => {
+            expect(screen.getByText('Mocked App')).toBeInTheDocument();
+        });
+        const openUserInfoButton = screen.getByTestId('open-user-info-popover');
+
+        await event.click(openUserInfoButton);
+        const logoutButton = screen.getByText(/logout/i);
+        await event.click(logoutButton);
+
+        expect(screen.getByText('Sign up with email')).toBeInTheDocument();
     });
 });
 
