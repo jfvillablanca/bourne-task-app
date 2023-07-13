@@ -518,6 +518,107 @@ describe.shuffle('Task', () => {
 
         // Expect that PATCH returns the updated document
         expect(updateResult.current.data?.title).toBe(updatedTaskTitle);
+    });
+
+    it('should handle a 401 status code on Task.useCreate', async () => {
+        clearTestAccessTokenFromLocalStorage();
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTaskState = mockProjects()[0].taskStates[0];
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
         );
+
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+
+        await waitFor(() => {
+            expect(createResult.current.error).toBeDefined();
+            expect(createResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handle a 401 status code on Task.useFindAll', async () => {
+        clearTestAccessTokenFromLocalStorage();
+        const mockProjectId = mockProjects()[0]._id;
+        const { result } = renderHook(() => Task.useFindAll(mockProjectId), {
+            wrapper: createWrapper(),
+        });
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handle a 401 status code on Task.useFindOne', async () => {
+        clearTestAccessTokenFromLocalStorage();
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTaskId = mockProjects()[0].tasks[0]._id;
+        const { result } = renderHook(
+            () => Task.useFindOne(mockProjectId, mockTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handle a 401 status code on Task.useUpdate', async () => {
+        // Create a document to FAIL to update
+        const mockProjectId = mockProjects()[0]._id;
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createResult.current.mutate({
+            title: 'new task title',
+            taskState: mockProjects()[0].taskStates[0],
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+
+        const mockTaskId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Clear the access token
+        clearTestAccessTokenFromLocalStorage();
+
+        const updatedTaskTitle = 'updated task title';
+        const { result: updateResult } = renderHook(
+            () => Task.useUpdate(mockProjectId, mockTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Update the document
+        updateResult.current.mutate({
+            title: updatedTaskTitle,
+        });
+
+        await waitFor(() => {
+            expect(updateResult.current.error).toBeDefined();
+            expect(updateResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
     });
 });
