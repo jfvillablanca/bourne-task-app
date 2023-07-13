@@ -3,6 +3,8 @@ import * as React from 'react';
 import {
     autoPlacement,
     autoUpdate,
+    flip,
+    FlipOptions,
     FloatingFocusManager,
     FloatingPortal,
     offset,
@@ -25,13 +27,18 @@ interface PopoverOptions {
     onOpenChange?: (open: boolean) => void;
 }
 
+interface UsePopover extends PopoverOptions {
+    placementStrategy?: FlipOptions | 'autoPlacement';
+}
+
 // eslint-disable-next-line react-refresh/only-export-components
 export function usePopover({
     initialOpen = false,
     modal,
     open: controlledOpen,
     onOpenChange: setControlledOpen,
-}: PopoverOptions = {}) {
+    placementStrategy = 'autoPlacement',
+}: UsePopover = {}) {
     const [uncontrolledOpen, setUncontrolledOpen] = React.useState(initialOpen);
     const [labelId, setLabelId] = React.useState<string | undefined>();
     const [descriptionId, setDescriptionId] = React.useState<
@@ -45,7 +52,13 @@ export function usePopover({
         open,
         onOpenChange: setOpen,
         whileElementsMounted: autoUpdate,
-        middleware: [offset(5), autoPlacement(), shift({ padding: 5 })],
+        middleware: [
+            offset(5),
+            placementStrategy === 'autoPlacement'
+                ? autoPlacement()
+                : flip(placementStrategy),
+            shift({ padding: 5 }),
+        ],
     });
 
     const context = data.context;
@@ -102,7 +115,7 @@ export function Popover({
     ...restOptions
 }: {
     children: React.ReactNode;
-} & PopoverOptions) {
+} & UsePopover) {
     // This can accept any props as options, e.g. `placement`,
     // or other positioning options.
     const popover = usePopover({ modal, ...restOptions });
