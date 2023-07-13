@@ -5,7 +5,7 @@ import { describe, it, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import { Auth, Project, Task } from '../api';
-import { AuthDto } from '../common';
+import { AuthDto, ProjectDto } from '../common';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 import {
@@ -301,10 +301,21 @@ describe.concurrent('Project', () => {
     });
 
     it('should update project of a user', async () => {
-        const mockProjectId = mockProjects()[0]._id;
-        const updatedDescription = 'new description';
+        // Create a document to update
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        const updatedDescription = 'project with description';
+
         const { result: updateResult } = renderHook(
-            () => Project.useUpdate(mockProjectId),
+            () => Project.useUpdate(projectId),
             {
                 wrapper: createWrapper(),
             },
