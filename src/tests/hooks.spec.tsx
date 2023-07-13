@@ -246,6 +246,23 @@ describe.shuffle('Project - Create', () => {
         await waitFor(() => expect(createResult.current.data).toBeDefined());
         expect(createResult.current.data?.title).toBe(newProjectTitle);
     });
+
+    it('should handle a 401 status code on Project.useCreate', async () => {
+        clearTestAccessTokenFromLocalStorage();
+        const newProjectTitle = 'new project';
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+
+        createResult.current.mutate({ title: newProjectTitle });
+
+        await waitFor(() => {
+            expect(createResult.current.error).toBeDefined();
+            expect(createResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
 });
 
 describe.shuffle('Project', () => {
@@ -313,7 +330,6 @@ describe.shuffle('Project', () => {
             : '';
 
         const updatedDescription = 'project with description';
-
         const { result: updateResult } = renderHook(
             () => Project.useUpdate(projectId),
             {
@@ -321,10 +337,92 @@ describe.shuffle('Project', () => {
             },
         );
 
+        // Update the document
         updateResult.current.mutate({ description: updatedDescription });
+
         await waitFor(() => expect(updateResult.current.data).toBeDefined());
+
         // Expect that PATCH returns the updated document
         expect(updateResult.current.data?.description).toBe(updatedDescription);
+    });
+
+    it('should handle a 401 status code on Project.useFindAll', async () => {
+        clearTestAccessTokenFromLocalStorage();
+        const { result } = renderHook(() => Project.useFindAll(), {
+            wrapper: createWrapper(),
+        });
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handle a 401 status code on Project.useFindOne', async () => {
+        clearTestAccessTokenFromLocalStorage();
+        const mockProjectId = mockProjects()[0]._id;
+        const { result } = renderHook(() => Project.useFindOne(mockProjectId), {
+            wrapper: createWrapper(),
+        });
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handle a 401 status code on Project.useGetProjectMembers', async () => {
+        clearTestAccessTokenFromLocalStorage();
+        const mockProjectId = mockProjects()[0]._id;
+        const { result } = renderHook(
+            () => Project.useGetProjectMembers(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handle a 401 status code on Project.useUpdate', async () => {
+        // Create a document to FAIL to update
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Clear the access token
+        clearTestAccessTokenFromLocalStorage();
+
+        const updatedDescription = 'project with description';
+        const { result: updateResult } = renderHook(
+            () => Project.useUpdate(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        updateResult.current.mutate({ description: updatedDescription });
+
+        await waitFor(() => {
+            expect(updateResult.current.error).toBeDefined();
+            expect(updateResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
     });
 });
 
