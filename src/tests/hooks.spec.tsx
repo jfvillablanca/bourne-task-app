@@ -227,11 +227,11 @@ describe.shuffle('Auth', () => {
 });
 
 describe.shuffle('Project - Create', () => {
-    beforeAll(() => {
-        setTestAccessTokenToLocalStorage();
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
     });
 
-    afterAll(() => {
+    afterEach(() => {
         clearTestAccessTokenFromLocalStorage();
     });
 
@@ -249,11 +249,11 @@ describe.shuffle('Project - Create', () => {
 });
 
 describe.shuffle('Project', () => {
-    beforeAll(() => {
-        setTestAccessTokenToLocalStorage();
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
     });
 
-    afterAll(() => {
+    afterEach(() => {
         clearTestAccessTokenFromLocalStorage();
     });
 
@@ -329,6 +329,14 @@ describe.shuffle('Project', () => {
 });
 
 describe.shuffle('Task', () => {
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
+    });
+
+    afterEach(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
     it('should create new task', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockTaskState = mockProjects()[0].taskStates[0];

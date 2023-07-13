@@ -43,11 +43,11 @@ afterEach(() => {
 afterAll(() => server.close());
 
 describe.shuffle('App', () => {
-    beforeAll(() => {
-        setTestAccessTokenToLocalStorage();
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
     });
 
-    afterAll(() => {
+    afterEach(() => {
         clearTestAccessTokenFromLocalStorage();
     });
 
@@ -109,6 +109,14 @@ describe.shuffle('App', () => {
 });
 
 describe.shuffle('ProjectTitle', () => {
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
+    });
+
+    afterEach(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
     it('should render the project title', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockProjectTitle = mockProjects()[0].title;
@@ -158,6 +166,14 @@ describe.shuffle('ProjectTitle', () => {
 });
 
 describe.shuffle('CardView', () => {
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
+    });
+
+    afterEach(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
     it('should render task card groups', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockProjectTaskStates = mockProjects()[0].taskStates;
@@ -211,6 +227,14 @@ describe.shuffle('CardView', () => {
 });
 
 describe.shuffle('TaskCardGroup', () => {
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
+    });
+
+    afterEach(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
     it('should be able to add new task', async () => {
         const user = userEvent.setup();
         const mockProjectId = mockProjects()[0]._id;
@@ -250,6 +274,14 @@ describe.shuffle('TaskCardGroup', () => {
 });
 
 describe.shuffle('TaskCard', () => {
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
+    });
+
+    afterEach(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
     it('should render an avatar for assigned member', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockTask = mockProjects()[0].tasks[0];
@@ -292,6 +324,14 @@ describe.shuffle('TaskCard', () => {
 });
 
 describe.shuffle('TaskModal', () => {
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
+    });
+
+    afterEach(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
     it('should be able to edit the task title', async () => {
         const user = userEvent.setup();
         const mockProjectId = mockProjects()[0]._id;
