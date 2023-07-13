@@ -326,13 +326,12 @@ export const handlers = [
 
     rest.post('/api/auth/logout', async (req, res, ctx) => {
         const authHeader = req.headers.get('Authorization');
-        const token = authHeader?.split(' ')[1];
+        const userId = authGuard(authHeader);
 
-        if (!token) {
+        if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-        const decodedUserId = decodeAccessToken(token).sub;
-        logUserOut(decodedUserId);
+        logUserOut(userId);
 
         return res(ctx.status(HttpStatusCode.Ok));
     }),
@@ -365,6 +364,13 @@ export const handlers = [
     }),
 
     rest.get('/api/projects/:projectId', (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+
         const { projectId } = req.params;
         const project = getProjectsFromStorage().find(
             (project) => project._id === projectId,
@@ -373,6 +379,13 @@ export const handlers = [
     }),
 
     rest.get('/api/projects/:projectId/members', (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+
         const { projectId } = req.params;
         const project = getProjectsFromStorage().find(
             (project) => project._id === projectId,
@@ -394,6 +407,13 @@ export const handlers = [
     }),
 
     rest.patch('/api/projects/:projectId', async (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+
         const interceptedPayload: UpdateProjectDto = await req.json();
         const { projectId } = req.params;
         const project = postProjectToStorage({
@@ -404,6 +424,13 @@ export const handlers = [
     }),
 
     rest.post('/api/projects/:projectId/tasks', async (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+
         const interceptedPayload: TaskDto = await req.json();
         const { projectId } = req.params;
         const task = addTaskToStorage({
@@ -415,6 +442,13 @@ export const handlers = [
     }),
 
     rest.get('/api/projects/:projectId/tasks', (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+
         const { projectId } = req.params;
         const tasks = getProjectsFromStorage().find(
             (project) => project._id === projectId,
@@ -424,6 +458,13 @@ export const handlers = [
     }),
 
     rest.get('/api/projects/:projectId/tasks/:taskId', (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+
         const { projectId, taskId } = req.params;
         const tasks = getProjectsFromStorage().find(
             (project) => project._id === projectId,
@@ -440,6 +481,13 @@ export const handlers = [
     rest.patch(
         '/api/projects/:projectId/tasks/:taskId',
         async (req, res, ctx) => {
+            const authHeader = req.headers.get('Authorization');
+            const userId = authGuard(authHeader);
+
+            if (!userId) {
+                return res(ctx.status(HttpStatusCode.Unauthorized));
+            }
+
             const interceptedPayload: UpdateTaskDto = await req.json();
             const { projectId, taskId } = req.params;
             const task = postTaskToStorage({
