@@ -42,7 +42,7 @@ afterEach(() => {
 
 afterAll(() => server.close());
 
-describe('App', () => {
+describe.shuffle('App', () => {
     beforeAll(() => {
         setTestAccessTokenToLocalStorage();
     });
@@ -108,7 +108,7 @@ describe('App', () => {
     });
 });
 
-describe('ProjectTitle', () => {
+describe.shuffle('ProjectTitle', () => {
     it('should render the project title', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockProjectTitle = mockProjects()[0].title;
@@ -157,7 +157,7 @@ describe('ProjectTitle', () => {
     });
 });
 
-describe('CardView', () => {
+describe.shuffle('CardView', () => {
     it('should render task card groups', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockProjectTaskStates = mockProjects()[0].taskStates;
@@ -210,7 +210,7 @@ describe('CardView', () => {
     });
 });
 
-describe('TaskCardGroup', () => {
+describe.shuffle('TaskCardGroup', () => {
     it('should be able to add new task', async () => {
         const user = userEvent.setup();
         const mockProjectId = mockProjects()[0]._id;
@@ -249,7 +249,7 @@ describe('TaskCardGroup', () => {
     });
 });
 
-describe('TaskCard', () => {
+describe.shuffle('TaskCard', () => {
     it('should render an avatar for assigned member', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockTask = mockProjects()[0].tasks[0];
@@ -291,7 +291,7 @@ describe('TaskCard', () => {
     });
 });
 
-describe('TaskModal', () => {
+describe.shuffle('TaskModal', () => {
     it('should be able to edit the task title', async () => {
         const user = userEvent.setup();
         const mockProjectId = mockProjects()[0]._id;

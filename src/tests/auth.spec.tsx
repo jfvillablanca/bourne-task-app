@@ -140,7 +140,7 @@ function MockApp() {
     );
 }
 
-describe('AuthLoader', () => {
+describe.shuffle('AuthLoader', () => {
     it('should render toast on successful registration', async () => {
         const toastSuccessSpy = vi
             .spyOn(toast, 'success')
@@ -197,7 +197,7 @@ describe('AuthLoader', () => {
     });
 });
 
-describe('AuthForm', () => {
+describe.shuffle('AuthForm', () => {
     it('should notify on invalid email input', async () => {
         const { typeEmailRegister, ...result } = await setup(<AuthForm />);
 

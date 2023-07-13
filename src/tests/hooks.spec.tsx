@@ -31,7 +31,7 @@ afterEach(() => {
 
 afterAll(() => server.close());
 
-describe('Auth', () => {
+describe.shuffle('Auth', () => {
     it('should create a new user', async () => {
         const setItemMock = vi.spyOn(Storage.prototype, 'setItem');
         const newUser: AuthDto = {
@@ -226,7 +226,7 @@ describe('Auth', () => {
     });
 });
 
-describe('Project - Create', () => {
+describe.shuffle('Project - Create', () => {
     beforeAll(() => {
         setTestAccessTokenToLocalStorage();
     });
@@ -248,7 +248,7 @@ describe('Project - Create', () => {
     });
 });
 
-describe.concurrent('Project', () => {
+describe.shuffle('Project', () => {
     beforeAll(() => {
         setTestAccessTokenToLocalStorage();
     });
@@ -328,7 +328,7 @@ describe.concurrent('Project', () => {
     });
 });
 
-describe.concurrent('Task', () => {
+describe.shuffle('Task', () => {
     it('should create new task', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockTaskState = mockProjects()[0].taskStates[0];
