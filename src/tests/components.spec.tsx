@@ -19,9 +19,9 @@ import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 import {
     clearTestAccessTokenFromLocalStorage,
-    populateMockUsers,
+    populateMockDatabase,
     setTestAccessTokenToLocalStorage,
-} from '../mocks/mockUsersTestUtils';
+} from '../mocks/mockDbTestUtils';
 
 import { renderWithClient } from './utils';
 
@@ -32,7 +32,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-    populateMockUsers();
+    populateMockDatabase();
 });
 
 afterEach(() => {

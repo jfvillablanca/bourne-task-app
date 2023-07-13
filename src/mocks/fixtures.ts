@@ -1,6 +1,6 @@
 import { MockedUser, ProjectDocument } from '../common';
 
-import { testOwner } from './mockUsersTestUtils';
+import { testOwner } from './mockDbTestUtils';
 
 export const mockUsers = (): MockedUser[] => [
     {

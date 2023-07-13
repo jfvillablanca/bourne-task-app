@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 
 import { AuthForm, AuthLoader, Header, ToastContainer } from '../components';
 import { handlers } from '../mocks/handlers';
-import { populateMockUsers } from '../mocks/mockUsersTestUtils';
+import { populateMockDatabase } from '../mocks/mockDbTestUtils';
 
 import { renderWithClient } from './utils';
 
@@ -20,7 +20,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-    populateMockUsers();
+    populateMockDatabase();
 });
 
 afterEach(() => {

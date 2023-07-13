@@ -10,9 +10,9 @@ import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 import {
     clearTestAccessTokenFromLocalStorage,
-    populateMockUsers,
+    populateMockDatabase,
     setTestAccessTokenToLocalStorage,
-} from '../mocks/mockUsersTestUtils';
+} from '../mocks/mockDbTestUtils';
 
 import { createWrapper } from './utils';
 
@@ -21,7 +21,7 @@ const server = setupServer(...handlers);
 beforeAll(() => server.listen());
 
 beforeEach(() => {
-    populateMockUsers();
+    populateMockDatabase();
 });
 
 afterEach(() => {
