@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { TaskDocument, TaskDto, UpdateTaskDto } from '../common';
@@ -13,7 +15,7 @@ export const Task = {
 
     useCreate: (projectId: string) => {
         const queryClient = useQueryClient();
-        return useMutation({
+        return useMutation<TaskDocument, AxiosError['response'], TaskDto>({
             mutationFn: (createdFields: TaskDto) =>
                 createTask(projectId, createdFields),
             onSuccess: () => {
@@ -25,28 +27,30 @@ export const Task = {
     },
 
     useFindAll: (projectId: string) =>
-        useQuery({
+        useQuery<TaskDocument[], AxiosError['response']>({
             queryKey: Task.queryKeys.all(projectId),
             queryFn: () => getTasks(projectId),
         }),
 
     useFindOne: (projectId: string, taskId: string) =>
-        useQuery({
+        useQuery<TaskDocument, AxiosError['response']>({
             queryKey: Task.queryKeys.byId(projectId, taskId),
             queryFn: () => getTaskById(projectId, taskId),
         }),
 
     useUpdate: (projectId: string, taskId: string) => {
         const queryClient = useQueryClient();
-        return useMutation({
-            mutationFn: (updatedFields: UpdateTaskDto) =>
-                updateTask(projectId, taskId, updatedFields),
-            onSuccess: () => {
-                return queryClient.invalidateQueries({
-                    queryKey: Task.queryKeys.all(projectId),
-                });
+        return useMutation<TaskDocument, AxiosError['response'], UpdateTaskDto>(
+            {
+                mutationFn: (updatedFields: UpdateTaskDto) =>
+                    updateTask(projectId, taskId, updatedFields),
+                onSuccess: () => {
+                    return queryClient.invalidateQueries({
+                        queryKey: Task.queryKeys.all(projectId),
+                    });
+                },
             },
-        });
+        );
     },
 
     filterByTaskState: (allTasks: TaskDocument[], taskState: string) => {
