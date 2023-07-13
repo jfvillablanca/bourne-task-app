@@ -18,7 +18,6 @@ import {
 import { decodeAccessToken, generateJwtToken } from '../lib/utils';
 
 import { PROJECTS_STORAGE_KEY, USERS_STORAGE_KEY } from './constants';
-import { mockProjects } from './fixtures';
 
 interface AddProjectToStorage {
     ownerId: string;
@@ -30,7 +29,7 @@ interface PostProjectToStorage {
     payload: UpdateProjectDto;
 }
 
-const getUserFromStorage = (userId: string) => {
+const getUsers = (userId: string) => {
     const storedData = localStorage.getItem(USERS_STORAGE_KEY);
     if (!storedData) {
         return;
@@ -140,20 +139,12 @@ const addUserToStorage = async ({ email, password }: AuthDto) => {
     return generatedTokens;
 };
 
-const getProjectsFromStorage = (): ProjectDocument[] => {
+const getProjects = () => {
     const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
-    if (storedData) {
-        return JSON.parse(storedData);
-    } else {
-        const initialData = mockProjects();
-        localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(initialData));
-        return initialData;
+    if (!storedData) {
+        return;
     }
-};
-
-const getProjectsOfOwnerId = (ownerId: string): ProjectDocument[] => {
-    const projects = getProjectsFromStorage();
-    return projects.filter((project) => project.ownerId === ownerId);
+    return JSON.parse(storedData) as ProjectDocument[];
 };
 
 const postProjectToStorage = ({ id, payload }: PostProjectToStorage) => {
@@ -219,8 +210,7 @@ const postTaskToStorage = ({
     taskId: string;
     payload: UpdateTaskDto;
 }) => {
-    const projects = getProjectsFromStorage();
-    const project = projects.find((project) => project._id === projectId);
+    const project = getProjects()?.find((project) => project._id === projectId);
     const taskToUpdate = project?.tasks.find((task) => task._id === taskId);
     if (project && taskToUpdate) {
         const updatedTask = {
@@ -234,7 +224,7 @@ const postTaskToStorage = ({
             return task;
         });
         const updatedProject = { ...project, tasks: updatedTasks };
-        const updatedData = projects.map((project) => {
+        const updatedData = getProjects()?.map((project) => {
             if (project._id === projectId) {
                 return updatedProject;
             }
@@ -252,8 +242,7 @@ const addTaskToStorage = ({
     projectId: string;
     payload: TaskDto;
 }) => {
-    const projects = getProjectsFromStorage();
-    const project = projects.find((project) => project._id === projectId);
+    const project = getProjects()?.find((project) => project._id === projectId);
     if (project) {
         const newTask: TaskDocument = {
             _id: ObjectID().toHexString(),
@@ -263,7 +252,7 @@ const addTaskToStorage = ({
         };
         const updatedTasks = [...project.tasks, newTask];
         const updatedProject = { ...project, tasks: updatedTasks };
-        const updatedData = projects.map((project) => {
+        const updatedData = getProjects()?.map((project) => {
             if (project._id === projectId) {
                 return updatedProject;
             }
@@ -319,7 +308,7 @@ export const handlers = [
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-        const user = getUserFromStorage(userId);
+        const user = getUsers(userId);
 
         return res(ctx.json(user), ctx.status(HttpStatusCode.Ok));
     }),
@@ -359,7 +348,9 @@ export const handlers = [
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
 
-        const projects = getProjectsOfOwnerId(userId);
+        const projects = getProjects()?.filter(
+            (project) => project.ownerId === userId,
+        );
         return res(ctx.json(projects), ctx.status(HttpStatusCode.Ok));
     }),
 
@@ -372,7 +363,7 @@ export const handlers = [
         }
 
         const { projectId } = req.params;
-        const project = getProjectsFromStorage().find(
+        const project = getProjects()?.find(
             (project) => project._id === projectId,
         );
         return res(ctx.json(project), ctx.status(HttpStatusCode.Ok));
@@ -387,7 +378,7 @@ export const handlers = [
         }
 
         const { projectId } = req.params;
-        const project = getProjectsFromStorage().find(
+        const project = getProjects()?.find(
             (project) => project._id === projectId,
         );
         const projectMemberIds = project
@@ -395,7 +386,7 @@ export const handlers = [
             : [];
 
         const projectMembers = projectMemberIds.map((id) => {
-            const user = getUserFromStorage(id);
+            const user = getUsers(id);
             if (!user) {
                 throw res(ctx.status(HttpStatusCode.NotFound));
             }
@@ -450,7 +441,7 @@ export const handlers = [
         }
 
         const { projectId } = req.params;
-        const tasks = getProjectsFromStorage().find(
+        const tasks = getProjects()?.find(
             (project) => project._id === projectId,
         )?.tasks;
 
@@ -466,7 +457,7 @@ export const handlers = [
         }
 
         const { projectId, taskId } = req.params;
-        const tasks = getProjectsFromStorage().find(
+        const tasks = getProjects()?.find(
             (project) => project._id === projectId,
         )?.tasks;
 
