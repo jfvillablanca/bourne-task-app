@@ -2,6 +2,8 @@ import { AxiosError } from 'axios';
 import { configureAuth } from 'react-query-auth';
 import { toast } from 'react-toastify';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import { AuthDto, AuthToken, User } from '../common';
 import { decodeAccessToken, tokenStorage } from '../lib/utils';
 
@@ -61,7 +63,14 @@ export const Auth = {
         });
     },
 
-    useLogout,
+    useLogout: () => {
+        const queryClient = useQueryClient();
+        return useLogout({
+            onSuccess: () => {
+                return queryClient.invalidateQueries();
+            },
+        });
+    },
 };
 
 async function getUser(): Promise<User> {
