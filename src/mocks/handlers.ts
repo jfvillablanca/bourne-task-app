@@ -19,16 +19,6 @@ import { decodeAccessToken, generateJwtToken } from '../lib/utils';
 
 import { PROJECTS_STORAGE_KEY, USERS_STORAGE_KEY } from './constants';
 
-interface AddProjectToStorage {
-    ownerId: string;
-    payload: ProjectDto;
-}
-
-interface PostProjectToStorage {
-    id: string;
-    payload: UpdateProjectDto;
-}
-
 const getUsers = (userId: string) => {
     const storedData = localStorage.getItem(USERS_STORAGE_KEY);
     if (!storedData) {
@@ -147,122 +137,6 @@ const getProjects = () => {
     return JSON.parse(storedData) as ProjectDocument[];
 };
 
-const postProjectToStorage = ({ id, payload }: PostProjectToStorage) => {
-    const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
-    if (storedData) {
-        const parsedData: ProjectDocument[] = JSON.parse(storedData);
-        const existingProject = parsedData.find(
-            (project) => project._id === id,
-        );
-
-        if (existingProject) {
-            const updatedProject = {
-                ...existingProject,
-                ...payload,
-            };
-            const updatedData = parsedData.map((project) => {
-                if (project._id === id) {
-                    return updatedProject;
-                }
-                return project;
-            });
-            localStorage.setItem(
-                PROJECTS_STORAGE_KEY,
-                JSON.stringify(updatedData),
-            );
-            return updatedProject;
-        }
-    }
-};
-
-const addProjectToStorage = ({ ownerId, payload }: AddProjectToStorage) => {
-    const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
-    const newProject: ProjectDocument = {
-        _id: ObjectID().toHexString(),
-        collaborators: [],
-        taskStates: ['todo', 'doing', 'done'],
-        tasks: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        ownerId,
-        ...payload,
-    };
-
-    if (storedData) {
-        const parsedData: ProjectDocument[] = JSON.parse(storedData);
-
-        const updatedData = [...parsedData, newProject];
-        localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(updatedData));
-        return newProject;
-    }
-
-    const newProjectsData = [newProject];
-    localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(newProjectsData));
-    return newProject;
-};
-
-const postTaskToStorage = ({
-    projectId,
-    taskId,
-    payload,
-}: {
-    projectId: string;
-    taskId: string;
-    payload: UpdateTaskDto;
-}) => {
-    const project = getProjects()?.find((project) => project._id === projectId);
-    const taskToUpdate = project?.tasks.find((task) => task._id === taskId);
-    if (project && taskToUpdate) {
-        const updatedTask = {
-            ...taskToUpdate,
-            ...payload,
-        };
-        const updatedTasks = project.tasks.map((task) => {
-            if (task._id === taskId) {
-                return updatedTask;
-            }
-            return task;
-        });
-        const updatedProject = { ...project, tasks: updatedTasks };
-        const updatedData = getProjects()?.map((project) => {
-            if (project._id === projectId) {
-                return updatedProject;
-            }
-            return project;
-        });
-        localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(updatedData));
-        return updatedTask;
-    }
-};
-
-const addTaskToStorage = ({
-    projectId,
-    payload,
-}: {
-    projectId: string;
-    payload: TaskDto;
-}) => {
-    const project = getProjects()?.find((project) => project._id === projectId);
-    if (project) {
-        const newTask: TaskDocument = {
-            _id: ObjectID().toHexString(),
-            description: '',
-            assignedProjMemberId: [],
-            ...payload,
-        };
-        const updatedTasks = [...project.tasks, newTask];
-        const updatedProject = { ...project, tasks: updatedTasks };
-        const updatedData = getProjects()?.map((project) => {
-            if (project._id === projectId) {
-                return updatedProject;
-            }
-            return project;
-        });
-        localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(updatedData));
-        return newTask;
-    }
-};
-
 const authGuard = (header: string | null) => {
     const token = header?.split(' ')[1];
     if (!token) {
@@ -333,11 +207,28 @@ export const handlers = [
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
         const interceptedPayload: ProjectDto = await req.json();
-        const project = addProjectToStorage({
+
+        const newProject: ProjectDocument = {
+            _id: ObjectID().toHexString(),
+            collaborators: [],
+            taskStates: ['todo', 'doing', 'done'],
+            tasks: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
             ownerId: userId,
-            payload: interceptedPayload,
-        });
-        return res(ctx.json(project), ctx.status(HttpStatusCode.Created));
+            ...interceptedPayload,
+        };
+        const projects = getProjects();
+        const updatedProjects = projects
+            ? [...projects, newProject]
+            : [newProject];
+
+        localStorage.setItem(
+            PROJECTS_STORAGE_KEY,
+            JSON.stringify(updatedProjects),
+        );
+
+        return res(ctx.json(newProject), ctx.status(HttpStatusCode.Created));
     }),
 
     rest.get('/api/projects', (req, res, ctx) => {
@@ -407,11 +298,30 @@ export const handlers = [
 
         const interceptedPayload: UpdateProjectDto = await req.json();
         const { projectId } = req.params;
-        const project = postProjectToStorage({
-            id: projectId as string,
-            payload: interceptedPayload,
+
+        const existingProject = getProjects()?.find(
+            (project) => project._id === projectId,
+        );
+
+        const updatedProject = existingProject
+            ? {
+                  ...existingProject,
+                  ...interceptedPayload,
+              }
+            : undefined;
+        const updatedProjects = getProjects()?.map((project) => {
+            if (project._id === projectId) {
+                return updatedProject;
+            }
+            return project;
         });
-        return res(ctx.json(project), ctx.status(HttpStatusCode.Ok));
+
+        localStorage.setItem(
+            PROJECTS_STORAGE_KEY,
+            JSON.stringify(updatedProjects),
+        );
+
+        return res(ctx.json(updatedProject), ctx.status(HttpStatusCode.Ok));
     }),
 
     rest.post('/api/projects/:projectId/tasks', async (req, res, ctx) => {
@@ -424,12 +334,32 @@ export const handlers = [
 
         const interceptedPayload: TaskDto = await req.json();
         const { projectId } = req.params;
-        const task = addTaskToStorage({
-            projectId: projectId as string,
-            payload: interceptedPayload,
+
+        const project = getProjects()?.find(
+            (project) => project._id === projectId,
+        );
+
+        const newTask: TaskDocument = {
+            _id: ObjectID().toHexString(),
+            description: '',
+            assignedProjMemberId: [],
+            ...interceptedPayload,
+        };
+        const updatedTasks = project ? [...project.tasks, newTask] : [newTask];
+        const updatedProject = { ...project, tasks: updatedTasks };
+        const updatedProjects = getProjects()?.map((project) => {
+            if (project._id === projectId) {
+                return updatedProject;
+            }
+            return project;
         });
 
-        return res(ctx.json(task), ctx.status(HttpStatusCode.Created));
+        localStorage.setItem(
+            PROJECTS_STORAGE_KEY,
+            JSON.stringify(updatedProjects),
+        );
+
+        return res(ctx.json(newTask), ctx.status(HttpStatusCode.Created));
     }),
 
     rest.get('/api/projects/:projectId/tasks', (req, res, ctx) => {
@@ -481,13 +411,41 @@ export const handlers = [
 
             const interceptedPayload: UpdateTaskDto = await req.json();
             const { projectId, taskId } = req.params;
-            const task = postTaskToStorage({
-                projectId: projectId as string,
-                taskId: taskId as string,
-                payload: interceptedPayload,
+
+            const project = getProjects()?.find(
+                (project) => project._id === projectId,
+            );
+            const taskToUpdate = project?.tasks.find(
+                (task) => task._id === taskId,
+            );
+
+            const updatedTask =
+                project && taskToUpdate
+                    ? {
+                          ...taskToUpdate,
+                          ...interceptedPayload,
+                      }
+                    : undefined;
+            const updatedTasks = project?.tasks.map((task) => {
+                if (task._id === taskId) {
+                    return updatedTask;
+                }
+                return task;
+            });
+            const updatedProject = { ...project, tasks: updatedTasks };
+            const updatedProjects = getProjects()?.map((project) => {
+                if (project._id === projectId) {
+                    return updatedProject;
+                }
+                return project;
             });
 
-            return res(ctx.json(task), ctx.status(HttpStatusCode.Ok));
+            localStorage.setItem(
+                PROJECTS_STORAGE_KEY,
+                JSON.stringify(updatedProjects),
+            );
+
+            return res(ctx.json(updatedTask), ctx.status(HttpStatusCode.Ok));
         },
     ),
 ];
