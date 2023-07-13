@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useCallback } from 'react';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -21,37 +22,39 @@ export const Project = {
 
     useCreate: () => {
         const queryClient = useQueryClient();
-        return useMutation({
-            mutationFn: (createdFields: ProjectDto) =>
-                createProject(createdFields),
-            onSuccess: () => {
-                return queryClient.invalidateQueries({
-                    queryKey: Project.queryKeys.all,
-                });
+        return useMutation<ProjectDocument, AxiosError['response'], ProjectDto>(
+            {
+                mutationFn: (createdFields: ProjectDto) =>
+                    createProject(createdFields),
+                onSuccess: () => {
+                    return queryClient.invalidateQueries({
+                        queryKey: Project.queryKeys.all,
+                    });
+                },
             },
-        });
+        );
     },
 
     useFindAll: () =>
-        useQuery({
+        useQuery<ProjectDocument[], AxiosError['response']>({
             queryKey: Project.queryKeys.all,
             queryFn: () => getProjects(),
         }),
 
     useFindOne: (projectId: string) =>
-        useQuery({
+        useQuery<ProjectDocument, AxiosError['response']>({
             queryKey: Project.queryKeys.byId(projectId),
             queryFn: () => getProjectById(projectId),
         }),
 
     useGetProjectMembers: (projectId: string) =>
-        useQuery({
+        useQuery<ProjectMember[], AxiosError['response']>({
             queryKey: Project.queryKeys.members(projectId),
             queryFn: () => getProjectMembers(projectId),
         }),
 
     useGetTaskStates: (projectId: string) =>
-        useQuery({
+        useQuery<ProjectDocument, AxiosError['response'], string[]>({
             queryKey: Project.queryKeys.byId(projectId),
             queryFn: () => getProjectById(projectId),
             select: useCallback((data: ProjectDocument) => data.taskStates, []),
@@ -59,7 +62,11 @@ export const Project = {
 
     useUpdate: (projectId: string) => {
         const queryClient = useQueryClient();
-        return useMutation({
+        return useMutation<
+            ProjectDocument,
+            AxiosError['response'],
+            UpdateProjectDto
+        >({
             mutationFn: (updatedFields: UpdateProjectDto) =>
                 updateProject(projectId, updatedFields),
             onSuccess: () => {
