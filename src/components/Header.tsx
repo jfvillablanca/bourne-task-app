@@ -3,7 +3,7 @@ import { HTMLAttributes } from 'react';
 
 import { cn } from '../lib/utils';
 
-import { AuthenticationModal } from '.';
+import { UserPopover } from '.';
 
 const Header: React.FC<HTMLAttributes<HTMLDivElement>> = ({
     className,
@@ -16,7 +16,7 @@ const Header: React.FC<HTMLAttributes<HTMLDivElement>> = ({
         >
             <GanttChart className="h-12 w-max mr-2" strokeLinecap="square" />
             <h2 className="font-bold tracking-wide">Bourne Task App</h2>
-            <AuthenticationModal />
+            <UserPopover />
         </div>
     );
 };
