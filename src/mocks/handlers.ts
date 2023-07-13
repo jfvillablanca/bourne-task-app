@@ -277,7 +277,7 @@ const addTaskToStorage = ({
 const authGuard = (header: string | null) => {
     const token = header?.split(' ')[1];
     if (!token) {
-        return 'none';
+        return;
     }
     const id = decodeAccessToken(token).sub ?? 'none';
     return id;

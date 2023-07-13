@@ -79,8 +79,8 @@ async function getUser(): Promise<User> {
 }
 
 async function logout() {
-    tokenStorage.clearTokens();
     await post('/api/auth/logout');
+    tokenStorage.clearTokens();
 }
 
 async function registerLocal(credentials: AuthDto) {
