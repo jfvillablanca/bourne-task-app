@@ -484,9 +484,24 @@ describe.shuffle('Task', () => {
     });
 
     it('should update task', async () => {
+        // Create a document to update
         const mockProjectId = mockProjects()[0]._id;
-        const mockTaskId = mockProjects()[0].tasks[0]._id;
-        const updatedTaskDescription = 'new task description';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createResult.current.mutate({
+            title: 'new task title',
+            taskState: mockProjects()[0].taskStates[0],
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+
+        const mockTaskId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+        const updatedTaskTitle = 'updated task title';
         const { result: updateResult } = renderHook(
             () => Task.useUpdate(mockProjectId, mockTaskId),
             {
@@ -494,13 +509,15 @@ describe.shuffle('Task', () => {
             },
         );
 
+        // Update the document
         updateResult.current.mutate({
-            description: updatedTaskDescription,
+            title: updatedTaskTitle,
         });
+
         await waitFor(() => expect(updateResult.current.data).toBeDefined());
+
         // Expect that PATCH returns the updated document
-        expect(updateResult.current.data?.description).toBe(
-            updatedTaskDescription,
+        expect(updateResult.current.data?.title).toBe(updatedTaskTitle);
         );
     });
 });
