@@ -1,4 +1,5 @@
 import { HttpStatusCode } from 'axios';
+import ObjectID from 'bson-objectid';
 import { setupServer } from 'msw/node';
 import { describe, it, vi } from 'vitest';
 
@@ -6,6 +7,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 
 import { Auth, Project, Task } from '../api';
 import { AuthDto, ProjectDto } from '../common';
+import { generateJwtToken } from '../lib/utils';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 import {
@@ -478,6 +480,67 @@ describe.shuffle('Project (Error handling)', () => {
             expect(removeResult.current.error).toBeDefined();
             expect(removeResult.current.error?.status).toBe(
                 HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handler a 404 status code on Project.useRemove', async () => {
+        const nonExistentProjectId = ObjectID(0).toHexString();
+        const { result: removeResult } = renderHook(
+            () => Project.useRemove(nonExistentProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        removeResult.current.mutate();
+
+        await waitFor(() => {
+            expect(removeResult.current.error).toBeDefined();
+            expect(removeResult.current.error?.status).toBe(
+                HttpStatusCode.NotFound,
+            );
+        });
+    });
+
+    it('should handler a 403 status code on Project.useRemove', async () => {
+        const forbiddenUser = {
+            _id: ObjectID(0).toHexString(),
+            email: 'not@teapot.com',
+        };
+
+        // Create a document to FAIL to remove
+        const newProject: ProjectDto = { title: 'delete me' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Set access_token to someone else's access_token
+        localStorage.setItem(
+            'access_token',
+            await generateJwtToken(forbiddenUser, 'access_token'),
+        );
+
+        const { result: removeResult } = renderHook(
+            () => Project.useRemove(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        removeResult.current.mutate();
+
+        await waitFor(() => {
+            expect(removeResult.current.error).toBeDefined();
+            expect(removeResult.current.error?.status).toBe(
+                HttpStatusCode.Forbidden,
+            );
+            expect(removeResult.current.error?.statusText).toBe(
+                'Invalid credentials: Cannot delete resource',
             );
         });
     });
