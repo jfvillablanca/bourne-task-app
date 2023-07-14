@@ -249,7 +249,7 @@ describe.shuffle('Project', () => {
         expect(createResult.current.data?.title).toBe(newProjectTitle);
     });
 
-    it('should findAll projects of a user', async () => {
+    it('should find all projects owned by a user', async () => {
         const { result } = renderHook(() => Project.useFindAll(), {
             wrapper: createWrapper(),
         });
@@ -258,6 +258,59 @@ describe.shuffle('Project', () => {
         const projects = result.current.data;
 
         expect(projects).toHaveLength(5);
+    });
+
+    it('should find all projects a user is a collaborator of', async () => {
+        const collaboratingUser = {
+            _id: ObjectID(0).toHexString(),
+            email: 'collab@teapot.com',
+        };
+
+        // Create a project to collaborate on
+        const newProject: ProjectDto = { title: 'collaborative project' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+        const { result: ownerUpdateResult } = renderHook(
+            () => Project.useUpdate(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Owner adds collaboratingUser to collaborators
+        ownerUpdateResult.current.mutate({
+            collaborators: [collaboratingUser._id],
+        });
+
+        // Set access_token to collaborator's access_token
+        localStorage.setItem(
+            'access_token',
+            await generateJwtToken(collaboratingUser, 'access_token'),
+        );
+
+        const { result: collaboratorFindAll } = renderHook(
+            () => Project.useFindAll(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() =>
+            expect(collaboratorFindAll.current.data).toBeDefined(),
+        );
+        const collaboratedProjects = collaboratorFindAll.current.data;
+        const collabProjectTitle = collaboratedProjects
+            ? collaboratedProjects[0].title
+            : '';
+
+        expect(collaboratedProjects).toHaveLength(1);
+        expect(collabProjectTitle).toBe('collaborative project');
     });
 
     it('should findOne project of a user', async () => {
@@ -346,7 +399,7 @@ describe.shuffle('Project', () => {
             },
         );
 
-        // Collaborator updates the document
+        // Owner adds collaboratingUser to collaborators
         ownerUpdateResult.current.mutate({
             collaborators: [collaboratingUser._id],
         });
@@ -357,6 +410,7 @@ describe.shuffle('Project', () => {
             await generateJwtToken(collaboratingUser, 'access_token'),
         );
 
+        // Collaborator updates the document
         const collabUpdatedDescription = 'description updated by collaborator';
         const { result: collabUpdateResult } = renderHook(
             () => Project.useUpdate(projectId),
