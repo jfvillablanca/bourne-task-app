@@ -226,7 +226,7 @@ describe.shuffle('Auth', () => {
     });
 });
 
-describe.shuffle('Project - Create', () => {
+describe.shuffle('Project', () => {
     beforeEach(async () => {
         await setTestAccessTokenToLocalStorage();
     });
@@ -245,33 +245,6 @@ describe.shuffle('Project - Create', () => {
 
         await waitFor(() => expect(createResult.current.data).toBeDefined());
         expect(createResult.current.data?.title).toBe(newProjectTitle);
-    });
-
-    it('should handle a 401 status code on Project.useCreate', async () => {
-        clearTestAccessTokenFromLocalStorage();
-        const newProjectTitle = 'new project';
-        const { result: createResult } = renderHook(() => Project.useCreate(), {
-            wrapper: createWrapper(),
-        });
-
-        createResult.current.mutate({ title: newProjectTitle });
-
-        await waitFor(() => {
-            expect(createResult.current.error).toBeDefined();
-            expect(createResult.current.error?.status).toBe(
-                HttpStatusCode.Unauthorized,
-            );
-        });
-    });
-});
-
-describe.shuffle('Project', () => {
-    beforeEach(async () => {
-        await setTestAccessTokenToLocalStorage();
-    });
-
-    afterEach(() => {
-        clearTestAccessTokenFromLocalStorage();
     });
 
     it('should findAll projects of a user', async () => {
@@ -370,6 +343,33 @@ describe.shuffle('Project', () => {
         await waitFor(() => expect(removeResult.current.data).toBeDefined());
 
         expect(removeResult.current.data).toBe(true);
+    });
+});
+
+describe.shuffle('Project (Error handling)', () => {
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
+    });
+
+    afterEach(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
+
+    it('should handle a 401 status code on Project.useCreate', async () => {
+        clearTestAccessTokenFromLocalStorage();
+        const newProjectTitle = 'new project';
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+
+        createResult.current.mutate({ title: newProjectTitle });
+
+        await waitFor(() => {
+            expect(createResult.current.error).toBeDefined();
+            expect(createResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
     });
 
     it('should handle a 401 status code on Project.useFindAll', async () => {
