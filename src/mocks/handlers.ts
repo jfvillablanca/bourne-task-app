@@ -191,6 +191,16 @@ export const handlers = [
     }),
 
     rest.post('/api/projects', async (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
 
@@ -209,10 +219,7 @@ export const handlers = [
             ownerId: userId,
             ...interceptedPayload,
         };
-        const projects = getProjects();
-        const updatedProjects = projects
-            ? [...projects, newProject]
-            : [newProject];
+        const updatedProjects = [...projects, newProject];
 
         localStorage.setItem(
             PROJECTS_STORAGE_KEY,
