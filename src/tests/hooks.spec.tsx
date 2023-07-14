@@ -461,6 +461,21 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
+    it('should handle a 404 status code on Project.useFindOne', async () => {
+        const nonExistentProjectId = ObjectID(0).toHexString();
+        const { result } = renderHook(
+            () => Project.useFindOne(nonExistentProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(HttpStatusCode.NotFound);
+        });
+    });
+
     it('should handle a 401 status code on Project.useGetProjectMembers', async () => {
         clearTestAccessTokenFromLocalStorage();
         const mockProjectId = mockProjects()[0]._id;
@@ -476,6 +491,21 @@ describe.shuffle('Project (Error handling)', () => {
             expect(result.current.error?.status).toBe(
                 HttpStatusCode.Unauthorized,
             );
+        });
+    });
+
+    it('should handle a 404 status code on Project.useGetProjectMembers', async () => {
+        const nonExistentProjectId = ObjectID(0).toHexString();
+        const { result } = renderHook(
+            () => Project.useGetProjectMembers(nonExistentProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(HttpStatusCode.NotFound);
         });
     });
 
