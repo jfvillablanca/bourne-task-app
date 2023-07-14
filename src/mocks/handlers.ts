@@ -223,6 +223,16 @@ export const handlers = [
     }),
 
     rest.get('/api/projects', (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
 
@@ -230,10 +240,12 @@ export const handlers = [
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
 
-        const projects = getProjects()?.filter(
-            (project) => project.ownerId === userId,
+        const foundProjects = projects.filter(
+            (project) =>
+                project.ownerId === userId ||
+                project.collaborators.includes(userId),
         );
-        return res(ctx.json(projects), ctx.status(HttpStatusCode.Ok));
+        return res(ctx.json(foundProjects), ctx.status(HttpStatusCode.Ok));
     }),
 
     rest.get('/api/projects/:projectId', (req, res, ctx) => {
