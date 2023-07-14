@@ -527,6 +527,7 @@ describe.shuffle('Project (Error handling)', () => {
         await waitFor(() => {
             expect(result.current.error).toBeDefined();
             expect(result.current.error?.status).toBe(HttpStatusCode.NotFound);
+            expect(result.current.error?.statusText).toBe('Project not found');
         });
     });
 
@@ -908,6 +909,23 @@ describe.shuffle('Task (Error handling)', () => {
         });
     });
 
+    it('should handle a 404 status code on Task.useFindOne', async () => {
+        const nonExistentTaskId = ObjectID(0).toHexString();
+        const mockProjectId = mockProjects()[0]._id;
+        const { result } = renderHook(
+            () => Task.useFindOne(mockProjectId, nonExistentTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(HttpStatusCode.NotFound);
+            expect(result.current.error?.statusText).toBe('Task not found');
+        });
+    });
+
     it('should handle a 401 status code on Task.useUpdate', async () => {
         // Create a document to FAIL to update
         const mockProjectId = mockProjects()[0]._id;
@@ -947,6 +965,33 @@ describe.shuffle('Task (Error handling)', () => {
             expect(updateResult.current.error).toBeDefined();
             expect(updateResult.current.error?.status).toBe(
                 HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handle a 404 status code on Task.useUpdate', async () => {
+        const nonExistentTaskId = ObjectID(0).toHexString();
+        const mockProjectId = mockProjects()[0]._id;
+        const updatedTaskTitle = 'update task title attempt';
+        const { result: updateResult } = renderHook(
+            () => Task.useUpdate(mockProjectId, nonExistentTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Update the document
+        updateResult.current.mutate({
+            title: updatedTaskTitle,
+        });
+
+        await waitFor(() => {
+            expect(updateResult.current.error).toBeDefined();
+            expect(updateResult.current.error?.status).toBe(
+                HttpStatusCode.NotFound,
+            );
+            expect(updateResult.current.error?.statusText).toBe(
+                'Task not found',
             );
         });
     });
