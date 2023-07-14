@@ -316,9 +316,67 @@ describe.shuffle('Project', () => {
         updateResult.current.mutate({ description: updatedDescription });
 
         await waitFor(() => expect(updateResult.current.data).toBeDefined());
+        const updatedProject = updateResult.current.data;
 
         // Expect that PATCH returns the updated document
-        expect(updateResult.current.data?.description).toBe(updatedDescription);
+        expect(updatedProject?.description).toBe(updatedDescription);
+    });
+
+    it('should let collaborator update project of another user', async () => {
+        const collaboratingUser = {
+            _id: ObjectID(0).toHexString(),
+            email: 'collab@teapot.com',
+        };
+
+        // Create a document to update
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        const { result: ownerUpdateResult } = renderHook(
+            () => Project.useUpdate(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Collaborator updates the document
+        ownerUpdateResult.current.mutate({
+            collaborators: [collaboratingUser._id],
+        });
+
+        // Set access_token to collaborator's access_token
+        localStorage.setItem(
+            'access_token',
+            await generateJwtToken(collaboratingUser, 'access_token'),
+        );
+
+        const collabUpdatedDescription = 'description updated by collaborator';
+        const { result: collabUpdateResult } = renderHook(
+            () => Project.useUpdate(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Collaborator updates the document
+        collabUpdateResult.current.mutate({
+            description: collabUpdatedDescription,
+        });
+
+        await waitFor(() =>
+            expect(collabUpdateResult.current.data).toBeDefined(),
+        );
+        const updatedProject = collabUpdateResult.current.data;
+
+        // Expect that PATCH returns the updated document
+        expect(updatedProject?.description).toBe(collabUpdatedDescription);
     });
 
     it('should remove project of a user', async () => {
@@ -449,6 +507,63 @@ describe.shuffle('Project (Error handling)', () => {
             expect(updateResult.current.error).toBeDefined();
             expect(updateResult.current.error?.status).toBe(
                 HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handler a 404 status code on Project.useUpdate', async () => {
+        const nonExistentProjectId = ObjectID(0).toHexString();
+        const { result: updateResult } = renderHook(
+            () => Project.useUpdate(nonExistentProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        updateResult.current.mutate({ description: 'some description' });
+
+        await waitFor(() => {
+            expect(updateResult.current.error).toBeDefined();
+            expect(updateResult.current.error?.status).toBe(
+                HttpStatusCode.NotFound,
+            );
+        });
+    });
+
+    it('should handler a 403 status code on Project.useUpdate', async () => {
+        const forbiddenUser = {
+            _id: ObjectID(0).toHexString(),
+            email: 'not@teapot.com',
+        };
+
+        // Create a document to FAIL to update
+        const newProject: ProjectDto = { title: 'update me' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Set access_token to someone else's access_token
+        localStorage.setItem(
+            'access_token',
+            await generateJwtToken(forbiddenUser, 'access_token'),
+        );
+
+        const { result: updateResult } = renderHook(
+            () => Project.useUpdate(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        updateResult.current.mutate({ description: 'some description' });
+
+        await waitFor(() => {
+            expect(updateResult.current.error).toBeDefined();
+            expect(updateResult.current.error?.status).toBe(
+                HttpStatusCode.Forbidden,
             );
         });
     });
