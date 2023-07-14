@@ -315,6 +315,55 @@ export const handlers = [
         return res(ctx.json(updatedProject), ctx.status(HttpStatusCode.Ok));
     }),
 
+    rest.delete('/api/projects/:projectId', (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+        const { projectId } = req.params;
+
+        const existingProjectIndex = projects.findIndex(
+            (project) => project._id === projectId,
+        );
+
+        if (existingProjectIndex < 0) {
+            return res(ctx.status(HttpStatusCode.NotFound));
+        }
+
+        if (projects[existingProjectIndex].ownerId !== userId) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.Forbidden,
+                    'Invalid credentials: Cannot delete resource',
+                ),
+            );
+        }
+
+        const updatedProjects = [
+            ...projects.slice(0, existingProjectIndex),
+            projects.slice(existingProjectIndex + 1),
+        ];
+
+        localStorage.setItem(
+            PROJECTS_STORAGE_KEY,
+            JSON.stringify(updatedProjects),
+        );
+
+        return res(ctx.status(HttpStatusCode.NoContent));
+    }),
+
     rest.post('/api/projects/:projectId/tasks', async (req, res, ctx) => {
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
