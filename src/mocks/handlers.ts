@@ -430,19 +430,29 @@ export const handlers = [
     }),
 
     rest.post('/api/projects/:projectId/tasks', async (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-
         const interceptedPayload: TaskDto = await req.json();
         const { projectId } = req.params;
 
-        const project = getProjects()?.find(
-            (project) => project._id === projectId,
-        );
+        const project = projects.find((project) => project._id === projectId);
+        if (!project) {
+            return res(ctx.status(HttpStatusCode.NotFound));
+        }
 
         const newTask: TaskDocument = {
             _id: ObjectID().toHexString(),
@@ -450,9 +460,9 @@ export const handlers = [
             assignedProjMemberId: [],
             ...interceptedPayload,
         };
-        const updatedTasks = project ? [...project.tasks, newTask] : [newTask];
+        const updatedTasks = [...project.tasks, newTask];
         const updatedProject = { ...project, tasks: updatedTasks };
-        const updatedProjects = getProjects()?.map((project) => {
+        const updatedProjects = projects.map((project) => {
             if (project._id === projectId) {
                 return updatedProject;
             }
@@ -468,45 +478,78 @@ export const handlers = [
     }),
 
     rest.get('/api/projects/:projectId/tasks', (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-
         const { projectId } = req.params;
-        const tasks = getProjects()?.find(
-            (project) => project._id === projectId,
-        )?.tasks;
 
-        return res(ctx.json(tasks ?? []), ctx.status(HttpStatusCode.Ok));
+        const project = projects.find((project) => project._id === projectId);
+        if (!project) {
+            return res(ctx.status(HttpStatusCode.NotFound));
+        }
+
+        return res(ctx.json(project.tasks), ctx.status(HttpStatusCode.Ok));
     }),
 
     rest.get('/api/projects/:projectId/tasks/:taskId', (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-
         const { projectId, taskId } = req.params;
-        const tasks = getProjects()?.find(
-            (project) => project._id === projectId,
-        )?.tasks;
 
-        const task = tasks?.find((task) => task._id === taskId);
-
-        if (task) {
-            return res(ctx.json(task), ctx.status(HttpStatusCode.Ok));
+        const project = projects.find((project) => project._id === projectId);
+        if (!project) {
+            return res(ctx.status(HttpStatusCode.NotFound));
         }
-        return res(ctx.status(HttpStatusCode.NotFound));
+
+        const tasks = project.tasks;
+        const task = tasks.find((task) => task._id === taskId);
+        if (!task) {
+            return res(ctx.status(HttpStatusCode.NotFound, 'Task not found'));
+        }
+
+        return res(ctx.json(task), ctx.status(HttpStatusCode.Ok));
     }),
 
     rest.patch(
         '/api/projects/:projectId/tasks/:taskId',
         async (req, res, ctx) => {
+            const projects = getProjects();
+            if (!projects) {
+                return res(
+                    ctx.status(
+                        HttpStatusCode.InternalServerError,
+                        'Mock projects not loaded to localStorage',
+                    ),
+                );
+            }
+
             const authHeader = req.headers.get('Authorization');
             const userId = authGuard(authHeader);
 
@@ -517,28 +560,33 @@ export const handlers = [
             const interceptedPayload: UpdateTaskDto = await req.json();
             const { projectId, taskId } = req.params;
 
-            const project = getProjects()?.find(
+            const project = projects.find(
                 (project) => project._id === projectId,
             );
-            const taskToUpdate = project?.tasks.find(
-                (task) => task._id === taskId,
-            );
+            if (!project) {
+                return res(ctx.status(HttpStatusCode.NotFound));
+            }
 
-            const updatedTask =
-                project && taskToUpdate
-                    ? {
-                          ...taskToUpdate,
-                          ...interceptedPayload,
-                      }
-                    : undefined;
-            const updatedTasks = project?.tasks.map((task) => {
+            const tasks = project.tasks;
+            const taskToUpdate = tasks.find((task) => task._id === taskId);
+            if (!taskToUpdate) {
+                return res(
+                    ctx.status(HttpStatusCode.NotFound, 'Task not found'),
+                );
+            }
+
+            const updatedTask = {
+                ...taskToUpdate,
+                ...interceptedPayload,
+            };
+            const updatedTasks = project.tasks.map((task) => {
                 if (task._id === taskId) {
                     return updatedTask;
                 }
                 return task;
             });
             const updatedProject = { ...project, tasks: updatedTasks };
-            const updatedProjects = getProjects()?.map((project) => {
+            const updatedProjects = projects.map((project) => {
                 if (project._id === projectId) {
                     return updatedProject;
                 }
