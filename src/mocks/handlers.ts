@@ -116,8 +116,8 @@ export const handlers = [
             );
         }
 
-        const existingUserIndex = users.findIndex((x) => x.email === email);
-        if (existingUserIndex < 0) {
+        const userIndex = users.findIndex((x) => x.email === email);
+        if (userIndex < 0) {
             return res(
                 ctx.status(
                     HttpStatusCode.Forbidden,
@@ -125,9 +125,9 @@ export const handlers = [
                 ),
             );
         }
-        const existingUser = users[existingUserIndex];
+        const user = users[userIndex];
 
-        const isValidPassword = existingUser.hashed_password === password;
+        const isValidPassword = user.hashed_password === password;
         if (!isValidPassword) {
             return res(
                 ctx.status(HttpStatusCode.Forbidden, 'Invalid password'),
@@ -136,22 +136,22 @@ export const handlers = [
 
         const generatedTokens: AuthToken = {
             access_token: await generateJwtToken(
-                { _id: existingUser._id, email: existingUser.email },
+                { _id: user._id, email: user.email },
                 'access_token',
             ),
             refresh_token: await generateJwtToken(
-                { _id: existingUser._id, email: existingUser.email },
+                { _id: user._id, email: user.email },
                 'refresh_token',
             ),
         };
 
         const updatedUser: MockedUser = {
-            ...existingUser,
+            ...user,
             refresh_token: generatedTokens.refresh_token,
         };
 
         const updatedUsers = users.map((user, index) => {
-            if (index === existingUserIndex) {
+            if (index === userIndex) {
                 return updatedUser;
             }
             return user;
@@ -299,20 +299,13 @@ export const handlers = [
         const interceptedPayload: UpdateProjectDto = await req.json();
         const { projectId } = req.params;
 
-        const existingProject = projects.find(
-            (project) => project._id === projectId,
-        );
+        const project = projects.find((project) => project._id === projectId);
 
-        if (!existingProject) {
+        if (!project) {
             return res(ctx.status(HttpStatusCode.NotFound));
         }
 
-        if (
-            ![
-                existingProject.ownerId,
-                ...existingProject.collaborators,
-            ].includes(userId)
-        ) {
+        if (![project.ownerId, ...project.collaborators].includes(userId)) {
             return res(
                 ctx.status(
                     HttpStatusCode.Forbidden,
@@ -322,7 +315,7 @@ export const handlers = [
         }
 
         const updatedProject = {
-            ...existingProject,
+            ...project,
             ...interceptedPayload,
         };
         const updatedProjects = getProjects()?.map((project) => {
@@ -359,15 +352,15 @@ export const handlers = [
         }
         const { projectId } = req.params;
 
-        const existingProjectIndex = projects.findIndex(
+        const projectIndex = projects.findIndex(
             (project) => project._id === projectId,
         );
 
-        if (existingProjectIndex < 0) {
+        if (projectIndex < 0) {
             return res(ctx.status(HttpStatusCode.NotFound));
         }
 
-        if (projects[existingProjectIndex].ownerId !== userId) {
+        if (projects[projectIndex].ownerId !== userId) {
             return res(
                 ctx.status(
                     HttpStatusCode.Forbidden,
@@ -377,8 +370,8 @@ export const handlers = [
         }
 
         const updatedProjects = [
-            ...projects.slice(0, existingProjectIndex),
-            projects.slice(existingProjectIndex + 1),
+            ...projects.slice(0, projectIndex),
+            projects.slice(projectIndex + 1),
         ];
 
         localStorage.setItem(
