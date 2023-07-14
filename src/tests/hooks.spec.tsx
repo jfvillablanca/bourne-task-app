@@ -838,6 +838,16 @@ describe.shuffle('Task', () => {
         // Expect that PATCH returns the updated document
         expect(updateResult.current.data?.title).toBe(updatedTaskTitle);
     });
+});
+
+describe.shuffle('Task (Error handling)', () => {
+    beforeEach(async () => {
+        await setTestAccessTokenToLocalStorage();
+    });
+
+    afterEach(() => {
+        clearTestAccessTokenFromLocalStorage();
+    });
 
     it('should handle a 401 status code on Task.useCreate', async () => {
         clearTestAccessTokenFromLocalStorage();
