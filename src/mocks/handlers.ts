@@ -280,26 +280,51 @@ export const handlers = [
     }),
 
     rest.patch('/api/projects/:projectId', async (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-
         const interceptedPayload: UpdateProjectDto = await req.json();
         const { projectId } = req.params;
 
-        const existingProject = getProjects()?.find(
+        const existingProject = projects.find(
             (project) => project._id === projectId,
         );
 
-        const updatedProject = existingProject
-            ? {
-                  ...existingProject,
-                  ...interceptedPayload,
-              }
-            : undefined;
+        if (!existingProject) {
+            return res(ctx.status(HttpStatusCode.NotFound));
+        }
+
+        if (
+            ![
+                existingProject.ownerId,
+                ...existingProject.collaborators,
+            ].includes(userId)
+        ) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.Forbidden,
+                    'Invalid credentials: Cannot update resource',
+                ),
+            );
+        }
+
+        const updatedProject = {
+            ...existingProject,
+            ...interceptedPayload,
+        };
         const updatedProjects = getProjects()?.map((project) => {
             if (project._id === projectId) {
                 return updatedProject;
