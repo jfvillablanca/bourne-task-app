@@ -237,32 +237,60 @@ export const handlers = [
     }),
 
     rest.get('/api/projects/:projectId', (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-
         const { projectId } = req.params;
-        const project = getProjects()?.find(
-            (project) => project._id === projectId,
-        );
+
+        const project = projects.find((project) => project._id === projectId);
+
+        if (!project) {
+            return res(
+                ctx.status(HttpStatusCode.NotFound, 'Project not found'),
+            );
+        }
+
         return res(ctx.json(project), ctx.status(HttpStatusCode.Ok));
     }),
 
     rest.get('/api/projects/:projectId/members', (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-
         const { projectId } = req.params;
-        const project = getProjects()?.find(
-            (project) => project._id === projectId,
-        );
+
+        const project = projects.find((project) => project._id === projectId);
+
+        if (!project) {
+            return res(ctx.status(HttpStatusCode.NotFound));
+        }
+
         const projectMemberIds = project
             ? [project.ownerId, ...project.collaborators]
             : [];
