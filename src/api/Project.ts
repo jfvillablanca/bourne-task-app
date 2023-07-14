@@ -10,7 +10,7 @@ import {
     UpdateProjectDto,
 } from '../common';
 
-import { get, patch, post } from '.';
+import { destroy, get, patch, post } from '.';
 
 export const Project = {
     queryKeys: {
@@ -76,6 +76,18 @@ export const Project = {
             },
         });
     },
+
+    useRemove: (projectId: string) => {
+        const queryClient = useQueryClient();
+        return useMutation<boolean, AxiosError['response'], void>({
+            mutationFn: () => removeProject(projectId),
+            onSuccess: () => {
+                return queryClient.invalidateQueries({
+                    queryKey: Project.queryKeys.all,
+                });
+            },
+        });
+    },
 };
 
 const createProject = async (
@@ -108,4 +120,9 @@ const updateProject = async (
 ): Promise<ProjectDocument> => {
     const response = await patch(`/api/projects/${projectId}`, updatedFields);
     return response.data;
+};
+
+const removeProject = async (projectId: string) => {
+    await destroy(`/api/projects/${projectId}`);
+    return true;
 };
