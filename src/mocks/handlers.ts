@@ -19,50 +19,119 @@ import { decodeAccessToken, generateJwtToken } from '../lib/utils';
 
 import { PROJECTS_STORAGE_KEY, USERS_STORAGE_KEY } from './constants';
 
-const getUsers = (userId: string) => {
-    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
-    if (!storedData) {
+const getUsers = () => {
+    const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
+    if (!storedUsers) {
         return;
     }
-    const userList: MockedUser[] = JSON.parse(storedData);
-    const mockUser = userList.find((user) => user._id === userId);
+
+    return JSON.parse(storedUsers) as MockedUser[];
+};
+
+const getUserById = (userId: string) => {
+    const mockUser = getUsers()?.find((user) => user._id === userId);
     if (mockUser) {
         const user: User = { _id: mockUser._id, email: mockUser.email };
         return user;
     }
 };
 
-const logUserOut = (userId: string) => {
-    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
-    if (!storedData) {
+const getProjects = () => {
+    const storedProjects = localStorage.getItem(PROJECTS_STORAGE_KEY);
+    if (!storedProjects) {
         return;
     }
-    const userList: MockedUser[] = JSON.parse(storedData);
-    userList.map((user) => {
-        if (user._id === userId) {
-            user.refresh_token = null;
-        }
-        return user;
-    });
+    return JSON.parse(storedProjects) as ProjectDocument[];
 };
 
-const logUserIn = async ({ email, password }: AuthDto) => {
-    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
+const authGuard = (header: string | null) => {
+    const token = header?.split(' ')[1];
+    if (!token) {
+        return;
+    }
+    const id = decodeAccessToken(token).sub ?? 'none';
+    return id;
+};
 
-    if (storedData) {
-        const parsedData: MockedUser[] = JSON.parse(storedData);
+export const handlers = [
+    rest.post('/api/auth/local/register', async (req, res, ctx) => {
+        const { email, password }: AuthDto = await req.json();
 
-        const existingUserIndex = parsedData.findIndex(
-            (x) => x.email === email,
-        );
-        if (existingUserIndex < 0) {
-            return new Error('Invalid credentials: user does not exist');
+        const users = getUsers();
+        if (!users) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock users not loaded to localStorage',
+                ),
+            );
         }
-        const existingUser = parsedData[existingUserIndex];
+
+        const _id = ObjectID().toHexString();
+        const generatedTokens: AuthToken = {
+            access_token: await generateJwtToken(
+                { _id, email },
+                'access_token',
+            ),
+            refresh_token: await generateJwtToken(
+                { _id, email },
+                'refresh_token',
+            ),
+        };
+        const newUser: MockedUser = {
+            _id,
+            email,
+            hashed_password: password,
+            refresh_token: generatedTokens.refresh_token,
+        };
+
+        const isExistingEmail = users.some(
+            (user) => user.email === newUser.email,
+        );
+        if (isExistingEmail) {
+            return res(
+                ctx.status(HttpStatusCode.Conflict, 'Email is already taken'),
+            );
+        }
+
+        const updatedUsers = [...users, newUser];
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsers));
+
+        return res(
+            ctx.json(generatedTokens),
+            ctx.status(HttpStatusCode.Created),
+        );
+    }),
+
+    rest.post('/api/auth/local/login', async (req, res, ctx) => {
+        const { email, password }: AuthDto = await req.json();
+
+        const users = getUsers();
+        if (!users) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock users not loaded to localStorage',
+                ),
+            );
+        }
+
+        const existingUserIndex = users.findIndex((x) => x.email === email);
+        if (existingUserIndex < 0) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.Forbidden,
+                    'Invalid credentials: user does not exist',
+                ),
+            );
+        }
+        const existingUser = users[existingUserIndex];
 
         const isValidPassword = existingUser.hashed_password === password;
         if (!isValidPassword) {
-            return new Error('Invalid password');
+            return res(
+                ctx.status(HttpStatusCode.Forbidden, 'Invalid password'),
+            );
         }
 
         const generatedTokens: AuthToken = {
@@ -81,98 +150,15 @@ const logUserIn = async ({ email, password }: AuthDto) => {
             refresh_token: generatedTokens.refresh_token,
         };
 
-        const updatedData = parsedData.map((user, index) => {
+        const updatedUsers = users.map((user, index) => {
             if (index === existingUserIndex) {
                 return updatedUser;
             }
             return user;
         });
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedData));
-        return generatedTokens;
-    }
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsers));
 
-    return new Error('Invalid credentials: user does not exist');
-};
-
-const addUserToStorage = async ({ email, password }: AuthDto) => {
-    const storedData = localStorage.getItem(USERS_STORAGE_KEY);
-
-    const _id = ObjectID().toHexString();
-    const generatedTokens: AuthToken = {
-        access_token: await generateJwtToken({ _id, email }, 'access_token'),
-        refresh_token: await generateJwtToken({ _id, email }, 'refresh_token'),
-    };
-    const newUser: MockedUser = {
-        _id,
-        email,
-        hashed_password: password,
-        refresh_token: generatedTokens.refresh_token,
-    };
-
-    if (storedData) {
-        const parsedData: MockedUser[] = JSON.parse(storedData);
-
-        const isExistingEmail = parsedData
-            .map((x) => x.email)
-            .includes(newUser.email);
-        if (isExistingEmail) {
-            return new Error('Email is already taken');
-        }
-
-        const updatedData = [...parsedData, newUser];
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedData));
-        return generatedTokens;
-    }
-
-    const newUsersData = [newUser];
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(newUsersData));
-    return generatedTokens;
-};
-
-const getProjects = () => {
-    const storedData = localStorage.getItem(PROJECTS_STORAGE_KEY);
-    if (!storedData) {
-        return;
-    }
-    return JSON.parse(storedData) as ProjectDocument[];
-};
-
-const authGuard = (header: string | null) => {
-    const token = header?.split(' ')[1];
-    if (!token) {
-        return;
-    }
-    const id = decodeAccessToken(token).sub ?? 'none';
-    return id;
-};
-
-export const handlers = [
-    rest.post('/api/auth/local/register', async (req, res, ctx) => {
-        const interceptedPayload: AuthDto = await req.json();
-        const tokens = await addUserToStorage({
-            email: interceptedPayload.email,
-            password: interceptedPayload.password,
-        });
-
-        if (tokens instanceof Error) {
-            return res(ctx.status(HttpStatusCode.Conflict, tokens.message));
-        }
-
-        return res(ctx.json(tokens), ctx.status(HttpStatusCode.Created));
-    }),
-
-    rest.post('/api/auth/local/login', async (req, res, ctx) => {
-        const interceptedPayload: AuthDto = await req.json();
-        const tokens = await logUserIn({
-            email: interceptedPayload.email,
-            password: interceptedPayload.password,
-        });
-
-        if (tokens instanceof Error) {
-            return res(ctx.status(HttpStatusCode.Forbidden, tokens.message));
-        }
-
-        return res(ctx.json(tokens), ctx.status(HttpStatusCode.Ok));
+        return res(ctx.json(generatedTokens), ctx.status(HttpStatusCode.Ok));
     }),
 
     rest.get('/api/users/me', (req, res, ctx) => {
@@ -182,7 +168,7 @@ export const handlers = [
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-        const user = getUsers(userId);
+        const user = getUserById(userId);
 
         return res(ctx.json(user), ctx.status(HttpStatusCode.Ok));
     }),
@@ -194,7 +180,12 @@ export const handlers = [
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-        logUserOut(userId);
+        getUsers()?.map((user) => {
+            if (user._id === userId) {
+                user.refresh_token = null;
+            }
+            return user;
+        });
 
         return res(ctx.status(HttpStatusCode.Ok));
     }),
@@ -276,8 +267,8 @@ export const handlers = [
             ? [project.ownerId, ...project.collaborators]
             : [];
 
-        const projectMembers = projectMemberIds.map((id) => {
-            const user = getUsers(id);
+        const projectMembers = projectMemberIds.map((userId) => {
+            const user = getUserById(userId);
             if (!user) {
                 throw res(ctx.status(HttpStatusCode.NotFound));
             }
