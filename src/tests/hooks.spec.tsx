@@ -346,6 +346,32 @@ describe.shuffle('Project', () => {
         expect(updateResult.current.data?.description).toBe(updatedDescription);
     });
 
+    it('should remove project of a user', async () => {
+        // Create a document to remove
+        const newProject: ProjectDto = { title: 'delete me' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        const { result: removeResult } = renderHook(
+            () => Project.useRemove(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Remove the document
+        removeResult.current.mutate();
+        await waitFor(() => expect(removeResult.current.data).toBeDefined());
+
+        expect(removeResult.current.data).toBe(true);
+    });
+
     it('should handle a 401 status code on Project.useFindAll', async () => {
         clearTestAccessTokenFromLocalStorage();
         const { result } = renderHook(() => Project.useFindAll(), {
@@ -420,6 +446,37 @@ describe.shuffle('Project', () => {
         await waitFor(() => {
             expect(updateResult.current.error).toBeDefined();
             expect(updateResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handler a 401 status code on Project.useRemove', async () => {
+        // Create a document to FAIL to remove
+        const newProject: ProjectDto = { title: 'delete me' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Clear the access token
+        clearTestAccessTokenFromLocalStorage();
+
+        const { result: removeResult } = renderHook(
+            () => Project.useRemove(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        removeResult.current.mutate();
+
+        await waitFor(() => {
+            expect(removeResult.current.error).toBeDefined();
+            expect(removeResult.current.error?.status).toBe(
                 HttpStatusCode.Unauthorized,
             );
         });
