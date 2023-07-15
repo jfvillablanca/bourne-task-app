@@ -418,7 +418,7 @@ export const handlers = [
 
         const updatedProjects = [
             ...projects.slice(0, projectIndex),
-            projects.slice(projectIndex + 1),
+            ...projects.slice(projectIndex + 1),
         ];
 
         localStorage.setItem(
@@ -644,7 +644,7 @@ export const handlers = [
 
         const updatedTasks = [
             ...tasks.slice(0, taskIndex),
-            tasks.slice(taskIndex + 1),
+            ...tasks.slice(taskIndex + 1),
         ];
         const updatedProject = { ...project, tasks: updatedTasks };
         const updatedProjects = projects.map((project) => {
