@@ -7,6 +7,7 @@ export { default as FormTaskMembers } from './FormTaskMembers';
 export { default as Header } from './Header';
 export { default as MemberAvatars } from './MemberAvatars';
 export { default as ProjectAdd } from './ProjectAdd';
+export { default as ProjectDelete } from './ProjectDelete';
 export { default as ProjectTitle } from './ProjectTitle';
 export { default as Sidebar } from './Sidebar';
 export { default as TaskCard } from './TaskCard';

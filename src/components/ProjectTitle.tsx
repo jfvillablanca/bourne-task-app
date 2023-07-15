@@ -6,6 +6,7 @@ import { ProjectDto } from '../common';
 import { cn } from '../lib/utils';
 
 import { Popover, PopoverContent, PopoverTrigger, Skeleton } from './ui';
+import { ProjectDelete } from '.';
 
 interface ProjectTitleProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
@@ -77,15 +78,21 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
             <div className={cn('flex items-center gap-2 h-14', className)}>
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                        <div
-                            className="btn btn-ghost flex gap-3 items-center data-[state=open]:bg-neutral -mx-4"
-                            data-testid={`project-title-${projectQuery.data._id}`}
-                            onClick={() => setOpen((v) => !v)}
-                        >
-                            <h2 className="text-3xl font-medium tracking-tight normal-case">
-                                {projectMeta.title}
-                            </h2>
-                            <Pencil className="w-4" />
+                        <div className="flex gap-5 items-center">
+                            <div
+                                className="btn btn-ghost flex gap-3 items-center data-[state=open]:bg-neutral -mx-4"
+                                data-testid={`project-title-${projectQuery.data._id}`}
+                                onClick={() => setOpen((v) => !v)}
+                            >
+                                <h2 className="text-3xl font-medium tracking-tight normal-case">
+                                    {projectMeta.title}
+                                </h2>
+                                <Pencil className="w-4" />
+                            </div>
+                            <ProjectDelete
+                                className="p-2"
+                                projectId={projectId}
+                            />
                         </div>
                         {projectMeta.description && (
                             <h3 className="flex justify-start text-sm">
