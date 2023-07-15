@@ -601,4 +601,64 @@ export const handlers = [
             return res(ctx.json(updatedTask), ctx.status(HttpStatusCode.Ok));
         },
     ),
+
+    rest.delete('/api/projects/:projectId/tasks/:taskId', (req, res, ctx) => {
+        const projects = getProjects();
+        if (!projects) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock projects not loaded to localStorage',
+                ),
+            );
+        }
+
+        const authHeader = req.headers.get('Authorization');
+        const userId = authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+
+        const { projectId, taskId } = req.params;
+
+        const project = projects.find((project) => project._id === projectId);
+        if (!project) {
+            return res(ctx.status(HttpStatusCode.NotFound));
+        }
+
+        const tasks = project.tasks;
+        const taskIndex = tasks.findIndex((task) => task._id === taskId);
+        if (taskIndex < 0) {
+            return res(ctx.status(HttpStatusCode.NotFound, 'Task not found'));
+        }
+
+        if (![project.ownerId, ...project.collaborators].includes(userId)) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.Forbidden,
+                    'Invalid credentials: Cannot update resource',
+                ),
+            );
+        }
+
+        const updatedTasks = [
+            ...tasks.slice(0, taskIndex),
+            tasks.slice(taskIndex + 1),
+        ];
+        const updatedProject = { ...project, tasks: updatedTasks };
+        const updatedProjects = projects.map((project) => {
+            if (project._id === projectId) {
+                return updatedProject;
+            }
+            return project;
+        });
+
+        localStorage.setItem(
+            PROJECTS_STORAGE_KEY,
+            JSON.stringify(updatedProjects),
+        );
+
+        return res(ctx.status(HttpStatusCode.NoContent));
+    }),
 ];
