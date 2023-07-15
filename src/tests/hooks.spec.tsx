@@ -747,8 +747,42 @@ describe.shuffle('Project (Error handling)', () => {
 });
 
 describe.shuffle('Task', () => {
+    let mockProjectId: string;
+    let mockTaskState: string;
+
     beforeEach(async () => {
         await setTestAccessTokenToLocalStorage();
+
+        const collaboratingUser = {
+            _id: ObjectID(0).toHexString(),
+            email: 'collab@teapot.com',
+        };
+
+        // Create a project to add task to
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        mockProjectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+        mockTaskState = createResult.current.isSuccess
+            ? createResult.current.data.taskStates[0]
+            : '';
+
+        const { result: updateResult } = renderHook(
+            () => Project.useUpdate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Owner adds collaboratingUser to collaborators
+        updateResult.current.mutate({
+            collaborators: [collaboratingUser._id],
+        });
     });
 
     afterEach(() => {
@@ -756,8 +790,6 @@ describe.shuffle('Task', () => {
     });
 
     it('should create new task', async () => {
-        const mockProjectId = mockProjects()[0]._id;
-        const mockTaskState = mockProjects()[0].taskStates[0];
         const newTaskTitle = 'new task title';
         const { result: createResult } = renderHook(
             () => Task.useCreate(mockProjectId),
@@ -771,50 +803,85 @@ describe.shuffle('Task', () => {
             taskState: mockTaskState,
         });
         await waitFor(() => expect(createResult.current.data).toBeDefined());
-        // Expect that CREATE returns the created document
         expect(createResult.current.data?.title).toBe(newTaskTitle);
     });
 
     it('should findAll tasks of a user', async () => {
-        const mockProjectId = mockProjects()[0]._id;
-        const { result } = renderHook(() => Task.useFindAll(mockProjectId), {
-            wrapper: createWrapper(),
-        });
-
-        await waitFor(() => expect(result.current.data).toBeDefined());
-        const tasks = result.current.data;
-
-        expect(tasks).toHaveLength(4);
-    });
-
-    it('should findOne task of a project', async () => {
-        const mockProjectId = mockProjects()[0]._id;
-        const mockTaskId = mockProjects()[0].tasks[0]._id;
-        const { result } = renderHook(
-            () => Task.useFindOne(mockProjectId, mockTaskId),
-            {
-                wrapper: createWrapper(),
-            },
-        );
-
-        await waitFor(() => expect(result.current.data).toBeDefined());
-        const task = result.current.data;
-
-        expect(task?._id).toBe(mockTaskId);
-    });
-
-    it('should update task', async () => {
-        // Create a document to update
-        const mockProjectId = mockProjects()[0]._id;
+        // Add tasks to project
         const { result: createResult } = renderHook(
             () => Task.useCreate(mockProjectId),
             {
                 wrapper: createWrapper(),
             },
         );
+        for (let i = 0; i < 3; i++) {
+            createResult.current.mutate({
+                title: mockProjects()[0].tasks[0].title,
+                taskState: mockProjects()[0].taskStates[0],
+            });
+            await waitFor(() =>
+                expect(createResult.current.data).toBeDefined(),
+            );
+        }
+
+        const { result: findAllResult } = renderHook(
+            () => Task.useFindAll(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => expect(findAllResult.current.data).toBeDefined());
+        const tasks = findAllResult.current.data;
+
+        expect(tasks).toHaveLength(3);
+    });
+
+    it('should findOne task of a project', async () => {
+        // Create a task to find
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
         createResult.current.mutate({
-            title: 'new task title',
-            taskState: mockProjects()[0].taskStates[0],
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const mockTaskId = createResult.current.isSuccess
+            ? createResult.current.data?._id
+            : '';
+
+        const { result: findOneResult } = renderHook(
+            () => Task.useFindOne(mockProjectId, mockTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => expect(findOneResult.current.data).toBeDefined());
+        const task = findOneResult.current.data;
+
+        expect(task?._id).toBe(mockTaskId);
+    });
+
+    it('should update task', async () => {
+        // Create a task to update
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
         });
         await waitFor(() => expect(createResult.current.data).toBeDefined());
 
@@ -829,21 +896,55 @@ describe.shuffle('Task', () => {
             },
         );
 
-        // Update the document
+        // Update the task
         updateResult.current.mutate({
             title: updatedTaskTitle,
         });
 
         await waitFor(() => expect(updateResult.current.data).toBeDefined());
 
-        // Expect that PATCH returns the updated document
+        // Expect that PATCH returns the updated task
         expect(updateResult.current.data?.title).toBe(updatedTaskTitle);
     });
 });
 
 describe.shuffle('Task (Error handling)', () => {
+    let mockProjectId: string;
+    let mockTaskState: string;
+
     beforeEach(async () => {
         await setTestAccessTokenToLocalStorage();
+
+        const collaboratingUser = {
+            _id: ObjectID(0).toHexString(),
+            email: 'collab@teapot.com',
+        };
+
+        // Create a project to add task to
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        mockProjectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+        mockTaskState = createResult.current.isSuccess
+            ? createResult.current.data.taskStates[0]
+            : '';
+
+        const { result: updateResult } = renderHook(
+            () => Project.useUpdate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Owner adds collaboratingUser to collaborators
+        updateResult.current.mutate({
+            collaborators: [collaboratingUser._id],
+        });
     });
 
     afterEach(() => {
@@ -852,8 +953,6 @@ describe.shuffle('Task (Error handling)', () => {
 
     it('should handle a 401 status code on Task.useCreate', async () => {
         clearTestAccessTokenFromLocalStorage();
-        const mockProjectId = mockProjects()[0]._id;
-        const mockTaskState = mockProjects()[0].taskStates[0];
         const newTaskTitle = 'new task title';
         const { result: createResult } = renderHook(
             () => Task.useCreate(mockProjectId),
@@ -876,25 +975,64 @@ describe.shuffle('Task (Error handling)', () => {
     });
 
     it('should handle a 401 status code on Task.useFindAll', async () => {
+        // Add tasks to project
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        for (let i = 0; i < 3; i++) {
+            createResult.current.mutate({
+                title: mockProjects()[0].tasks[0].title,
+                taskState: mockProjects()[0].taskStates[0],
+            });
+            await waitFor(() =>
+                expect(createResult.current.data).toBeDefined(),
+            );
+        }
+
+        // Clear the access token
         clearTestAccessTokenFromLocalStorage();
-        const mockProjectId = mockProjects()[0]._id;
-        const { result } = renderHook(() => Task.useFindAll(mockProjectId), {
-            wrapper: createWrapper(),
-        });
+
+        const { result: findAllResult } = renderHook(
+            () => Task.useFindAll(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
 
         await waitFor(() => {
-            expect(result.current.error).toBeDefined();
-            expect(result.current.error?.status).toBe(
+            expect(findAllResult.current.error).toBeDefined();
+            expect(findAllResult.current.error?.status).toBe(
                 HttpStatusCode.Unauthorized,
             );
         });
     });
 
     it('should handle a 401 status code on Task.useFindOne', async () => {
+        // Create a task to find
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const mockTaskId = createResult.current.isSuccess
+            ? createResult.current.data?._id
+            : '';
+
+        // Clear the access token
         clearTestAccessTokenFromLocalStorage();
-        const mockProjectId = mockProjects()[0]._id;
-        const mockTaskId = mockProjects()[0].tasks[0]._id;
-        const { result } = renderHook(
+
+        const { result: findOneResult } = renderHook(
             () => Task.useFindOne(mockProjectId, mockTaskId),
             {
                 wrapper: createWrapper(),
@@ -902,8 +1040,8 @@ describe.shuffle('Task (Error handling)', () => {
         );
 
         await waitFor(() => {
-            expect(result.current.error).toBeDefined();
-            expect(result.current.error?.status).toBe(
+            expect(findOneResult.current.error).toBeDefined();
+            expect(findOneResult.current.error?.status).toBe(
                 HttpStatusCode.Unauthorized,
             );
         });
@@ -911,7 +1049,6 @@ describe.shuffle('Task (Error handling)', () => {
 
     it('should handle a 404 status code on Task.useFindOne', async () => {
         const nonExistentTaskId = ObjectID(0).toHexString();
-        const mockProjectId = mockProjects()[0]._id;
         const { result } = renderHook(
             () => Task.useFindOne(mockProjectId, nonExistentTaskId),
             {
@@ -928,7 +1065,7 @@ describe.shuffle('Task (Error handling)', () => {
 
     it('should handle a 401 status code on Task.useUpdate', async () => {
         // Create a document to FAIL to update
-        const mockProjectId = mockProjects()[0]._id;
+        const newTaskTitle = 'new task title';
         const { result: createResult } = renderHook(
             () => Task.useCreate(mockProjectId),
             {
@@ -936,8 +1073,8 @@ describe.shuffle('Task (Error handling)', () => {
             },
         );
         createResult.current.mutate({
-            title: 'new task title',
-            taskState: mockProjects()[0].taskStates[0],
+            title: newTaskTitle,
+            taskState: mockTaskState,
         });
         await waitFor(() => expect(createResult.current.data).toBeDefined());
 
@@ -956,7 +1093,7 @@ describe.shuffle('Task (Error handling)', () => {
             },
         );
 
-        // Update the document
+        // Update the task
         updateResult.current.mutate({
             title: updatedTaskTitle,
         });
@@ -971,7 +1108,6 @@ describe.shuffle('Task (Error handling)', () => {
 
     it('should handle a 404 status code on Task.useUpdate', async () => {
         const nonExistentTaskId = ObjectID(0).toHexString();
-        const mockProjectId = mockProjects()[0]._id;
         const updatedTaskTitle = 'update task title attempt';
         const { result: updateResult } = renderHook(
             () => Task.useUpdate(mockProjectId, nonExistentTaskId),
