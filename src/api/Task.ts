@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { TaskDocument, TaskDto, UpdateTaskDto } from '../common';
 
-import { get, patch, post } from '.';
+import { destroy, get, patch, post } from '.';
 
 export const Task = {
     queryKeys: {
@@ -53,6 +53,18 @@ export const Task = {
         );
     },
 
+    useRemove: (projectId: string, taskId: string) => {
+        const queryClient = useQueryClient();
+        return useMutation<boolean, AxiosError['response'], void>({
+            mutationFn: () => removeTask(projectId, taskId),
+            onSuccess: () => {
+                return queryClient.invalidateQueries({
+                    queryKey: Task.queryKeys.all(projectId),
+                });
+            },
+        });
+    },
+
     filterByTaskState: (allTasks: TaskDocument[], taskState: string) => {
         return allTasks.filter((task) => task.taskState === taskState);
     },
@@ -92,4 +104,9 @@ const updateTask = async (
         updatedFields,
     );
     return response.data;
+};
+
+const removeTask = async (projectId: string, taskId: string) => {
+    await destroy(`/api/projects/${projectId}/tasks/${taskId}`);
+    return true;
 };
