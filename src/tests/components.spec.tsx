@@ -92,6 +92,32 @@ describe.shuffle('App', () => {
         expect(titleInput).toHaveValue('new project');
     });
 
+    it('should open a modal to confirm project deletion', async () => {
+        const user = userEvent.setup();
+        // This project title is assured to load. App is loaded with mockProjects() in dev mode.
+        const mockProjectTitle = mockProjects()[0].title;
+
+        const result = renderWithClient(<App />);
+
+        // Click on the first project title
+        await waitFor(() => result.findByText(mockProjectTitle));
+        const selectedProject = result.getByText(mockProjectTitle);
+        await user.click(selectedProject);
+
+        const deleteProjectButton = result.getByLabelText('delete project');
+        await user.click(deleteProjectButton);
+
+        const confirmDeleteProjectButton = result.getByLabelText(
+            'confirm delete project',
+        );
+        await waitFor(() =>
+            expect(confirmDeleteProjectButton).toBeInTheDocument(),
+        );
+        await user.click(confirmDeleteProjectButton);
+
+        await waitFor(() => expect(selectedProject).not.toBeInTheDocument());
+    });
+
     it.skip('should render toast notification on error', async () => {
         server.use(
             rest.get('/api/projects', (_req, res, ctx) => {
