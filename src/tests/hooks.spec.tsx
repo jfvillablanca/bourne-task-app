@@ -6,7 +6,7 @@ import { describe, it, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import { Auth, Project, Task } from '../api';
-import { AuthDto, ProjectDto } from '../common';
+import { AuthDto, ProjectDto, ProjectMember } from '../common';
 import { generateJwtToken } from '../lib/utils';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
@@ -749,11 +749,12 @@ describe.shuffle('Project (Error handling)', () => {
 describe.shuffle('Task', () => {
     let mockProjectId: string;
     let mockTaskState: string;
+    let collaboratingUser: ProjectMember;
 
     beforeEach(async () => {
         await setTestAccessTokenToLocalStorage();
 
-        const collaboratingUser = {
+        collaboratingUser = {
             _id: ObjectID(0).toHexString(),
             email: 'collab@teapot.com',
         };
@@ -905,6 +906,76 @@ describe.shuffle('Task', () => {
 
         // Expect that PATCH returns the updated task
         expect(updateResult.current.data?.title).toBe(updatedTaskTitle);
+    });
+
+    it('should remove task as an owner', async () => {
+        // Create a task to remove
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const taskId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        const { result: removeResult } = renderHook(
+            () => Task.useRemove(mockProjectId, taskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Remove the task
+        removeResult.current.mutate();
+        await waitFor(() => expect(removeResult.current.data).toBeDefined());
+
+        expect(removeResult.current.data).toBe(true);
+    });
+
+    it('should remove task as a collaborator project member', async () => {
+        // Create a task to remove
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const taskId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Set access_token to collaborator's access_token
+        localStorage.setItem(
+            'access_token',
+            await generateJwtToken(collaboratingUser, 'access_token'),
+        );
+
+        const { result: removeResult } = renderHook(
+            () => Task.useRemove(mockProjectId, taskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Remove the task
+        removeResult.current.mutate();
+        await waitFor(() => expect(removeResult.current.data).toBeDefined());
+
+        expect(removeResult.current.data).toBe(true);
     });
 });
 
@@ -1128,6 +1199,118 @@ describe.shuffle('Task (Error handling)', () => {
             );
             expect(updateResult.current.error?.statusText).toBe(
                 'Task not found',
+            );
+        });
+    });
+
+    it('should handle a 401 status code on Task.useRemove', async () => {
+        // Create a task to FAIL to remove
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const taskId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Clear the access token
+        clearTestAccessTokenFromLocalStorage();
+
+        const { result: removeResult } = renderHook(
+            () => Task.useRemove(mockProjectId, taskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Remove the task
+        removeResult.current.mutate();
+
+        await waitFor(() => {
+            expect(removeResult.current.error).toBeDefined();
+            expect(removeResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('should handle a 404 status code on Task.useRemove', async () => {
+        const nonExistentTaskId = ObjectID(0).toHexString();
+        const { result: removeResult } = renderHook(
+            () => Task.useRemove(mockProjectId, nonExistentTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Update the document
+        removeResult.current.mutate();
+
+        await waitFor(() => {
+            expect(removeResult.current.error).toBeDefined();
+            expect(removeResult.current.error?.status).toBe(
+                HttpStatusCode.NotFound,
+            );
+            expect(removeResult.current.error?.statusText).toBe(
+                'Task not found',
+            );
+        });
+    });
+
+    it('should handle a 403 status code on Task.useRemove', async () => {
+        const forbiddenUser = {
+            _id: ObjectID(0).toHexString(),
+            email: 'not@teapot.com',
+        };
+
+        // Create a task to FAIL to remove
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const taskId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Set access_token to someone else's access_token
+        localStorage.setItem(
+            'access_token',
+            await generateJwtToken(forbiddenUser, 'access_token'),
+        );
+
+        const { result: removeResult } = renderHook(
+            () => Task.useRemove(mockProjectId, taskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        // Remove the document
+        removeResult.current.mutate();
+
+        await waitFor(() => {
+            expect(removeResult.current.error).toBeDefined();
+            expect(removeResult.current.error?.status).toBe(
+                HttpStatusCode.Forbidden,
+            );
+            expect(removeResult.current.error?.statusText).toBe(
+                'Invalid credentials: Cannot update resource',
             );
         });
     });
