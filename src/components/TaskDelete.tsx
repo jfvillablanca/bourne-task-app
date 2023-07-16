@@ -30,15 +30,13 @@ const TaskDelete = ({
         <DeleteConfirmModal
             renderButton={() => (
                 <div
-                    className={cn(
-                        'btn btn-ghost hover:btn-error grid overflow-hidden',
-                        className,
-                    )}
+                    className={cn('btn btn-outline btn-error', className)}
                     role="button"
                     aria-label="delete task"
                     {...props}
                 >
                     <Trash className="w-4 place-self-center" />
+                    Delete
                 </div>
             )}
             renderWarningModal={() => (

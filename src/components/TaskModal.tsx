@@ -42,7 +42,12 @@ const TaskModal: React.FC<TaskModalProps> = ({
     projectId,
     ...props
 }) => {
-    const [open, setOpen] = useState(false);
+    const {
+        value: isOpen,
+        setValue: setIsOpen,
+        setFalse: closeModal,
+        toggle: toggleOpen,
+    } = useBoolean(false);
     const { value: isFindOneQueryEnabled, setFalse: disableFindOneQuery } =
         useBoolean(true);
     const [taskForm, setTaskForm] = useState<UpdateTaskDto>({
@@ -60,17 +65,19 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
     useEffect(() => {
         if (taskQuery.isSuccess) {
+            const { title, description, taskState, assignedProjMemberId } =
+                taskQuery.data;
             setTaskForm(() => ({
-                title: taskQuery.data.title,
-                description: taskQuery.data.description,
-                taskState: taskQuery.data.taskState,
-                assignedProjMemberId: taskQuery.data.assignedProjMemberId,
+                title,
+                description,
+                taskState,
+                assignedProjMemberId,
             }));
             setEditTaskForm(() => ({
-                title: taskQuery.data.title,
-                description: taskQuery.data.description,
-                taskState: taskQuery.data.taskState,
-                assignedProjMemberId: taskQuery.data.assignedProjMemberId,
+                title,
+                description,
+                taskState,
+                assignedProjMemberId,
             }));
         }
     }, [taskQuery.isSuccess, taskQuery.data]);
@@ -93,17 +100,17 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
     const handleMutation = () => {
         setTaskForm(() => editTaskForm);
-        setOpen(false);
+        closeModal();
         taskMutation.mutate(editTaskForm);
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <button
                     className="btn btn-sm btn-circle btn-ghost ml-3 self-start"
                     data-testid={`open-task-modal-${taskId}`}
-                    onClick={() => setOpen((v) => !v)}
+                    onClick={() => toggleOpen()}
                 >
                     <Pencil className="w-4" />
                 </button>
@@ -180,11 +187,11 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             taskId={taskId}
                             cleanup={() => {
                                 disableFindOneQuery();
-                                setOpen(false);
+                                closeModal();
                             }}
                         />
                         <button
-                            className="btn btn-ghost hover:btn-accent self-end"
+                            className="btn btn-outline hover:btn-accent self-end"
                             type="submit"
                         >
                             <Check />
