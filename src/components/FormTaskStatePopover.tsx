@@ -58,6 +58,11 @@ const FormTaskStatePopover: React.FC<FormTaskStatePopoverProps> = ({
                         return (
                             <li key={i} className="join-item">
                                 <button
+                                    className={`${
+                                        currentTaskState === taskState
+                                            ? 'btn-disabled text-neutral-focus'
+                                            : 'btn-ghost'
+                                    }`}
                                     disabled={currentTaskState === taskState}
                                     onClick={() =>
                                         handleSelectTaskState(taskState)
