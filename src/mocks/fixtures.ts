@@ -85,7 +85,6 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Improve the efficiency of multiplying two matrices.',
-                    subtasks: [],
                     assignedProjMemberId: ['64956dead2af038ec229278g'],
                     _id: '648f63abc9ce700ba3f9edef',
                 },
@@ -94,14 +93,6 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Determine whether every positive integer will eventually reach 1.',
-                    subtasks: [
-                        { title: 'Find Waldo', isCompleted: false },
-                        {
-                            title: "Solve Fermat's Last Theorem",
-                            isCompleted: true,
-                        },
-                        { title: 'Write a Novel', isCompleted: false },
-                    ],
                     assignedProjMemberId: [
                         '64956dead2af038ec2292788',
                         '64956dead2af038ec229278c',
@@ -114,14 +105,6 @@ export const mockProjects = (): ProjectDocument[] => {
                     title: 'Implement Depth-First Search Algorithm',
                     taskState: 'doing',
                     description: 'Traverse a graph in depth-first order.',
-                    subtasks: [
-                        { title: 'Find Waldo', isCompleted: false },
-                        {
-                            title: "Solve Fermat's Last Theorem",
-                            isCompleted: true,
-                        },
-                        { title: 'Write a Novel', isCompleted: false },
-                    ],
                     assignedProjMemberId: ['64956dead2af038ec229278g'],
                     _id: '648f63abc9ce700ba3f9edf1',
                 },
@@ -130,14 +113,6 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Write a function to sort an array using the QuickSort algorithm.',
-                    subtasks: [
-                        { title: 'Find Waldo', isCompleted: false },
-                        {
-                            title: "Solve Fermat's Last Theorem",
-                            isCompleted: true,
-                        },
-                        { title: 'Write a Novel', isCompleted: false },
-                    ],
                     assignedProjMemberId: ['64956dead2af038ec229278g'],
                     _id: '648f63abc9ce700ba3f9edf6',
                 },
@@ -183,14 +158,6 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'todo',
                     description:
                         'Write a function to perform binary search on a sorted array.',
-                    subtasks: [
-                        { title: 'Find Waldo', isCompleted: false },
-                        {
-                            title: "Solve Fermat's Last Theorem",
-                            isCompleted: true,
-                        },
-                        { title: 'Write a Novel', isCompleted: false },
-                    ],
                     assignedProjMemberId: ['64956dead2af038ec229278h'],
                     _id: '648f63abc9ce700ba3f9eded',
                 },
@@ -199,14 +166,6 @@ export const mockProjects = (): ProjectDocument[] => {
                     taskState: 'doing',
                     description:
                         'Find the shortest possible route that visits each city exactly once.',
-                    subtasks: [
-                        { title: 'Find Waldo', isCompleted: false },
-                        {
-                            title: "Solve Fermat's Last Theorem",
-                            isCompleted: true,
-                        },
-                        { title: 'Write a Novel', isCompleted: false },
-                    ],
                     assignedProjMemberId: [
                         '64956dead2af038ec229278h',
                         '64956dead2af038ec229278h',

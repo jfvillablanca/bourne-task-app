@@ -33,26 +33,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <p>{task.description}</p>
             </div>
             {task.description && <div className="divider mt-0 mb-0"></div>}
-            {task.subtasks && (
-                <ul>
-                    {task.subtasks.map((subtask, i) => {
-                        return (
-                            <li
-                                key={`${task._id}-${i}`}
-                                className="flex gap-2 items-center"
-                            >
-                                <input
-                                    type="checkbox"
-                                    className="checkbox checkbox-xs cursor-default border-base-content"
-                                    checked={subtask.isCompleted}
-                                    readOnly
-                                />
-                                <p>{subtask.title}</p>
-                            </li>
-                        );
-                    })}
-                </ul>
-            )}
             <MemberAvatars
                 projectId={projectId}
                 taskMemberIds={task.assignedProjMemberId}

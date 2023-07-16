@@ -6,7 +6,6 @@ import { Project, Task } from '../api';
 import {
     FormChangeType,
     FormElementType,
-    SubTask,
     UpdateTaskDto,
 } from '../common';
 import { cn } from '../lib/utils';
@@ -83,7 +82,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     }, [taskQuery.isSuccess, taskQuery.data]);
 
     const handleChange = (e: FormChangeType) => {
-        let name: string, value: string | string[] | SubTask[];
+        let name: string, value: string;
 
         if ('target' in e) {
             name = e.target.name;

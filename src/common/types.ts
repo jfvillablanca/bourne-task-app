@@ -1,13 +1,7 @@
-export type SubTask = {
-    title: string;
-    isCompleted: boolean;
-};
-
 export type UpdateTaskDto = {
     title?: string;
     taskState?: string;
     description?: string;
-    subtasks?: SubTask[];
     assignedProjMemberId?: string[];
 };
 
@@ -15,7 +9,6 @@ export type TaskDto = {
     title: string;
     taskState: string;
     description?: string;
-    subtasks?: SubTask[];
     assignedProjMemberId?: string[];
 };
 
@@ -73,6 +66,7 @@ export type FormElementType =
     | HTMLInputElement
     | HTMLTextAreaElement
     | HTMLSelectElement;
+
 export type FormChangeType =
     | React.ChangeEvent<FormElementType>
-    | { name: string; value: string[] };
+    | { name: string; value: string };
