@@ -3,11 +3,7 @@ import { HTMLAttributes, useEffect, useState } from 'react';
 import { useBoolean } from 'usehooks-ts';
 
 import { Project, Task } from '../api';
-import {
-    FormChangeType,
-    FormElementType,
-    UpdateTaskDto,
-} from '../common';
+import { FormChangeType, FormElementType, UpdateTaskDto } from '../common';
 import { cn } from '../lib/utils';
 
 import {
@@ -17,7 +13,12 @@ import {
     DialogTrigger,
     ExitButton,
 } from './ui';
-import { FormTaskMembers, MemberAvatars, TaskDelete } from '.';
+import {
+    FormTaskMembers,
+    FormTaskStatePopover,
+    MemberAvatars,
+    TaskDelete,
+} from '.';
 
 interface FormElementProps extends HTMLAttributes<FormElementType> {
     label: string;
@@ -59,7 +60,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
     const taskQuery = Task.useFindOne(projectId, taskId, isFindOneQueryEnabled);
     const taskMutation = Task.useUpdate(projectId, taskId);
-    const projQueryTaskStates = Project.useGetTaskStates(projectId);
     const projQueryMembers = Project.useGetProjectMembers(projectId);
 
     useEffect(() => {
@@ -146,8 +146,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
                         </DialogClose>
                     </div>
                     <div className="flex flex-col gap-2 flex-1">
-                        <FormTaskState
-                            taskStates={projQueryTaskStates.data ?? []}
+                        <FormTaskStatePopover
+                            projectId={projectId}
                             value={editTaskForm.taskState ?? ''}
                             handleChange={handleChange}
                         />
@@ -229,49 +229,6 @@ const FormElement = ({
                 onChange={handleChange}
             />
         </>
-    );
-};
-
-const FormTaskState = ({
-    value,
-    taskStates,
-    handleChange,
-}: {
-    value: string;
-    taskStates: string[];
-    handleChange: (e: FormChangeType) => void;
-}) => {
-    return (
-        <div className="dropdown dropdown-right w-min">
-            <button
-                className="btn btn-ghost border border-base-content p-2 mr-2"
-                data-testid="open-select-task-state"
-                onClick={(e) => e.preventDefault()}
-            >
-                {value}
-            </button>
-            <select
-                className="select select-accent dropdown-content z-[1] p-2 text-lg capitalize"
-                tabIndex={0}
-                name="taskState"
-                data-testid="select-task-state-combobox"
-                value={value}
-                onChange={handleChange}
-            >
-                {taskStates.map((taskState, i) => {
-                    return (
-                        <option
-                            key={i}
-                            className="join-item"
-                            value={taskState}
-                            disabled={value === taskState}
-                        >
-                            {taskState}
-                        </option>
-                    );
-                })}
-            </select>
-        </div>
     );
 };
 
