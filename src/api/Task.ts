@@ -32,8 +32,9 @@ export const Task = {
             queryFn: () => getTasks(projectId),
         }),
 
-    useFindOne: (projectId: string, taskId: string) =>
+    useFindOne: (projectId: string, taskId: string, isEnabled: boolean) =>
         useQuery<TaskDocument, AxiosError['response']>({
+            enabled: isEnabled,
             queryKey: Task.queryKeys.byId(projectId, taskId),
             queryFn: () => getTaskById(projectId, taskId),
         }),

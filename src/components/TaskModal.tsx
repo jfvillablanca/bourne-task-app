@@ -1,5 +1,6 @@
 import { Check, Pencil } from 'lucide-react';
-import React, { HTMLAttributes, useEffect, useState } from 'react';
+import { HTMLAttributes, useEffect, useState } from 'react';
+import { useBoolean } from 'usehooks-ts';
 
 import { Project, Task } from '../api';
 import {
@@ -17,7 +18,7 @@ import {
     DialogTrigger,
     ExitButton,
 } from './ui';
-import { FormTaskMembers, MemberAvatars } from '.';
+import { FormTaskMembers, MemberAvatars, TaskDelete } from '.';
 
 interface FormElementProps extends HTMLAttributes<FormElementType> {
     label: string;
@@ -42,6 +43,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
     ...props
 }) => {
     const [open, setOpen] = useState(false);
+    const { value: isFindOneQueryEnabled, setFalse: disableFindOneQuery } =
+        useBoolean(true);
     const [taskForm, setTaskForm] = useState<UpdateTaskDto>({
         title: '',
         description: '',
@@ -50,7 +53,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     });
     const [editTaskForm, setEditTaskForm] = useState<UpdateTaskDto>(taskForm);
 
-    const taskQuery = Task.useFindOne(projectId, taskId);
+    const taskQuery = Task.useFindOne(projectId, taskId, isFindOneQueryEnabled);
     const taskMutation = Task.useUpdate(projectId, taskId);
     const projQueryTaskStates = Project.useGetTaskStates(projectId);
     const projQueryMembers = Project.useGetProjectMembers(projectId);
@@ -170,13 +173,24 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             />
                         </div>
                     </div>
-                    <button
-                        className="btn btn-ghost hover:btn-accent self-end"
-                        type="submit"
-                    >
-                        <Check />
-                        Submit
-                    </button>
+                    <div className="flex justify-between">
+                        <TaskDelete
+                            className="p-2"
+                            projectId={projectId}
+                            taskId={taskId}
+                            cleanup={() => {
+                                disableFindOneQuery();
+                                setOpen(false);
+                            }}
+                        />
+                        <button
+                            className="btn btn-ghost hover:btn-accent self-end"
+                            type="submit"
+                        >
+                            <Check />
+                            Submit
+                        </button>
+                    </div>
                 </form>
             </DialogContent>
         </Dialog>

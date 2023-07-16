@@ -13,6 +13,7 @@ export { default as Sidebar } from './Sidebar';
 export { default as TaskCard } from './TaskCard';
 export { default as TaskCardGroup } from './TaskCardGroup';
 export { default as TaskCardGroupDropdown } from './TaskCardGroupDropdown';
+export { default as TaskDelete } from './TaskDelete';
 export { default as TaskModal } from './TaskModal';
 export { default as ToastContainer } from './ToastContainer';
 export { default as UserPopover } from './UserPopover';
