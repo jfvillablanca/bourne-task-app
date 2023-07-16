@@ -283,6 +283,44 @@ describe.shuffle('TaskCardGroup', () => {
         expect(titleInput).toBeInTheDocument();
     });
 
+    it('should be able to delete a task', async () => {
+        const user = userEvent.setup();
+        const mockProjectId = mockProjects()[0]._id;
+        const mockTaskId = mockProjects()[0].tasks[0]._id;
+        const mockTaskTitle = mockProjects()[0].tasks[0].title;
+        const mockProjectTaskState = mockProjects()[0].taskStates[0];
+
+        const result = renderWithClient(
+            <TaskCardGroup
+                projectId={mockProjectId}
+                taskState={mockProjectTaskState}
+            />,
+        );
+
+        await waitFor(() => {
+            expect(result.getByText(mockTaskTitle)).toBeInTheDocument();
+        });
+        const taskCardTitle = result.getByText(mockTaskTitle);
+        const taskCardEditButton = result.getByTestId(
+            `open-task-modal-${mockTaskId}`,
+        );
+        await user.click(taskCardEditButton);
+
+        const deleteTaskButton = result.getByLabelText('delete task');
+        await user.click(deleteTaskButton);
+
+        const confirmDeleteTaskButton = result.getByLabelText(
+            'confirm delete task',
+        );
+        await waitFor(() =>
+            expect(confirmDeleteTaskButton).toBeInTheDocument(),
+        );
+
+        await user.click(confirmDeleteTaskButton);
+
+        await waitFor(() => expect(taskCardTitle).not.toBeInTheDocument());
+    });
+
     it('should render skeletons if tasks are still being fetched', async () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockProjectTaskState = mockProjects()[0].taskStates[0];

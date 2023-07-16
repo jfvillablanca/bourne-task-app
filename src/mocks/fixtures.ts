@@ -82,7 +82,7 @@ export const mockProjects = (): ProjectDocument[] => {
             tasks: [
                 {
                     title: 'Optimize Matrix Multiplication Algorithm',
-                    taskState: 'archived',
+                    taskState: 'todo',
                     description:
                         'Improve the efficiency of multiplying two matrices.',
                     subtasks: [],
