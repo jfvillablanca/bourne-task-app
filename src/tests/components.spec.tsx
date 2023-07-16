@@ -428,6 +428,7 @@ describe.shuffle('TaskModal', () => {
         const mockProjectId = mockProjects()[0]._id;
         const mockTask = mockProjects()[0].tasks[0];
         const mockTaskId = mockTask._id;
+        const mockTaskState = mockTask.taskState;
         const result = renderWithClient(
             <TaskModal taskId={mockTaskId} projectId={mockProjectId} />,
         );
@@ -442,15 +443,10 @@ describe.shuffle('TaskModal', () => {
             ).toBeInTheDocument(),
         );
 
-        const editTaskStateButton = result.getByTestId(
-            'open-select-task-state',
-        );
-        const selectTaskState = result.getByTestId(
-            'select-task-state-combobox',
-        );
+        const editTaskStateButton = result.getByText(mockTaskState);
         await user.click(editTaskStateButton);
 
-        expect(selectTaskState).toBeVisible();
+        expect(result.getByTestId('task-states-popover')).toBeVisible();
     });
 
     it('should render select dropdown to change update assigned task members', async () => {
