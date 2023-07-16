@@ -2,7 +2,7 @@ import { HTMLAttributes } from 'react';
 import { useToggle } from 'usehooks-ts';
 
 import { Project } from '../api';
-import { FormChangeType } from '../common';
+import { FormChangeType, UpdateTaskDto } from '../common';
 import { cn } from '../lib/utils';
 
 import { Popover, PopoverContent, PopoverTrigger } from './ui';
@@ -25,7 +25,9 @@ const FormTaskStatePopover: React.FC<FormTaskStatePopoverProps> = ({
     const taskStatesQuery = Project.useGetTaskStates(projectId);
     const taskStates = taskStatesQuery.data ?? [];
 
-    const handleSelectTaskState = (newTaskState: string) => {
+    const handleSelectTaskState = (
+        newTaskState: NonNullable<UpdateTaskDto['taskState']>,
+    ) => {
         setOpen(false);
         handleChange({ name: 'taskState', value: newTaskState });
     };

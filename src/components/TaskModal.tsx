@@ -23,10 +23,10 @@ import {
 interface FormElementProps extends HTMLAttributes<FormElementType> {
     label: string;
     id: string;
-    name: string;
+    name: keyof UpdateTaskDto;
     placeholder: string;
     required?: boolean;
-    value: string;
+    value: UpdateTaskDto[keyof UpdateTaskDto];
     handleChange: (e: FormChangeType) => void;
     FormComponent: React.ElementType;
 }
@@ -82,15 +82,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
     }, [taskQuery.isSuccess, taskQuery.data]);
 
     const handleChange = (e: FormChangeType) => {
-        let name: string, value: string;
+        const [name, value] =
+            'target' in e
+                ? [
+                      e.target.name as keyof UpdateTaskDto,
+                      e.target.value as UpdateTaskDto[keyof UpdateTaskDto],
+                  ]
+                : [e.name, e.value];
 
-        if ('target' in e) {
-            name = e.target.name;
-            value = e.target.value;
-        } else {
-            name = e.name;
-            value = e.value;
-        }
         setEditTaskForm((prev) => ({
             ...prev,
             [name]: value,

@@ -1,9 +1,4 @@
-export type UpdateTaskDto = {
-    title?: string;
-    taskState?: string;
-    description?: string;
-    assignedProjMemberId?: string[];
-};
+export type UpdateTaskDto = Partial<TaskDto>;
 
 export type TaskDto = {
     title: string;
@@ -16,13 +11,10 @@ export type TaskDocument = TaskDto & {
     _id: string;
 };
 
-export type UpdateProjectDto = {
-    title?: string;
-    description?: string;
-    collaborators?: string[];
-    taskStates?: string[];
-    tasks?: TaskDocument[];
-};
+export type UpdateProjectDto = Partial<ProjectDto> &
+    Partial<
+        Omit<ProjectDocument, '_id' | 'ownerId' | 'createdAt' | 'updatedAt'>
+    >;
 
 export type ProjectDto = {
     title: string;
@@ -62,11 +54,8 @@ export type MockedUser = User & {
     refresh_token: string | null;
 };
 
-export type FormElementType =
-    | HTMLInputElement
-    | HTMLTextAreaElement
-    | HTMLSelectElement;
+export type FormElementType = HTMLInputElement | HTMLTextAreaElement;
 
-export type FormChangeType =
-    | React.ChangeEvent<FormElementType>
-    | { name: string; value: string };
+export type FormChangeType<
+    T extends keyof UpdateTaskDto = keyof UpdateTaskDto,
+> = React.ChangeEvent<FormElementType> | { name: T; value: UpdateTaskDto[T] };
