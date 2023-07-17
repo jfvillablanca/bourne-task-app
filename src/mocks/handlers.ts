@@ -165,18 +165,29 @@ export const handlers = [
     }),
 
     rest.post('/api/auth/logout', async (req, res, ctx) => {
+        const users = getUsers();
+        if (!users) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock users not loaded to localStorage',
+                ),
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
         const userId = authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
         }
-        getUsers()?.map((user) => {
+        const updatedUsers = users.map((user) => {
             if (user._id === userId) {
                 user.refresh_token = null;
             }
             return user;
         });
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsers));
 
         return res(ctx.status(HttpStatusCode.Ok));
     }),
