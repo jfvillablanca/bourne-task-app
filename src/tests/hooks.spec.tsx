@@ -55,34 +55,6 @@ describe.shuffle('Auth', () => {
         setItemMock.mockRestore();
     });
 
-    it('should handle a 409 status code if email is already taken', async () => {
-        const newUser: AuthDto = {
-            email: 'iam@teapot.com',
-            password: 'swordfish',
-        };
-
-        const duplicateUser: AuthDto = {
-            email: 'iam@teapot.com',
-            password: 'blobfish',
-        };
-
-        const { result } = renderHook(() => Auth.useRegisterLocal(), {
-            wrapper: createWrapper(),
-        });
-
-        result.current.mutate(newUser);
-        await waitFor(() => expect(result.current.data).toBeDefined());
-        result.current.mutate(duplicateUser);
-
-        await waitFor(() => {
-            expect(result.current.error).toBeDefined();
-            expect(result.current.error?.status).toBe(HttpStatusCode.Conflict);
-            expect(result.current.error?.statusText).toBe(
-                'Email is already taken',
-            );
-        });
-    });
-
     it('should log a user in', async () => {
         const user: AuthDto = {
             email: 'iam@teapot.com',
@@ -110,64 +82,6 @@ describe.shuffle('Auth', () => {
         expect(setItemMock).toHaveBeenCalled();
 
         setItemMock.mockRestore();
-    });
-
-    it('should handle a 403 status code if user does not exist', async () => {
-        const nonExistentUser: AuthDto = {
-            email: 'iam@teapot.com',
-            password: 'swordfish',
-        };
-
-        const { result } = renderHook(() => Auth.useLoginLocal(), {
-            wrapper: createWrapper(),
-        });
-
-        result.current.mutate(nonExistentUser);
-
-        await waitFor(() => {
-            expect(result.current.error).toBeDefined();
-            expect(result.current.error?.status).toBe(HttpStatusCode.Forbidden);
-            expect(result.current.error?.statusText).toBe(
-                'Invalid credentials: user does not exist',
-            );
-            expect(result.current.error?.type).toBe('user');
-        });
-    });
-
-    it('should handle a 403 status code if password is invalid', async () => {
-        const user: AuthDto = {
-            email: 'iam@teapot.com',
-            password: 'swordfish',
-        };
-        const userWithInvalidPassword: AuthDto = {
-            ...user,
-            password: 'blobfish',
-        };
-
-        const { result: registerResult } = renderHook(
-            () => Auth.useRegisterLocal(),
-            {
-                wrapper: createWrapper(),
-            },
-        );
-        registerResult.current.mutate(user);
-        await waitFor(() => expect(registerResult.current.data).toBeDefined());
-
-        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
-            wrapper: createWrapper(),
-        });
-        loginResult.current.mutate(userWithInvalidPassword);
-
-        await waitFor(() => {
-            expect(loginResult.current.error).toBeDefined();
-            expect(loginResult.current.error?.status).toBe(
-                HttpStatusCode.Forbidden,
-            );
-            expect(loginResult.current.error?.statusText).toBe(
-                'Invalid password',
-            );
-            expect(loginResult.current.error?.type).toBe('password');
-        });
     });
 
     it('should get user info', async () => {
@@ -223,8 +137,96 @@ describe.shuffle('Auth', () => {
         logoutResult.current.mutate({});
 
         expect(removeItemMock).toHaveBeenCalled();
-
         removeItemMock.mockRestore();
+    });
+
+});
+
+describe.shuffle('Auth (Error handling)', () => {
+    it('[Auth.useRegisterLocal] should handle a 409 status code if email is already taken', async () => {
+        const newUser: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+
+        const duplicateUser: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'blobfish',
+        };
+
+        const { result } = renderHook(() => Auth.useRegisterLocal(), {
+            wrapper: createWrapper(),
+        });
+
+        result.current.mutate(newUser);
+        await waitFor(() => expect(result.current.data).toBeDefined());
+        result.current.mutate(duplicateUser);
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(HttpStatusCode.Conflict);
+            expect(result.current.error?.statusText).toBe(
+                'Email is already taken',
+            );
+        });
+    });
+
+    it('[Auth.useLoginLocal] should handle a 403 status code if user does not exist', async () => {
+        const nonExistentUser: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+
+        const { result } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+
+        result.current.mutate(nonExistentUser);
+
+        await waitFor(() => {
+            expect(result.current.error).toBeDefined();
+            expect(result.current.error?.status).toBe(HttpStatusCode.Forbidden);
+            expect(result.current.error?.statusText).toBe(
+                'Invalid credentials: user does not exist',
+            );
+            expect(result.current.error?.type).toBe('user');
+        });
+    });
+
+    it('[Auth.useLoginLocal] should handle a 403 status code if password is invalid', async () => {
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const userWithInvalidPassword: AuthDto = {
+            ...user,
+            password: 'blobfish',
+        };
+
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(userWithInvalidPassword);
+
+        await waitFor(() => {
+            expect(loginResult.current.error).toBeDefined();
+            expect(loginResult.current.error?.status).toBe(
+                HttpStatusCode.Forbidden,
+            );
+            expect(loginResult.current.error?.statusText).toBe(
+                'Invalid password',
+            );
+            expect(loginResult.current.error?.type).toBe('password');
+        });
     });
 });
 
@@ -469,7 +471,7 @@ describe.shuffle('Project (Error handling)', () => {
         clearTestAccessTokenFromLocalStorage();
     });
 
-    it('should handle a 401 status code on Project.useCreate', async () => {
+    it('[Project.useCreate] should handle a 401 status code', async () => {
         clearTestAccessTokenFromLocalStorage();
         const newProjectTitle = 'new project';
         const { result: createResult } = renderHook(() => Project.useCreate(), {
@@ -486,7 +488,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handle a 401 status code on Project.useFindAll', async () => {
+    it('[Project.useFindAll] should handle a 401 status code', async () => {
         clearTestAccessTokenFromLocalStorage();
         const { result } = renderHook(() => Project.useFindAll(), {
             wrapper: createWrapper(),
@@ -500,7 +502,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handle a 401 status code on Project.useFindOne', async () => {
+    it('[Project.useFindOne] should handle a 401 status code', async () => {
         clearTestAccessTokenFromLocalStorage();
         const mockProjectId = mockProjects()[0]._id;
         const { result } = renderHook(() => Project.useFindOne(mockProjectId), {
@@ -515,7 +517,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handle a 404 status code on Project.useFindOne', async () => {
+    it('[Project.useFindOne] should handle a 404 status code', async () => {
         const nonExistentProjectId = ObjectID(0).toHexString();
         const { result } = renderHook(
             () => Project.useFindOne(nonExistentProjectId),
@@ -531,7 +533,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handle a 401 status code on Project.useGetProjectMembers', async () => {
+    it('[Project.useGetProjectMembers] should handle a 401 status code', async () => {
         clearTestAccessTokenFromLocalStorage();
         const mockProjectId = mockProjects()[0]._id;
         const { result } = renderHook(
@@ -549,7 +551,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handle a 404 status code on Project.useGetProjectMembers', async () => {
+    it('[Project.useGetProjectMembers] should handle a 404 status code', async () => {
         const nonExistentProjectId = ObjectID(0).toHexString();
         const { result } = renderHook(
             () => Project.useGetProjectMembers(nonExistentProjectId),
@@ -564,7 +566,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handle a 401 status code on Project.useUpdate', async () => {
+    it('[Project.useUpdate] should handle a 401 status code', async () => {
         // Create a document to FAIL to update
         const newProject: ProjectDto = { title: 'new project' };
         const { result: createResult } = renderHook(() => Project.useCreate(), {
@@ -596,7 +598,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handler a 404 status code on Project.useUpdate', async () => {
+    it('[Project.useUpdate] should handler a 404 status code', async () => {
         const nonExistentProjectId = ObjectID(0).toHexString();
         const { result: updateResult } = renderHook(
             () => Project.useUpdate(nonExistentProjectId),
@@ -614,7 +616,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handler a 403 status code on Project.useUpdate', async () => {
+    it('[Project.useUpdate] should handler a 403 status code', async () => {
         const forbiddenUser = {
             _id: ObjectID(0).toHexString(),
             email: 'not@teapot.com',
@@ -653,7 +655,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handler a 401 status code on Project.useRemove', async () => {
+    it('[Project.useRemove] should handler a 401 status code', async () => {
         // Create a document to FAIL to remove
         const newProject: ProjectDto = { title: 'delete me' };
         const { result: createResult } = renderHook(() => Project.useCreate(), {
@@ -684,7 +686,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handler a 404 status code on Project.useRemove', async () => {
+    it('[Project.useRemove] should handler a 404 status code', async () => {
         const nonExistentProjectId = ObjectID(0).toHexString();
         const { result: removeResult } = renderHook(
             () => Project.useRemove(nonExistentProjectId),
@@ -702,7 +704,7 @@ describe.shuffle('Project (Error handling)', () => {
         });
     });
 
-    it('should handler a 403 status code on Project.useRemove', async () => {
+    it('[Project.useRemove] should handler a 403 status code', async () => {
         const forbiddenUser = {
             _id: ObjectID(0).toHexString(),
             email: 'not@teapot.com',
@@ -1022,7 +1024,7 @@ describe.shuffle('Task (Error handling)', () => {
         clearTestAccessTokenFromLocalStorage();
     });
 
-    it('should handle a 401 status code on Task.useCreate', async () => {
+    it('[Task.useCreate] should handle a 401 status code', async () => {
         clearTestAccessTokenFromLocalStorage();
         const newTaskTitle = 'new task title';
         const { result: createResult } = renderHook(
@@ -1045,7 +1047,7 @@ describe.shuffle('Task (Error handling)', () => {
         });
     });
 
-    it('should handle a 401 status code on Task.useFindAll', async () => {
+    it('[Task.useFindAll] should handle a 401 status code', async () => {
         // Add tasks to project
         const { result: createResult } = renderHook(
             () => Task.useCreate(mockProjectId),
@@ -1081,7 +1083,7 @@ describe.shuffle('Task (Error handling)', () => {
         });
     });
 
-    it('should handle a 401 status code on Task.useFindOne', async () => {
+    it('[Task.useFindOne] should handle a 401 status code', async () => {
         // Create a task to find
         const newTaskTitle = 'new task title';
         const { result: createResult } = renderHook(
@@ -1118,7 +1120,7 @@ describe.shuffle('Task (Error handling)', () => {
         });
     });
 
-    it('should handle a 404 status code on Task.useFindOne', async () => {
+    it('[Task.useFindOne] should handle a 404 status code', async () => {
         const nonExistentTaskId = ObjectID(0).toHexString();
         const { result } = renderHook(
             () => Task.useFindOne(mockProjectId, nonExistentTaskId),
@@ -1134,7 +1136,7 @@ describe.shuffle('Task (Error handling)', () => {
         });
     });
 
-    it('should handle a 401 status code on Task.useUpdate', async () => {
+    it('[Task.useUpdate] should handle a 401 status code', async () => {
         // Create a document to FAIL to update
         const newTaskTitle = 'new task title';
         const { result: createResult } = renderHook(
@@ -1177,7 +1179,7 @@ describe.shuffle('Task (Error handling)', () => {
         });
     });
 
-    it('should handle a 404 status code on Task.useUpdate', async () => {
+    it('[Task.useUpdate] should handle a 404 status code', async () => {
         const nonExistentTaskId = ObjectID(0).toHexString();
         const updatedTaskTitle = 'update task title attempt';
         const { result: updateResult } = renderHook(
@@ -1203,7 +1205,7 @@ describe.shuffle('Task (Error handling)', () => {
         });
     });
 
-    it('should handle a 401 status code on Task.useRemove', async () => {
+    it('[Task.useRemove] should handle a 401 status code', async () => {
         // Create a task to FAIL to remove
         const newTaskTitle = 'new task title';
         const { result: createResult } = renderHook(
@@ -1242,7 +1244,7 @@ describe.shuffle('Task (Error handling)', () => {
         });
     });
 
-    it('should handle a 404 status code on Task.useRemove', async () => {
+    it('[Task.useRemove] should handle a 404 status code', async () => {
         const nonExistentTaskId = ObjectID(0).toHexString();
         const { result: removeResult } = renderHook(
             () => Task.useRemove(mockProjectId, nonExistentTaskId),
@@ -1265,7 +1267,7 @@ describe.shuffle('Task (Error handling)', () => {
         });
     });
 
-    it('should handle a 403 status code on Task.useRemove', async () => {
+    it('[Task.useRemove] should handle a 403 status code', async () => {
         const forbiddenUser = {
             _id: ObjectID(0).toHexString(),
             email: 'not@teapot.com',
