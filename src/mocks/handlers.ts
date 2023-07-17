@@ -192,6 +192,56 @@ export const handlers = [
         return res(ctx.status(HttpStatusCode.Ok));
     }),
 
+    rest.post('/api/auth/refresh', async (req, res, ctx) => {
+        const users = getUsers();
+        if (!users) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.InternalServerError,
+                    'Mock users not loaded to localStorage',
+                ),
+            );
+        }
+
+        const authHeaderRefresh = req.headers.get('Authorization');
+        const userId = authGuard(authHeaderRefresh);
+        const userIndex = users.findIndex((x) => x._id === userId);
+        if (userIndex < 0) {
+            return res(
+                ctx.status(HttpStatusCode.Unauthorized, 'User does not exist'),
+            );
+        }
+
+        const user = users[userIndex];
+        if (!user.refresh_token) {
+            return res(
+                ctx.status(
+                    HttpStatusCode.Forbidden,
+                    'Cannot refresh when logged out',
+                ),
+            );
+        }
+
+        const generatedTokens = await generateTokens({
+            _id: user._id,
+            email: user.email,
+        });
+        const updatedUser: MockedUser = {
+            ...user,
+            refresh_token: generatedTokens.refresh_token,
+        };
+
+        const updatedUsers = users.map((user, index) => {
+            if (index === userIndex) {
+                return updatedUser;
+            }
+            return user;
+        });
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsers));
+
+        return res(ctx.json(generatedTokens), ctx.status(HttpStatusCode.Ok));
+    }),
+
     rest.post('/api/projects', async (req, res, ctx) => {
         const projects = getProjects();
         if (!projects) {
