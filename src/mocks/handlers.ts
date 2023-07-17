@@ -62,8 +62,6 @@ const generateTokens = async ({ _id, email }: User): Promise<AuthToken> => {
 
 export const handlers = [
     rest.post('/api/auth/local/register', async (req, res, ctx) => {
-        const { email, password }: AuthDto = await req.json();
-
         const users = getUsers();
         if (!users) {
             return res(
@@ -73,6 +71,8 @@ export const handlers = [
                 ),
             );
         }
+
+        const { email, password }: AuthDto = await req.json();
 
         const _id = ObjectID().toHexString();
         const generatedTokens = await generateTokens({ _id, email });
@@ -102,8 +102,6 @@ export const handlers = [
     }),
 
     rest.post('/api/auth/local/login', async (req, res, ctx) => {
-        const { email, password }: AuthDto = await req.json();
-
         const users = getUsers();
         if (!users) {
             return res(
@@ -113,6 +111,8 @@ export const handlers = [
                 ),
             );
         }
+
+        const { email, password }: AuthDto = await req.json();
 
         const userIndex = users.findIndex((x) => x.email === email);
         if (userIndex < 0) {
