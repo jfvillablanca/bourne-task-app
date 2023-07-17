@@ -141,6 +141,32 @@ describe.shuffle('Auth', () => {
         removeItemMock.mockRestore();
     });
 
+    it('should refresh token if authorized', async () => {
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+
+        const setItemMock = vi.spyOn(Storage.prototype, 'setItem');
+        const { result: refreshResult } = renderHook(() => Auth.useRefresh(), {
+            wrapper: createWrapper(),
+        });
+
+        refreshResult.current.mutate();
+
+        await waitFor(() => expect(refreshResult.current.data).toBe(true));
+        expect(setItemMock).toHaveBeenCalled();
+
+        setItemMock.mockRestore();
+    });
 });
 
 describe.shuffle('Auth (Error handling)', () => {
@@ -227,6 +253,83 @@ describe.shuffle('Auth (Error handling)', () => {
                 'Invalid password',
             );
             expect(loginResult.current.error?.type).toBe('password');
+        });
+    });
+
+    it('[Auth.useRefresh] should handle a 401 status code if user does not exist', async () => {
+        const nonExistentUser = {
+            _id: ObjectID(0).toHexString(),
+            email: 'non@existent.com',
+        };
+        // Set refresh_token to non-existent user's refresh_token
+        localStorage.setItem(
+            'refresh_token',
+            await generateJwtToken(nonExistentUser, 'refresh_token'),
+        );
+
+        const { result: refreshResult } = renderHook(() => Auth.useRefresh(), {
+            wrapper: createWrapper(),
+        });
+        refreshResult.current.mutate();
+
+        await waitFor(() => {
+            expect(refreshResult.current.error).toBeDefined();
+            expect(refreshResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+            expect(refreshResult.current.error?.statusText).toBe(
+                'User does not exist',
+            );
+        });
+    });
+
+    it('[Auth.useRefresh] should handle a 403 status code if a user is logged out', async () => {
+        // Create a user that will log out
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(user);
+        await waitFor(() => expect(loginResult.current.data).toBeDefined());
+
+        // Capture refresh_token that is supposed to be expired and must have been purged from localStorage
+        const loggedOutRefreshToken =
+            localStorage.getItem('refresh_token') ?? '';
+
+        // Proceed with user log out
+        const { result: logoutResult } = renderHook(() => Auth.useLogout(), {
+            wrapper: createWrapper(),
+        });
+        logoutResult.current.mutate({});
+        await waitFor(() => expect(logoutResult.current.data).toBe(true));
+
+        // Set refresh_token to a supposedly purged refresh token
+        localStorage.setItem('refresh_token', loggedOutRefreshToken);
+
+        const { result: refreshResult } = renderHook(() => Auth.useRefresh(), {
+            wrapper: createWrapper(),
+        });
+        refreshResult.current.mutate();
+
+        await waitFor(() => {
+            expect(refreshResult.current.error).toBeDefined();
+            expect(refreshResult.current.error?.status).toBe(
+                HttpStatusCode.Forbidden,
+            );
+            expect(refreshResult.current.error?.statusText).toBe(
+                'Cannot refresh when logged out',
+            );
         });
     });
 });
