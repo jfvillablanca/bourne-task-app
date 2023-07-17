@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { AuthDto, AuthToken, User } from '../common';
-import { decodeAccessToken, tokenStorage } from '../lib/utils';
+import { decodeToken, tokenStorage } from '../lib/utils';
 
 import { get, post } from '.';
 
@@ -95,7 +95,7 @@ async function loginLocal(credentials: AuthDto) {
 
 function handleUserResponse(data: AuthToken) {
     tokenStorage.setTokens(data);
-    const decodedData = decodeAccessToken(data.access_token);
+    const decodedData = decodeToken(data.access_token);
     const user: User = {
         _id: decodedData.sub,
         email: decodedData.email,

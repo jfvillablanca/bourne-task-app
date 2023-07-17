@@ -15,7 +15,7 @@ import {
     UpdateTaskDto,
     User,
 } from '../common';
-import { decodeAccessToken, generateJwtToken } from '../lib/utils';
+import { decodeToken, generateJwtToken } from '../lib/utils';
 
 import { PROJECTS_STORAGE_KEY, USERS_STORAGE_KEY } from './constants';
 
@@ -49,8 +49,15 @@ const authGuard = (header: string | null) => {
     if (!token) {
         return;
     }
-    const id = decodeAccessToken(token).sub ?? 'none';
+    const id = decodeToken(token).sub;
     return id;
+};
+
+const generateTokens = async ({ _id, email }: User): Promise<AuthToken> => {
+    return {
+        access_token: await generateJwtToken({ _id, email }, 'access_token'),
+        refresh_token: await generateJwtToken({ _id, email }, 'refresh_token'),
+    };
 };
 
 export const handlers = [
@@ -68,16 +75,7 @@ export const handlers = [
         }
 
         const _id = ObjectID().toHexString();
-        const generatedTokens: AuthToken = {
-            access_token: await generateJwtToken(
-                { _id, email },
-                'access_token',
-            ),
-            refresh_token: await generateJwtToken(
-                { _id, email },
-                'refresh_token',
-            ),
-        };
+        const generatedTokens = await generateTokens({ _id, email });
         const newUser: MockedUser = {
             _id,
             email,
@@ -134,17 +132,10 @@ export const handlers = [
             );
         }
 
-        const generatedTokens: AuthToken = {
-            access_token: await generateJwtToken(
-                { _id: user._id, email: user.email },
-                'access_token',
-            ),
-            refresh_token: await generateJwtToken(
-                { _id: user._id, email: user.email },
-                'refresh_token',
-            ),
-        };
-
+        const generatedTokens = await generateTokens({
+            _id: user._id,
+            email: user.email,
+        });
         const updatedUser: MockedUser = {
             ...user,
             refresh_token: generatedTokens.refresh_token,

@@ -27,8 +27,8 @@ export const tokenStorage = {
         localStorage.removeItem(tokenType),
 };
 
-export function decodeAccessToken(accessToken: string): DecodedToken {
-    return jwtDecode(accessToken);
+export function decodeToken(token: string): DecodedToken {
+    return jwtDecode(token);
 }
 
 export async function generateJwtToken(
