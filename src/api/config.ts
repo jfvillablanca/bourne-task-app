@@ -12,6 +12,12 @@ apiClient.interceptors.request.use(
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
+        if (config.url === '/api/auth/refresh' && config.method === 'post') {
+            const refreshToken = tokenStorage.getToken('refresh_token');
+            if (refreshToken) {
+                config.headers.Authorization = `Bearer ${refreshToken}`;
+            }
+        }
         return config;
     },
     (error) => Promise.reject(error),

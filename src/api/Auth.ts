@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { configureAuth } from 'react-query-auth';
 import { toast } from 'react-toastify';
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { AuthDto, AuthToken, User } from '../common';
 import { decodeToken, tokenStorage } from '../lib/utils';
@@ -71,6 +71,16 @@ export const Auth = {
             },
         });
     },
+
+    useRefresh: () => {
+        const queryClient = useQueryClient();
+        return useMutation<boolean, AxiosError['response'], void>({
+            mutationFn: () => refresh(),
+            onSuccess: () => {
+                return queryClient.invalidateQueries();
+            },
+        });
+    },
 };
 
 async function getUser(): Promise<User> {
@@ -92,6 +102,13 @@ async function registerLocal(credentials: AuthDto) {
 async function loginLocal(credentials: AuthDto) {
     const response = await post(`/api/auth/local/login`, credentials);
     return handleUserResponse(response.data);
+}
+
+async function refresh() {
+    const response = await post('/api/auth/refresh');
+    const tokens = response.data as AuthToken;
+    tokenStorage.setTokens(tokens);
+    return true;
 }
 
 function handleUserResponse(data: AuthToken) {
