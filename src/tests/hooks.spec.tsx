@@ -393,6 +393,9 @@ describe.shuffle('Project', () => {
         ownerUpdateResult.current.mutate({
             collaborators: [collaboratingUser._id],
         });
+        await waitFor(() =>
+            expect(ownerUpdateResult.current.data).toBeDefined(),
+        );
 
         // Set access_token to collaborator's access_token
         localStorage.setItem(
@@ -509,6 +512,9 @@ describe.shuffle('Project', () => {
         ownerUpdateResult.current.mutate({
             collaborators: [collaboratingUser._id],
         });
+        await waitFor(() =>
+            expect(ownerUpdateResult.current.data).toBeDefined(),
+        );
 
         // Set access_token to collaborator's access_token
         localStorage.setItem(
@@ -890,6 +896,7 @@ describe.shuffle('Task', () => {
         updateResult.current.mutate({
             collaborators: [collaboratingUser._id],
         });
+        await waitFor(() => expect(updateResult.current.data).toBeDefined());
     });
 
     afterEach(() => {
