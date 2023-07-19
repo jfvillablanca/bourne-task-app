@@ -1,5 +1,5 @@
 import { ClassValue, clsx } from 'clsx';
-import { SignJWT } from 'jose';
+import { jwtVerify, SignJWT } from 'jose';
 import jwtDecode from 'jwt-decode';
 import { twMerge } from 'tailwind-merge';
 
@@ -29,6 +29,15 @@ export const tokenStorage = {
 
 export function decodeToken(token: string): DecodedToken {
     return jwtDecode(token);
+}
+
+export async function verifyToken(token: string) {
+    try {
+        const { payload } = await jwtVerify(token, JWT_SECRET);
+        return payload.sub;
+    } catch (err) {
+        return;
+    }
 }
 
 export async function generateJwtToken(

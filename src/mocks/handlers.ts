@@ -15,7 +15,7 @@ import {
     UpdateTaskDto,
     User,
 } from '../common';
-import { decodeToken, generateJwtToken } from '../lib/utils';
+import { generateJwtToken, verifyToken } from '../lib/utils';
 
 import { PROJECTS_STORAGE_KEY, USERS_STORAGE_KEY } from './constants';
 
@@ -44,12 +44,12 @@ const getProjects = () => {
     return JSON.parse(storedProjects) as ProjectDocument[];
 };
 
-const authGuard = (header: string | null) => {
+const authGuard = async (header: string | null) => {
     const token = header?.split(' ')[1];
     if (!token) {
         return;
     }
-    const id = decodeToken(token).sub;
+    const id = await verifyToken(token);
     return id;
 };
 
@@ -152,9 +152,9 @@ export const handlers = [
         return res(ctx.json(generatedTokens), ctx.status(HttpStatusCode.Ok));
     }),
 
-    rest.get('/api/users/me', (req, res, ctx) => {
+    rest.get('/api/users/me', async (req, res, ctx) => {
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -176,7 +176,7 @@ export const handlers = [
         }
 
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -204,7 +204,7 @@ export const handlers = [
         }
 
         const authHeaderRefresh = req.headers.get('Authorization');
-        const userId = authGuard(authHeaderRefresh);
+        const userId = await authGuard(authHeaderRefresh);
         const userIndex = users.findIndex((x) => x._id === userId);
         if (userIndex < 0) {
             return res(
@@ -254,7 +254,7 @@ export const handlers = [
         }
 
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -281,7 +281,7 @@ export const handlers = [
         return res(ctx.json(newProject), ctx.status(HttpStatusCode.Created));
     }),
 
-    rest.get('/api/projects', (req, res, ctx) => {
+    rest.get('/api/projects', async (req, res, ctx) => {
         const projects = getProjects();
         if (!projects) {
             return res(
@@ -293,7 +293,7 @@ export const handlers = [
         }
 
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -307,7 +307,7 @@ export const handlers = [
         return res(ctx.json(foundProjects), ctx.status(HttpStatusCode.Ok));
     }),
 
-    rest.get('/api/projects/:projectId', (req, res, ctx) => {
+    rest.get('/api/projects/:projectId', async (req, res, ctx) => {
         const projects = getProjects();
         if (!projects) {
             return res(
@@ -319,7 +319,7 @@ export const handlers = [
         }
 
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -337,7 +337,7 @@ export const handlers = [
         return res(ctx.json(project), ctx.status(HttpStatusCode.Ok));
     }),
 
-    rest.get('/api/projects/:projectId/members', (req, res, ctx) => {
+    rest.get('/api/projects/:projectId/members', async (req, res, ctx) => {
         const projects = getProjects();
         if (!projects) {
             return res(
@@ -349,7 +349,7 @@ export const handlers = [
         }
 
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -390,7 +390,7 @@ export const handlers = [
         }
 
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -432,7 +432,7 @@ export const handlers = [
         return res(ctx.json(updatedProject), ctx.status(HttpStatusCode.Ok));
     }),
 
-    rest.delete('/api/projects/:projectId', (req, res, ctx) => {
+    rest.delete('/api/projects/:projectId', async (req, res, ctx) => {
         const projects = getProjects();
         if (!projects) {
             return res(
@@ -444,7 +444,7 @@ export const handlers = [
         }
 
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -493,7 +493,7 @@ export const handlers = [
         }
 
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -529,7 +529,7 @@ export const handlers = [
         return res(ctx.json(newTask), ctx.status(HttpStatusCode.Created));
     }),
 
-    rest.get('/api/projects/:projectId/tasks', (req, res, ctx) => {
+    rest.get('/api/projects/:projectId/tasks', async (req, res, ctx) => {
         const projects = getProjects();
         if (!projects) {
             return res(
@@ -541,7 +541,7 @@ export const handlers = [
         }
 
         const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+        const userId = await authGuard(authHeader);
 
         if (!userId) {
             return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -556,38 +556,45 @@ export const handlers = [
         return res(ctx.json(project.tasks), ctx.status(HttpStatusCode.Ok));
     }),
 
-    rest.get('/api/projects/:projectId/tasks/:taskId', (req, res, ctx) => {
-        const projects = getProjects();
-        if (!projects) {
-            return res(
-                ctx.status(
-                    HttpStatusCode.InternalServerError,
-                    'Mock projects not loaded to localStorage',
-                ),
+    rest.get(
+        '/api/projects/:projectId/tasks/:taskId',
+        async (req, res, ctx) => {
+            const projects = getProjects();
+            if (!projects) {
+                return res(
+                    ctx.status(
+                        HttpStatusCode.InternalServerError,
+                        'Mock projects not loaded to localStorage',
+                    ),
+                );
+            }
+
+            const authHeader = req.headers.get('Authorization');
+            const userId = await authGuard(authHeader);
+
+            if (!userId) {
+                return res(ctx.status(HttpStatusCode.Unauthorized));
+            }
+            const { projectId, taskId } = req.params;
+
+            const project = projects.find(
+                (project) => project._id === projectId,
             );
-        }
+            if (!project) {
+                return res(ctx.status(HttpStatusCode.NotFound));
+            }
 
-        const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
+            const tasks = project.tasks;
+            const task = tasks.find((task) => task._id === taskId);
+            if (!task) {
+                return res(
+                    ctx.status(HttpStatusCode.NotFound, 'Task not found'),
+                );
+            }
 
-        if (!userId) {
-            return res(ctx.status(HttpStatusCode.Unauthorized));
-        }
-        const { projectId, taskId } = req.params;
-
-        const project = projects.find((project) => project._id === projectId);
-        if (!project) {
-            return res(ctx.status(HttpStatusCode.NotFound));
-        }
-
-        const tasks = project.tasks;
-        const task = tasks.find((task) => task._id === taskId);
-        if (!task) {
-            return res(ctx.status(HttpStatusCode.NotFound, 'Task not found'));
-        }
-
-        return res(ctx.json(task), ctx.status(HttpStatusCode.Ok));
-    }),
+            return res(ctx.json(task), ctx.status(HttpStatusCode.Ok));
+        },
+    ),
 
     rest.patch(
         '/api/projects/:projectId/tasks/:taskId',
@@ -603,7 +610,7 @@ export const handlers = [
             }
 
             const authHeader = req.headers.get('Authorization');
-            const userId = authGuard(authHeader);
+            const userId = await authGuard(authHeader);
 
             if (!userId) {
                 return res(ctx.status(HttpStatusCode.Unauthorized));
@@ -654,63 +661,70 @@ export const handlers = [
         },
     ),
 
-    rest.delete('/api/projects/:projectId/tasks/:taskId', (req, res, ctx) => {
-        const projects = getProjects();
-        if (!projects) {
-            return res(
-                ctx.status(
-                    HttpStatusCode.InternalServerError,
-                    'Mock projects not loaded to localStorage',
-                ),
-            );
-        }
-
-        const authHeader = req.headers.get('Authorization');
-        const userId = authGuard(authHeader);
-
-        if (!userId) {
-            return res(ctx.status(HttpStatusCode.Unauthorized));
-        }
-
-        const { projectId, taskId } = req.params;
-
-        const project = projects.find((project) => project._id === projectId);
-        if (!project) {
-            return res(ctx.status(HttpStatusCode.NotFound));
-        }
-
-        const tasks = project.tasks;
-        const taskIndex = tasks.findIndex((task) => task._id === taskId);
-        if (taskIndex < 0) {
-            return res(ctx.status(HttpStatusCode.NotFound, 'Task not found'));
-        }
-
-        if (![project.ownerId, ...project.collaborators].includes(userId)) {
-            return res(
-                ctx.status(
-                    HttpStatusCode.Forbidden,
-                    'Invalid credentials: Cannot update resource',
-                ),
-            );
-        }
-
-        const updatedTasks = [
-            ...tasks.slice(0, taskIndex),
-            ...tasks.slice(taskIndex + 1),
-        ];
-        const updatedProject = { ...project, tasks: updatedTasks };
-        const updatedProjects = projects.map((project) => {
-            if (project._id === projectId) {
-                return updatedProject;
+    rest.delete(
+        '/api/projects/:projectId/tasks/:taskId',
+        async (req, res, ctx) => {
+            const projects = getProjects();
+            if (!projects) {
+                return res(
+                    ctx.status(
+                        HttpStatusCode.InternalServerError,
+                        'Mock projects not loaded to localStorage',
+                    ),
+                );
             }
-            return project;
-        });
 
-        localStorage.setItem(
-            PROJECTS_STORAGE_KEY,
-            JSON.stringify(updatedProjects),
-        );
+            const authHeader = req.headers.get('Authorization');
+            const userId = await authGuard(authHeader);
 
-        return res(ctx.status(HttpStatusCode.NoContent));
-    }),
+            if (!userId) {
+                return res(ctx.status(HttpStatusCode.Unauthorized));
+            }
+
+            const { projectId, taskId } = req.params;
+
+            const project = projects.find(
+                (project) => project._id === projectId,
+            );
+            if (!project) {
+                return res(ctx.status(HttpStatusCode.NotFound));
+            }
+
+            const tasks = project.tasks;
+            const taskIndex = tasks.findIndex((task) => task._id === taskId);
+            if (taskIndex < 0) {
+                return res(
+                    ctx.status(HttpStatusCode.NotFound, 'Task not found'),
+                );
+            }
+
+            if (![project.ownerId, ...project.collaborators].includes(userId)) {
+                return res(
+                    ctx.status(
+                        HttpStatusCode.Forbidden,
+                        'Invalid credentials: Cannot update resource',
+                    ),
+                );
+            }
+
+            const updatedTasks = [
+                ...tasks.slice(0, taskIndex),
+                ...tasks.slice(taskIndex + 1),
+            ];
+            const updatedProject = { ...project, tasks: updatedTasks };
+            const updatedProjects = projects.map((project) => {
+                if (project._id === projectId) {
+                    return updatedProject;
+                }
+                return project;
+            });
+
+            localStorage.setItem(
+                PROJECTS_STORAGE_KEY,
+                JSON.stringify(updatedProjects),
+            );
+
+            return res(ctx.status(HttpStatusCode.NoContent));
+        },
+    ),
 ];
