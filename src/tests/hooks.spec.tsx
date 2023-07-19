@@ -7,7 +7,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 
 import { Auth, Project, Task } from '../api';
 import { AuthDto, ProjectDto, ProjectMember } from '../common';
-import { generateJwtToken } from '../lib/utils';
+import { decodeToken, generateJwtToken } from '../lib/utils';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 import {
@@ -253,6 +253,84 @@ describe.shuffle('Auth (Error handling)', () => {
                 'Invalid password',
             );
             expect(loginResult.current.error?.type).toBe('password');
+        });
+    });
+
+    it('[Auth.useUser] should handle a 401 status code on requests with no access token', async () => {
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(user);
+        await waitFor(() => expect(loginResult.current.data).toBeDefined());
+
+        // Clear the access token
+        clearTestAccessTokenFromLocalStorage();
+
+        const { result: getUserResult } = renderHook(() => Auth.useUser(), {
+            wrapper: createWrapper(),
+        });
+
+        await waitFor(() => {
+            expect(getUserResult.current.error).toBeDefined();
+            expect(getUserResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('[Auth.useUser] should handle a 401 status code if accessing with an expired access token', async () => {
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(user);
+        await waitFor(() => expect(loginResult.current.data).toBeDefined());
+
+        // Get current access_token
+        const nonExpiredAccessToken =
+            localStorage.getItem('access_token') ?? '';
+        const expiredAccessToken = await generateJwtToken(
+            {
+                _id: decodeToken(nonExpiredAccessToken).sub,
+                email: user.email,
+            },
+            '0s',
+        );
+        // Set access_token to an expired access_token
+        localStorage.setItem('access_token', expiredAccessToken);
+
+        const { result: getUserResult } = renderHook(() => Auth.useUser(), {
+            wrapper: createWrapper(),
+        });
+
+        await waitFor(() => {
+            expect(getUserResult.current.error).toBeDefined();
+            expect(getUserResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
         });
     });
 
