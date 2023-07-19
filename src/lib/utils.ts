@@ -34,12 +34,26 @@ export function decodeToken(token: string): DecodedToken {
 export async function generateJwtToken(
     payload: Pick<MockedUser, '_id' | 'email'>,
     type: 'access_token' | 'refresh_token',
+): Promise<string>;
+export async function generateJwtToken(
+    payload: Pick<MockedUser, '_id' | 'email'>,
+    expiresIn: string,
+): Promise<string>;
+export async function generateJwtToken(
+    payload: Pick<MockedUser, '_id' | 'email'>,
+    arg2: 'access_token' | 'refresh_token' | string,
 ) {
     const jwtPayload = { sub: payload._id, email: payload.email };
     const signedJwt = await new SignJWT({ ...jwtPayload })
         .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
         .setIssuedAt()
-        .setExpirationTime(type === 'access_token' ? '15m' : '7d')
+        .setExpirationTime(
+            arg2 === 'access_token'
+                ? '15m'
+                : arg2 === 'refresh_token'
+                ? '7d'
+                : arg2,
+        )
         .sign(JWT_SECRET);
     return signedJwt;
 }
