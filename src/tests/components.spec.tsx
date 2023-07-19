@@ -20,10 +20,9 @@ import { handlers } from '../mocks/handlers';
 import {
     clearTestAccessTokenFromLocalStorage,
     populateMockDatabase,
+    renderWithClient,
     setTestAccessTokenToLocalStorage,
-} from '../mocks/mockDbTestUtils';
-
-import { renderWithClient } from './utils';
+} from '../tests/utils';
 
 const server = setupServer(...handlers);
 

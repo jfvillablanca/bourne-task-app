@@ -9,9 +9,7 @@ import userEvent from '@testing-library/user-event';
 
 import { AuthForm, AuthLoader, Header, ToastContainer } from '../components';
 import { handlers } from '../mocks/handlers';
-import { populateMockDatabase } from '../mocks/mockDbTestUtils';
-
-import { renderWithClient } from './utils';
+import { populateMockDatabase, renderWithClient } from '../tests/utils';
 
 const server = setupServer(...handlers);
 

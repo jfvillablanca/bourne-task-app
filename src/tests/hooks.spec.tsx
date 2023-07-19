@@ -7,16 +7,16 @@ import { renderHook, waitFor } from '@testing-library/react';
 
 import { Auth, Project, Task } from '../api';
 import { AuthDto, ProjectDto, ProjectMember } from '../common';
-import { decodeToken, generateJwtToken } from '../lib/utils';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 import {
     clearTestAccessTokenFromLocalStorage,
+    createWrapper,
+    generateJwtToken,
     populateMockDatabase,
     setTestAccessTokenToLocalStorage,
-} from '../mocks/mockDbTestUtils';
-
-import { createWrapper } from './utils';
+    verifyToken,
+} from '../tests/utils';
 
 const server = setupServer(...handlers);
 
@@ -312,9 +312,10 @@ describe.shuffle('Auth (Error handling)', () => {
         // Get current access_token
         const nonExpiredAccessToken =
             localStorage.getItem('access_token') ?? '';
+        const userId = (await verifyToken(nonExpiredAccessToken)) ?? '';
         const expiredAccessToken = await generateJwtToken(
             {
-                _id: decodeToken(nonExpiredAccessToken).sub,
+                _id: userId,
                 email: user.email,
             },
             '0s',

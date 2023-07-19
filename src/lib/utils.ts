@@ -1,10 +1,8 @@
 import { ClassValue, clsx } from 'clsx';
-import { jwtVerify, SignJWT } from 'jose';
 import jwtDecode from 'jwt-decode';
 import { twMerge } from 'tailwind-merge';
 
-import { AuthToken, DecodedToken, MockedUser } from '../common';
-import { JWT_SECRET } from '../mocks/constants';
+import { AuthToken, DecodedToken } from '../common';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -29,40 +27,4 @@ export const tokenStorage = {
 
 export function decodeToken(token: string): DecodedToken {
     return jwtDecode(token);
-}
-
-export async function verifyToken(token: string) {
-    try {
-        const { payload } = await jwtVerify(token, JWT_SECRET);
-        return payload.sub;
-    } catch (err) {
-        return;
-    }
-}
-
-export async function generateJwtToken(
-    payload: Pick<MockedUser, '_id' | 'email'>,
-    type: 'access_token' | 'refresh_token',
-): Promise<string>;
-export async function generateJwtToken(
-    payload: Pick<MockedUser, '_id' | 'email'>,
-    expiresIn: string,
-): Promise<string>;
-export async function generateJwtToken(
-    payload: Pick<MockedUser, '_id' | 'email'>,
-    arg2: 'access_token' | 'refresh_token' | string,
-) {
-    const jwtPayload = { sub: payload._id, email: payload.email };
-    const signedJwt = await new SignJWT({ ...jwtPayload })
-        .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
-        .setIssuedAt()
-        .setExpirationTime(
-            arg2 === 'access_token'
-                ? '15m'
-                : arg2 === 'refresh_token'
-                ? '7d'
-                : arg2,
-        )
-        .sign(JWT_SECRET);
-    return signedJwt;
 }

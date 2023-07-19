@@ -15,7 +15,7 @@ import {
     UpdateTaskDto,
     User,
 } from '../common';
-import { generateJwtToken, verifyToken } from '../lib/utils';
+import { generateJwtToken, verifyToken } from '../tests/utils';
 
 import { PROJECTS_STORAGE_KEY, USERS_STORAGE_KEY } from './constants';
 
