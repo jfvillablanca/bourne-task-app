@@ -27,6 +27,9 @@ export const Auth = {
     useUser: () => {
         return useUser({
             retry: false,
+            meta: {
+                isErrorHandledLocally: true,
+            },
         });
     },
 

@@ -9,7 +9,7 @@ import AuthLoader from './components/AuthLoader.tsx';
 import { worker } from './mocks/browser';
 import { populateMockDatabase } from './tests/utils';
 import App from './App.tsx';
-import { createQueryClient } from './common';
+import { queryClient } from './common';
 
 import './index.css';
 
@@ -21,7 +21,7 @@ async function main() {
 
     ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <React.StrictMode>
-            <QueryClientProvider client={createQueryClient()}>
+            <QueryClientProvider client={queryClient}>
                 <AuthLoader>
                     <App />
                 </AuthLoader>

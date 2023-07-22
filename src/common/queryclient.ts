@@ -8,6 +8,8 @@ import {
     QueryClientConfig,
 } from '@tanstack/react-query';
 
+import { tokenStorage } from '../lib/utils';
+
 const isAxiosErrorResponse = (
     error: unknown,
 ): error is AxiosError['response'] => {
@@ -25,6 +27,10 @@ const handleError = (error: unknown) => {
         if (error.status === HttpStatusCode.Unauthorized) {
             // TODO: suppress error unless access with expired token
             // toast.error(`Please login to continue`); // commented for now
+
+            tokenStorage.clearTokens();
+            queryClient.invalidateQueries();
+
             return;
         }
         if (error.status === HttpStatusCode.Forbidden) {
@@ -63,3 +69,5 @@ export const createQueryClient = (config?: QueryClientConfig) =>
         mutationCache: createMutationCache(),
         ...config,
     });
+
+export const queryClient = createQueryClient();
