@@ -1,4 +1,4 @@
-import { HttpStatusCode } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import ObjectID from 'bson-objectid';
 import { setupServer } from 'msw/node';
 import { describe, it, vi } from 'vitest';
@@ -139,33 +139,6 @@ describe.shuffle('Auth', () => {
 
         expect(removeItemMock).toHaveBeenCalled();
         removeItemMock.mockRestore();
-    });
-
-    it('should refresh token if authorized', async () => {
-        const user: AuthDto = {
-            email: 'iam@teapot.com',
-            password: 'swordfish',
-        };
-        const { result: registerResult } = renderHook(
-            () => Auth.useRegisterLocal(),
-            {
-                wrapper: createWrapper(),
-            },
-        );
-        registerResult.current.mutate(user);
-        await waitFor(() => expect(registerResult.current.data).toBeDefined());
-
-        const setItemMock = vi.spyOn(Storage.prototype, 'setItem');
-        const { result: refreshResult } = renderHook(() => Auth.useRefresh(), {
-            wrapper: createWrapper(),
-        });
-
-        refreshResult.current.mutate();
-
-        await waitFor(() => expect(refreshResult.current.data).toBe(true));
-        expect(setItemMock).toHaveBeenCalled();
-
-        setItemMock.mockRestore();
     });
 });
 
@@ -334,8 +307,40 @@ describe.shuffle('Auth (Error handling)', () => {
             );
         });
     });
+});
 
-    it('[Auth.useRefresh] should handle a 401 status code if user does not exist', async () => {
+describe.shuffle('Token Refresh', () => {
+    it('should refresh token if authorized', async () => {
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+
+        const setItemMock = vi.spyOn(Storage.prototype, 'setItem');
+        const { result: tokenRefresh } = renderHook(
+            () => Auth.useTokenRefresh(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        const refreshTokenIfNeeded = tokenRefresh.current;
+
+        await waitFor(() => expect(refreshTokenIfNeeded()).resolves.toBe(true));
+        expect(setItemMock).toHaveBeenCalled();
+
+        setItemMock.mockRestore();
+    });
+
+    it('[Auth.useTokenRefresh] should handle a 401 status code if user does not exist', async () => {
+        const removeItemMock = vi.spyOn(Storage.prototype, 'removeItem');
         const nonExistentUser = {
             _id: ObjectID(0).toHexString(),
             email: 'non@existent.com',
@@ -346,23 +351,28 @@ describe.shuffle('Auth (Error handling)', () => {
             await generateJwtToken(nonExistentUser, 'refresh_token'),
         );
 
-        const { result: refreshResult } = renderHook(() => Auth.useRefresh(), {
-            wrapper: createWrapper(),
-        });
-        refreshResult.current.mutate();
+        const { result: tokenRefresh } = renderHook(
+            () => Auth.useTokenRefresh(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        const refreshTokenIfNeeded = tokenRefresh.current;
 
-        await waitFor(() => {
-            expect(refreshResult.current.error).toBeDefined();
-            expect(refreshResult.current.error?.status).toBe(
-                HttpStatusCode.Unauthorized,
-            );
-            expect(refreshResult.current.error?.statusText).toBe(
-                'User does not exist',
-            );
-        });
+        try {
+            await refreshTokenIfNeeded();
+        } catch (err) {
+            const error = err as AxiosError['response'];
+            expect(removeItemMock).toHaveBeenCalled();
+            expect(error?.status).toBe(HttpStatusCode.Unauthorized);
+            expect(error?.statusText).toBe('User does not exist');
+        }
+
+        removeItemMock.mockRestore();
     });
 
-    it('[Auth.useRefresh] should handle a 403 status code if a user is logged out', async () => {
+    it('[Auth.useTokenRefresh] should handle a 403 status code if a user is logged out', async () => {
+        const removeItemMock = vi.spyOn(Storage.prototype, 'removeItem');
         // Create a user that will log out
         const user: AuthDto = {
             email: 'iam@teapot.com',
@@ -396,20 +406,24 @@ describe.shuffle('Auth (Error handling)', () => {
         // Set refresh_token to a supposedly purged refresh token
         localStorage.setItem('refresh_token', loggedOutRefreshToken);
 
-        const { result: refreshResult } = renderHook(() => Auth.useRefresh(), {
-            wrapper: createWrapper(),
-        });
-        refreshResult.current.mutate();
+        const { result: tokenRefresh } = renderHook(
+            () => Auth.useTokenRefresh(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        const refreshTokenIfNeeded = tokenRefresh.current;
 
-        await waitFor(() => {
-            expect(refreshResult.current.error).toBeDefined();
-            expect(refreshResult.current.error?.status).toBe(
-                HttpStatusCode.Forbidden,
-            );
-            expect(refreshResult.current.error?.statusText).toBe(
-                'Cannot refresh when logged out',
-            );
-        });
+        try {
+            await refreshTokenIfNeeded();
+        } catch (err) {
+            const error = err as AxiosError['response'];
+            expect(removeItemMock).toHaveBeenCalled();
+            expect(error?.status).toBe(HttpStatusCode.Forbidden);
+            expect(error?.statusText).toBe('Cannot refresh when logged out');
+        }
+
+        removeItemMock.mockRestore();
     });
 });
 
