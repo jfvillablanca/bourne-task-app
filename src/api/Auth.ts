@@ -1,9 +1,8 @@
 import { AxiosError } from 'axios';
 import { useCallback } from 'react';
-import { configureAuth } from 'react-query-auth';
 import { toast } from 'react-toastify';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { AuthDto, AuthToken, User } from '../common';
 import { decodeToken, tokenStorage } from '../lib/utils';
@@ -12,21 +11,13 @@ import { get, post } from '.';
 
 type AuthError = AxiosError['response'] & { type?: 'password' | 'user' };
 
-const { useUser, useRegister, useLogin, useLogout } = configureAuth<
-    User,
-    AuthError,
-    AuthDto,
-    AuthDto
->({
-    userFn: () => getUser(),
-    registerFn: (credentials: AuthDto) => registerLocal(credentials),
-    loginFn: (credentials: AuthDto) => loginLocal(credentials),
-    logoutFn: () => logout(),
-});
-
 export const Auth = {
+    queryKey: ['authenticated-user'] as const,
+
     useUser: () => {
-        return useUser({
+        return useQuery<User, AxiosError['response']>({
+            queryKey: Auth.queryKey,
+            queryFn: () => getUser(),
             retry: false,
             meta: {
                 isErrorHandledLocally: true,
@@ -35,8 +26,17 @@ export const Auth = {
     },
 
     useRegisterLocal: () => {
-        return useRegister({
-            onSuccess: () => {
+        const queryClient = useQueryClient();
+
+        const setUser = useCallback(
+            (data: User) => queryClient.setQueryData(Auth.queryKey, data),
+            [queryClient],
+        );
+
+        return useMutation<User, AxiosError['response'], AuthDto>({
+            mutationFn: (credentials: AuthDto) => registerLocal(credentials),
+            onSuccess: (user) => {
+                setUser(user);
                 toast.success("You're all set! 🥳");
             },
             onError: (error) => {
@@ -49,7 +49,15 @@ export const Auth = {
     },
 
     useLoginLocal: () => {
-        return useLogin({
+        const queryClient = useQueryClient();
+
+        const setUser = useCallback(
+            (data: User) => queryClient.setQueryData(Auth.queryKey, data),
+            [queryClient],
+        );
+
+        return useMutation<User, AuthError, AuthDto>({
+            mutationFn: (credentials: AuthDto) => loginLocal(credentials),
             onError: (error) => {
                 if (error?.statusText === 'Invalid password') {
                     error.type = 'password';
@@ -58,7 +66,8 @@ export const Auth = {
                 error.type = 'user';
                 return error;
             },
-            onSuccess: () => {
+            onSuccess: (user) => {
+                setUser(user);
                 toast.success('Welcome back! 😊');
             },
             meta: {
@@ -69,9 +78,24 @@ export const Auth = {
 
     useLogout: () => {
         const queryClient = useQueryClient();
-        return useLogout({
+
+        const setUser = useCallback(
+            (data: User | null) =>
+                queryClient.setQueryData(Auth.queryKey, data),
+            [queryClient],
+        );
+
+        return useMutation<unknown, AxiosError['response'], unknown>({
+            mutationFn: () => logout(),
+            onError: (error) => {
+                return error;
+            },
             onSuccess: () => {
-                return queryClient.invalidateQueries();
+                setUser(null);
+                queryClient.invalidateQueries();
+            },
+            meta: {
+                isErrorHandledLocally: true,
             },
         });
     },
