@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios';
+import { useCallback } from 'react';
 import { configureAuth } from 'react-query-auth';
 import { toast } from 'react-toastify';
 
@@ -75,14 +76,27 @@ export const Auth = {
         });
     },
 
-    useRefresh: () => {
-        const queryClient = useQueryClient();
-        return useMutation<boolean, AxiosError['response'], void>({
+    useTokenRefresh: () => {
+        const refreshMutation = useMutation<
+            boolean,
+            AxiosError['response'],
+            void
+        >({
             mutationFn: () => refresh(),
-            onSuccess: () => {
-                return queryClient.invalidateQueries();
-            },
         });
+
+        const refreshTokenIfNeeded = useCallback(async () => {
+            const shouldRefresh = true; // access_token expiration logic
+
+            if (shouldRefresh) {
+                try {
+                    return await refreshMutation.mutateAsync();
+                } catch (err) {
+                    tokenStorage.clearTokens();
+                }
+            }
+        }, [refreshMutation]);
+        return refreshTokenIfNeeded;
     },
 };
 
