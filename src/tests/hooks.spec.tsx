@@ -1,12 +1,13 @@
 import { HttpStatusCode } from 'axios';
 import ObjectID from 'bson-objectid';
+import { subSeconds } from 'date-fns';
 import { setupServer } from 'msw/node';
 import { describe, it, vi } from 'vitest';
 
 import { renderHook, waitFor } from '@testing-library/react';
 
 import { Auth, Project, Task } from '../api';
-import { AuthDto, ProjectDto, ProjectMember } from '../common';
+import { AuthDto, expirationDate, ProjectDto, ProjectMember } from '../common';
 import { mockProjects } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 import {
@@ -248,6 +249,8 @@ describe.shuffle('Auth (Error handling)', () => {
         loginResult.current.mutate(user);
         await waitFor(() => expect(loginResult.current.data).toBeDefined());
 
+        // Remove refresh_token to prevent a refresh request on the expected 401 error
+        localStorage.removeItem('refresh_token');
         // Clear the access token
         clearTestAccessTokenFromLocalStorage();
 
@@ -282,6 +285,8 @@ describe.shuffle('Auth (Error handling)', () => {
         loginResult.current.mutate(user);
         await waitFor(() => expect(loginResult.current.data).toBeDefined());
 
+        // Remove refresh_token to prevent a refresh request on the expected 401 error
+        localStorage.removeItem('refresh_token');
         // Get current access_token
         const nonExpiredAccessToken =
             localStorage.getItem('access_token') ?? '';
@@ -310,8 +315,14 @@ describe.shuffle('Auth (Error handling)', () => {
 });
 
 describe.shuffle('Token Refresh', () => {
+    // Token refresh is a 'meta' Auth hook.
+    // Auth.useUser() is used as the hook for useQuery but the refresh should work on all
+    // protected useQuery hooks
 
+    let user: AuthDto;
 
+    beforeEach(async () => {
+        user = {
             email: 'iam@teapot.com',
             password: 'swordfish',
         };
@@ -323,14 +334,45 @@ describe.shuffle('Token Refresh', () => {
         );
         registerResult.current.mutate(user);
         await waitFor(() => expect(registerResult.current.data).toBeDefined());
+    });
+
+    it('[useQuery] should NOT trigger refresh on access token not near expiry', async () => {
+        const apiConfig = await import('../api/config');
+        const postMock = vi.spyOn(apiConfig, 'post');
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+        const { result: getUserResult } = renderHook(() => Auth.useUser(), {
             wrapper: createWrapper(),
         });
+        await waitFor(() => expect(getUserResult.current.data).toBeDefined());
 
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+        expect(postMock).not.toHaveBeenCalledWith('/api/auth/refresh');
 
+        vi.restoreAllMocks();
+    });
+
+    it('[useQuery] should trigger refresh when access token is near expiration', async () => {
+        // Get current access_token to get expiration
+        const accessToken = localStorage.getItem('access_token') ?? '';
+        const expiration = expirationDate(accessToken);
+        const dateNearExpiration = subSeconds(expiration, 45);
+        vi.useFakeTimers();
+        vi.setSystemTime(dateNearExpiration);
+        expect(new Date(Date.now())).toStrictEqual(subSeconds(expiration, 45));
+
+        const apiConfig = await import('../api/config');
+        const postMock = vi.spyOn(apiConfig, 'post');
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+        const { result: getUserResult } = renderHook(() => Auth.useUser(), {
             wrapper: createWrapper(),
         });
+        await waitFor(() => expect(getUserResult.current.data).toBeDefined());
 
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+        expect(postMock).toHaveBeenCalledWith('/api/auth/refresh');
 
+        vi.restoreAllMocks();
+        vi.useRealTimers();
     });
 });
 
