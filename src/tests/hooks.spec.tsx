@@ -340,6 +340,7 @@ describe.shuffle('Token Refresh', () => {
         const apiConfig = await import('../api/config');
         const postMock = vi.spyOn(apiConfig, 'post');
         const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
         const { result: getUserResult } = renderHook(() => Auth.useUser(), {
             wrapper: createWrapper(),
         });
@@ -363,6 +364,7 @@ describe.shuffle('Token Refresh', () => {
         const apiConfig = await import('../api/config');
         const postMock = vi.spyOn(apiConfig, 'post');
         const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
         const { result: getUserResult } = renderHook(() => Auth.useUser(), {
             wrapper: createWrapper(),
         });
@@ -370,6 +372,32 @@ describe.shuffle('Token Refresh', () => {
 
         expect(useTokenRefreshMock).toHaveBeenCalled();
         expect(postMock).toHaveBeenCalledWith('/api/auth/refresh');
+
+        vi.restoreAllMocks();
+        vi.useRealTimers();
+    });
+
+    it('[useQuery] should trigger refresh when access token is expired but refresh token is not yet expired', async () => {
+        // Get current access_token to get expiration
+        const accessToken = localStorage.getItem('access_token') ?? '';
+        const expiration = expirationDate(accessToken);
+        vi.useFakeTimers();
+        vi.setSystemTime(expiration);
+        expect(new Date(Date.now())).toStrictEqual(new Date(expiration));
+
+        const apiConfig = await import('../api/config');
+        const postMock = vi.spyOn(apiConfig, 'post');
+        const getMock = vi.spyOn(apiConfig, 'get');
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result: getUserResult } = renderHook(() => Auth.useUser(), {
+            wrapper: createWrapper(),
+        });
+        await waitFor(() => expect(getUserResult.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+        expect(postMock).toHaveBeenCalledWith('/api/auth/refresh');
+        expect(getMock).toHaveBeenNthCalledWith(2, '/api/users/me');
 
         vi.restoreAllMocks();
         vi.useRealTimers();
