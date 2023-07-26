@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useEffectOnce } from 'usehooks-ts';
 
 import { Project } from './api';
 import {
@@ -15,14 +14,6 @@ function App() {
     const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
     const projectsQuery = Project.useFindAll();
-    const projects = projectsQuery.data;
-
-    useEffectOnce(() => {
-        if (projects && projects.length > 0) {
-            const initialProjectId = projects[0]._id;
-            setSelectedProject(() => initialProjectId);
-        }
-    });
 
     const handleClickedProject = (projectId: string) => {
         setSelectedProject(() => projectId);
