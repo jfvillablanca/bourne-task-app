@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 
@@ -116,15 +116,22 @@ export const Auth = {
                 const accessToken = tokenStorage.getToken('access_token');
                 if (accessToken) {
                     try {
+                        const fnResult = await queryFn();
                         if (secondsBeforeExpiration(accessToken) < 60) {
                             await refreshMutation.mutateAsync();
                         }
-                        return await queryFn();
+                        return fnResult;
                     } catch (err) {
+                        const error = err as AxiosError['response'];
+                        if (error?.status === HttpStatusCode.Unauthorized) {
+                            await refreshMutation.mutateAsync();
+                            return await queryFn();
+                        }
                         tokenStorage.clearTokens();
                         queryClient.invalidateQueries();
                     }
                 }
+                return await queryFn();
             },
             [refreshMutation, queryClient],
         );
