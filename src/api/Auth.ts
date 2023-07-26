@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { AuthDto, AuthToken, User } from '../common';
+import { AuthDto, AuthToken, secondsBeforeExpiration, User } from '../common';
 import { decodeToken, tokenStorage } from '../lib/utils';
 
 import { get, post } from '.';
@@ -15,9 +15,10 @@ export const Auth = {
     queryKey: ['authenticated-user'] as const,
 
     useUser: () => {
+        const refreshToken = Auth.useTokenRefresh();
         return useQuery<User, AxiosError['response']>({
-            queryKey: Auth.queryKey,
-            queryFn: () => getUser(),
+            queryKey: [Auth.queryKey, getUser],
+            queryFn: () => refreshToken(getUser),
             retry: false,
             meta: {
                 isErrorHandledLocally: true,
@@ -108,19 +109,26 @@ export const Auth = {
         >({
             mutationFn: () => refresh(),
         });
+        const queryClient = useQueryClient();
 
-        const refreshTokenIfNeeded = useCallback(async () => {
-            const shouldRefresh = true; // access_token expiration logic
-
-            if (shouldRefresh) {
-                try {
-                    return await refreshMutation.mutateAsync();
-                } catch (err) {
-                    tokenStorage.clearTokens();
+        const refreshToken = useCallback(
+            async <T>(queryFn: () => Promise<T>) => {
+                const accessToken = tokenStorage.getToken('access_token');
+                if (accessToken) {
+                    try {
+                        if (secondsBeforeExpiration(accessToken) < 60) {
+                            await refreshMutation.mutateAsync();
+                        }
+                        return await queryFn();
+                    } catch (err) {
+                        tokenStorage.clearTokens();
+                        queryClient.invalidateQueries();
+                    }
                 }
-            }
-        }, [refreshMutation]);
-        return refreshTokenIfNeeded;
+            },
+            [refreshMutation, queryClient],
+        );
+        return refreshToken;
     },
 };
 
