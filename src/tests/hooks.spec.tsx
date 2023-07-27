@@ -402,6 +402,35 @@ describe.shuffle('Token Refresh', () => {
         vi.restoreAllMocks();
         vi.useRealTimers();
     });
+
+    it('[useQuery] should NOT trigger refresh when refresh token is expired', async () => {
+        // Get current refresh_token to get expiration
+        const refreshToken = localStorage.getItem('refresh_token') ?? '';
+        const expiration = expirationDate(refreshToken);
+        vi.useFakeTimers();
+        vi.setSystemTime(expiration);
+        expect(new Date(Date.now())).toStrictEqual(new Date(expiration));
+
+        const apiConfig = await import('../api/config');
+        const postMock = vi.spyOn(apiConfig, 'post');
+        const getMock = vi.spyOn(apiConfig, 'get');
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result: getUserResult } = renderHook(() => Auth.useUser(), {
+            wrapper: createWrapper(),
+        });
+        await waitFor(() => expect(getUserResult.current.error).toBeDefined());
+
+        expect(getUserResult.current.error?.status).toBe(
+            HttpStatusCode.Unauthorized,
+        );
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+        expect(postMock).not.toHaveBeenCalledWith('/api/auth/refresh');
+        expect(getMock).toHaveBeenNthCalledWith(1, '/api/users/me');
+
+        vi.restoreAllMocks();
+        vi.useRealTimers();
+    });
 });
 
 describe.shuffle('Project', () => {
