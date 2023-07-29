@@ -6,6 +6,8 @@ This app is a TODO app but collaborative in nature, similar to Trello.
 
 Features:
 - Authentication and authorization 
+    - Continuous Authentication: The access token gets refreshed when close to expiry.
+    - Security Note: The refresh and access tokens are stored in localStorage. Yes, this is not secure. Security could be improved by using a combination storing the tokens in HTTP-only cookie and in memory, but this app is for demonstration purposes only. Token rotation/revocation is not employed in the backend also.
 - User owning multiple projects with their own task states
 - Assigning task to multiple project members
 
