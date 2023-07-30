@@ -22,10 +22,11 @@ export const Project = {
 
     useCreate: () => {
         const queryClient = useQueryClient();
+        const refreshToken = Auth.useTokenRefresh();
         return useMutation<ProjectDocument, AxiosError['response'], ProjectDto>(
             {
                 mutationFn: (createdFields: ProjectDto) =>
-                    createProject(createdFields),
+                    refreshToken(() => createProject(createdFields)),
                 onSuccess: () => {
                     return queryClient.invalidateQueries({
                         queryKey: Project.queryKeys.all,
