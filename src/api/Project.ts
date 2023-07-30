@@ -10,7 +10,7 @@ import {
     UpdateProjectDto,
 } from '../common';
 
-import { destroy, get, patch, post } from '.';
+import { Auth, destroy, get, patch, post } from '.';
 
 export const Project = {
     queryKeys: {
@@ -35,11 +35,13 @@ export const Project = {
         );
     },
 
-    useFindAll: () =>
-        useQuery<ProjectDocument[], AxiosError['response']>({
-            queryKey: Project.queryKeys.all,
-            queryFn: () => getProjects(),
-        }),
+    useFindAll: () => {
+        const refreshToken = Auth.useTokenRefresh();
+        return useQuery<ProjectDocument[], AxiosError['response']>({
+            queryKey: [Project.queryKeys.all, getProjects],
+            queryFn: () => refreshToken(getProjects),
+        });
+    },
 
     useFindOne: (projectId: string) =>
         useQuery<ProjectDocument, AxiosError['response']>({
@@ -83,7 +85,7 @@ export const Project = {
             mutationFn: () => removeProject(projectId),
             onSuccess: () => {
                 return queryClient.invalidateQueries({
-                    queryKey: Project.queryKeys.all,
+                    queryKey: [Project.queryKeys.all, getProjects],
                 });
             },
         });
