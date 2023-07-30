@@ -337,6 +337,7 @@ describe.shuffle('Token Refresh', () => {
     });
 
     afterEach(() => {
+        vi.restoreAllMocks();
         localStorage.clear();
     });
 
@@ -352,8 +353,6 @@ describe.shuffle('Token Refresh', () => {
 
         expect(useTokenRefreshMock).toHaveBeenCalled();
         expect(postMock).not.toHaveBeenCalledWith('/api/auth/refresh');
-
-        vi.restoreAllMocks();
     });
 
     it('[Auth.useUser] should trigger refresh when access token is near expiration', async () => {
@@ -377,7 +376,6 @@ describe.shuffle('Token Refresh', () => {
         expect(useTokenRefreshMock).toHaveBeenCalled();
         expect(postMock).toHaveBeenCalledWith('/api/auth/refresh');
 
-        vi.restoreAllMocks();
         vi.useRealTimers();
     });
 
@@ -403,7 +401,6 @@ describe.shuffle('Token Refresh', () => {
         expect(postMock).toHaveBeenCalledWith('/api/auth/refresh');
         expect(getMock).toHaveBeenNthCalledWith(2, '/api/users/me');
 
-        vi.restoreAllMocks();
         vi.useRealTimers();
     });
 
@@ -429,7 +426,6 @@ describe.shuffle('Token Refresh', () => {
         expect(postMock).not.toHaveBeenCalledWith('/api/auth/refresh');
         expect(getMock).toHaveBeenNthCalledWith(1, '/api/users/me');
 
-        vi.restoreAllMocks();
         vi.useRealTimers();
     });
 
