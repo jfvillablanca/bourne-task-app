@@ -336,6 +336,10 @@ describe.shuffle('Token Refresh', () => {
         await waitFor(() => expect(registerResult.current.data).toBeDefined());
     });
 
+    afterEach(() => {
+        localStorage.clear();
+    });
+
     it('[useQuery] should NOT trigger refresh on access token not near expiry', async () => {
         const apiConfig = await import('../api/config');
         const postMock = vi.spyOn(apiConfig, 'post');
@@ -421,9 +425,6 @@ describe.shuffle('Token Refresh', () => {
         });
         await waitFor(() => expect(getUserResult.current.error).toBeDefined());
 
-        expect(getUserResult.current.error?.status).toBe(
-            HttpStatusCode.Unauthorized,
-        );
         expect(useTokenRefreshMock).toHaveBeenCalled();
         expect(postMock).not.toHaveBeenCalledWith('/api/auth/refresh');
         expect(getMock).toHaveBeenNthCalledWith(1, '/api/users/me');

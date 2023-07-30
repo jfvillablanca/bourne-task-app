@@ -113,6 +113,7 @@ export const Auth = {
 
         const refreshToken = useCallback(
             async <T>(queryFn: () => Promise<T>) => {
+                // FIXME: Move access token to context instead of tokenStorage
                 const accessToken = tokenStorage.getToken('access_token');
                 if (accessToken) {
                     try {
@@ -131,6 +132,8 @@ export const Auth = {
                         queryClient.invalidateQueries();
                     }
                 }
+                // HACK: queryFn is expected to throw a 401 here since
+                // axios couldn't find access token in localStorage
                 return await queryFn();
             },
             [refreshMutation, queryClient],
