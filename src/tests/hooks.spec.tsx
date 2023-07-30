@@ -429,6 +429,18 @@ describe.shuffle('Token Refresh', () => {
         vi.useRealTimers();
     });
 
+    it('[Project.useCreate] should have its queryFn wrapped in refreshToken()', async () => {
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        result.current.mutate({ title: 'title' });
+        await waitFor(() => expect(result.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
+
     it('[Project.useFindAll] should have its queryFn wrapped in refreshToken()', async () => {
         const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
 
