@@ -340,7 +340,7 @@ describe.shuffle('Token Refresh', () => {
         localStorage.clear();
     });
 
-    it('[useQuery] should NOT trigger refresh on access token not near expiry', async () => {
+    it('[Auth.useUser] should NOT trigger refresh on access token not near expiry', async () => {
         const apiConfig = await import('../api/config');
         const postMock = vi.spyOn(apiConfig, 'post');
         const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
@@ -356,7 +356,7 @@ describe.shuffle('Token Refresh', () => {
         vi.restoreAllMocks();
     });
 
-    it('[useQuery] should trigger refresh when access token is near expiration', async () => {
+    it('[Auth.useUser] should trigger refresh when access token is near expiration', async () => {
         // Get current access_token to get expiration
         const accessToken = localStorage.getItem('access_token') ?? '';
         const expiration = expirationDate(accessToken);
@@ -381,7 +381,7 @@ describe.shuffle('Token Refresh', () => {
         vi.useRealTimers();
     });
 
-    it('[useQuery] should trigger refresh when access token is expired but refresh token is not yet expired', async () => {
+    it('[Auth.useUser] should trigger refresh when access token is expired but refresh token is not yet expired', async () => {
         // Get current access_token to get expiration
         const accessToken = localStorage.getItem('access_token') ?? '';
         const expiration = expirationDate(accessToken);
@@ -407,7 +407,7 @@ describe.shuffle('Token Refresh', () => {
         vi.useRealTimers();
     });
 
-    it('[useQuery] should NOT trigger refresh when refresh token is expired', async () => {
+    it('[Auth.useUser] should NOT trigger refresh when refresh token is expired', async () => {
         // Get current refresh_token to get expiration
         const refreshToken = localStorage.getItem('refresh_token') ?? '';
         const expiration = expirationDate(refreshToken);
@@ -431,6 +431,17 @@ describe.shuffle('Token Refresh', () => {
 
         vi.restoreAllMocks();
         vi.useRealTimers();
+    });
+
+    it('[Project.useFindAll] should have its queryFn wrapped in refreshToken()', async () => {
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result } = renderHook(() => Project.useFindAll(), {
+            wrapper: createWrapper(),
+        });
+        await waitFor(() => expect(result.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
     });
 });
 
