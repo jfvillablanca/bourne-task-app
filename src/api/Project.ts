@@ -44,11 +44,13 @@ export const Project = {
         });
     },
 
-    useFindOne: (projectId: string) =>
-        useQuery<ProjectDocument, AxiosError['response']>({
+    useFindOne: (projectId: string) => {
+        const refreshToken = Auth.useTokenRefresh();
+        return useQuery<ProjectDocument, AxiosError['response']>({
             queryKey: Project.queryKeys.byId(projectId),
-            queryFn: () => getProjectById(projectId),
-        }),
+            queryFn: () => refreshToken(() => getProjectById(projectId)),
+        });
+    },
 
     useGetProjectMembers: (projectId: string) =>
         useQuery<ProjectMember[], AxiosError['response']>({

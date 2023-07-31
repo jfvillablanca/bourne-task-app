@@ -124,6 +124,9 @@ export const Auth = {
                         return fnResult;
                     } catch (err) {
                         const error = err as AxiosError['response'];
+                        if (error?.status !== HttpStatusCode.Unauthorized) {
+                            return await queryFn();
+                        }
                         if (error?.status === HttpStatusCode.Unauthorized) {
                             await refreshMutation.mutateAsync();
                             return await queryFn();
