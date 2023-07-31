@@ -451,6 +451,18 @@ describe.shuffle('Token Refresh', () => {
 
         expect(useTokenRefreshMock).toHaveBeenCalled();
     });
+
+    it('[Project.useFindOne] should have its queryFn wrapped in refreshToken()', async () => {
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const mockProjectId = mockProjects()[0]._id;
+        const { result } = renderHook(() => Project.useFindOne(mockProjectId), {
+            wrapper: createWrapper(),
+        });
+        await waitFor(() => expect(result.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
 });
 
 describe.shuffle('Project', () => {
