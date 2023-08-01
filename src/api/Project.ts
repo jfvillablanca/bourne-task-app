@@ -39,8 +39,8 @@ export const Project = {
     useFindAll: () => {
         const refreshToken = Auth.useTokenRefresh();
         return useQuery<ProjectDocument[], AxiosError['response']>({
-            queryKey: [Project.queryKeys.all, getProjects],
-            queryFn: () => refreshToken(getProjects),
+            queryKey: Project.queryKeys.all,
+            queryFn: () => refreshToken(() => getProjects()),
         });
     },
 
@@ -94,7 +94,7 @@ export const Project = {
             mutationFn: () => refreshToken(() => removeProject(projectId)),
             onSuccess: () => {
                 return queryClient.invalidateQueries({
-                    queryKey: [Project.queryKeys.all, getProjects],
+                    queryKey: Project.queryKeys.all,
                 });
             },
         });

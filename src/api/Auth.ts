@@ -17,8 +17,8 @@ export const Auth = {
     useUser: () => {
         const refreshToken = Auth.useTokenRefresh();
         return useQuery<User, AxiosError['response']>({
-            queryKey: [Auth.queryKey, getUser],
-            queryFn: () => refreshToken(getUser),
+            queryKey: Auth.queryKey,
+            queryFn: () => refreshToken(() => getUser()),
             retry: false,
             meta: {
                 isErrorHandledLocally: true,
