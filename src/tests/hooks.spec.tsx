@@ -463,6 +463,78 @@ describe.shuffle('Token Refresh', () => {
 
         expect(useTokenRefreshMock).toHaveBeenCalled();
     });
+
+    it('[Project.useGetProjectMembers] should have its queryFn wrapped in refreshToken()', async () => {
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const mockProject = mockProjects()[0];
+        const mockProjectId = mockProject._id;
+        const { result } = renderHook(
+            () => Project.useGetProjectMembers(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        await waitFor(() => expect(result.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
+
+    it('[Project.useUpdate] should have its queryFn wrapped in refreshToken()', async () => {
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+        const updatedDescription = 'project with description';
+
+        // Spy useTokenRefresh on useUpdate exclusively
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result: updateResult } = renderHook(
+            () => Project.useUpdate(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        // Update the document
+        updateResult.current.mutate({ description: updatedDescription });
+        await waitFor(() => expect(updateResult.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
+
+    it('[Project.useRemove] should have its queryFn wrapped in refreshToken()', async () => {
+        // Create a document to remove
+        const newProject: ProjectDto = { title: 'delete me' };
+        const { result: createResult } = renderHook(() => Project.useCreate(), {
+            wrapper: createWrapper(),
+        });
+        createResult.current.mutate(newProject);
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const projectId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Spy useTokenRefresh on useRemove hook exclusively
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result: removeResult } = renderHook(
+            () => Project.useRemove(projectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        // Remove the document
+        removeResult.current.mutate();
+        await waitFor(() => expect(removeResult.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
 });
 
 describe.shuffle('Project', () => {
