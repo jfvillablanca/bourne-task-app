@@ -52,28 +52,33 @@ export const Project = {
         });
     },
 
-    useGetProjectMembers: (projectId: string) =>
-        useQuery<ProjectMember[], AxiosError['response']>({
+    useGetProjectMembers: (projectId: string) => {
+        const refreshToken = Auth.useTokenRefresh();
+        return useQuery<ProjectMember[], AxiosError['response']>({
             queryKey: Project.queryKeys.members(projectId),
-            queryFn: () => getProjectMembers(projectId),
-        }),
+            queryFn: () => refreshToken(() => getProjectMembers(projectId)),
+        });
+    },
 
-    useGetTaskStates: (projectId: string) =>
-        useQuery<ProjectDocument, AxiosError['response'], string[]>({
+    useGetTaskStates: (projectId: string) => {
+        const refreshToken = Auth.useTokenRefresh();
+        return useQuery<ProjectDocument, AxiosError['response'], string[]>({
             queryKey: Project.queryKeys.byId(projectId),
-            queryFn: () => getProjectById(projectId),
+            queryFn: () => refreshToken(() => getProjectById(projectId)),
             select: useCallback((data: ProjectDocument) => data.taskStates, []),
-        }),
+        });
+    },
 
     useUpdate: (projectId: string) => {
         const queryClient = useQueryClient();
+        const refreshToken = Auth.useTokenRefresh();
         return useMutation<
             ProjectDocument,
             AxiosError['response'],
             UpdateProjectDto
         >({
             mutationFn: (updatedFields: UpdateProjectDto) =>
-                updateProject(projectId, updatedFields),
+                refreshToken(() => updateProject(projectId, updatedFields)),
             onSuccess: () => {
                 return queryClient.invalidateQueries({
                     queryKey: Project.queryKeys.all,
@@ -84,8 +89,9 @@ export const Project = {
 
     useRemove: (projectId: string) => {
         const queryClient = useQueryClient();
+        const refreshToken = Auth.useTokenRefresh();
         return useMutation<boolean, AxiosError['response'], void>({
-            mutationFn: () => removeProject(projectId),
+            mutationFn: () => refreshToken(() => removeProject(projectId)),
             onSuccess: () => {
                 return queryClient.invalidateQueries({
                     queryKey: [Project.queryKeys.all, getProjects],
