@@ -535,6 +535,254 @@ describe.shuffle('Token Refresh', () => {
 
         expect(useTokenRefreshMock).toHaveBeenCalled();
     });
+
+    it('[Task.useCreate] should have its queryFn wrapped in refreshToken()', async () => {
+        // Create a project to add task to
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createProjectResult } = renderHook(
+            () => Project.useCreate(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createProjectResult.current.mutate(newProject);
+        await waitFor(() =>
+            expect(createProjectResult.current.data).toBeDefined(),
+        );
+        const mockProjectId = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data._id
+            : '';
+        const mockTaskState = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data.taskStates[0]
+            : '';
+
+        // Spy useTokenRefresh on useCreate hook exclusively
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const newTaskTitle = 'new task title';
+        const { result: createTaskResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createTaskResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() =>
+            expect(createTaskResult.current.data).toBeDefined(),
+        );
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
+
+    it('[Task.useFindAll] should have its queryFn wrapped in refreshToken()', async () => {
+        // Create a project to add task to
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createProjectResult } = renderHook(
+            () => Project.useCreate(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createProjectResult.current.mutate(newProject);
+        await waitFor(() =>
+            expect(createProjectResult.current.data).toBeDefined(),
+        );
+        const mockProjectId = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data._id
+            : '';
+        const mockTaskState = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data.taskStates[0]
+            : '';
+        // Add tasks to project
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        for (let i = 0; i < 3; i++) {
+            createResult.current.mutate({
+                title: mockProjects()[0].tasks[0].title,
+                taskState: mockTaskState,
+            });
+            await waitFor(() =>
+                expect(createResult.current.data).toBeDefined(),
+            );
+        }
+
+        // Spy useTokenRefresh on useFindAll hook exclusively
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result: findAllResult } = renderHook(
+            () => Task.useFindAll(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        await waitFor(() => expect(findAllResult.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
+
+    it('[Task.useFindOne] should have its queryFn wrapped in refreshToken()', async () => {
+        // Create a project to add task to
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createProjectResult } = renderHook(
+            () => Project.useCreate(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createProjectResult.current.mutate(newProject);
+        await waitFor(() =>
+            expect(createProjectResult.current.data).toBeDefined(),
+        );
+        const mockProjectId = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data._id
+            : '';
+        const mockTaskState = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data.taskStates[0]
+            : '';
+        // Create a task to find
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const mockTaskId = createResult.current.isSuccess
+            ? createResult.current.data?._id
+            : '';
+
+        // Spy useTokenRefresh on useFindOne hook exclusively
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result: findOneResult } = renderHook(
+            () => Task.useFindOne(mockProjectId, mockTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        await waitFor(() => expect(findOneResult.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
+
+    it('[Task.useUpdate] should have its queryFn wrapped in refreshToken()', async () => {
+        // Create a project to add task to
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createProjectResult } = renderHook(
+            () => Project.useCreate(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createProjectResult.current.mutate(newProject);
+        await waitFor(() =>
+            expect(createProjectResult.current.data).toBeDefined(),
+        );
+        const mockProjectId = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data._id
+            : '';
+        const mockTaskState = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data.taskStates[0]
+            : '';
+        // Create a task to update
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const mockTaskId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+        const updatedTaskTitle = 'updated task title';
+
+        // Spy useTokenRefresh on useUpdate hook exclusively
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result: updateResult } = renderHook(
+            () => Task.useUpdate(mockProjectId, mockTaskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        // Update the task
+        updateResult.current.mutate({
+            title: updatedTaskTitle,
+        });
+        await waitFor(() => expect(updateResult.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
+
+    it('[Task.useRemove] should have its queryFn wrapped in refreshToken()', async () => {
+        // Create a project to add task to
+        const newProject: ProjectDto = { title: 'new project' };
+        const { result: createProjectResult } = renderHook(
+            () => Project.useCreate(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createProjectResult.current.mutate(newProject);
+        await waitFor(() =>
+            expect(createProjectResult.current.data).toBeDefined(),
+        );
+        const mockProjectId = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data._id
+            : '';
+        const mockTaskState = createProjectResult.current.isSuccess
+            ? createProjectResult.current.data.taskStates[0]
+            : '';
+        // Create a task to remove
+        const newTaskTitle = 'new task title';
+        const { result: createResult } = renderHook(
+            () => Task.useCreate(mockProjectId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        createResult.current.mutate({
+            title: newTaskTitle,
+            taskState: mockTaskState,
+        });
+        await waitFor(() => expect(createResult.current.data).toBeDefined());
+        const taskId = createResult.current.isSuccess
+            ? createResult.current.data._id
+            : '';
+
+        // Spy useTokenRefresh on useRemove hook exclusively
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result: removeResult } = renderHook(
+            () => Task.useRemove(mockProjectId, taskId),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        // Remove the task
+        removeResult.current.mutate();
+        await waitFor(() => expect(removeResult.current.data).toBeDefined());
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
 });
 
 describe.shuffle('Project', () => {
