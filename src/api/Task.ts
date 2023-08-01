@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { TaskDocument, TaskDto, UpdateTaskDto } from '../common';
 
-import { destroy, get, patch, post } from '.';
+import { Auth, destroy, get, patch, post } from '.';
 
 export const Task = {
     queryKeys: {
@@ -15,9 +15,10 @@ export const Task = {
 
     useCreate: (projectId: string) => {
         const queryClient = useQueryClient();
+        const refreshToken = Auth.useTokenRefresh();
         return useMutation<TaskDocument, AxiosError['response'], TaskDto>({
             mutationFn: (createdFields: TaskDto) =>
-                createTask(projectId, createdFields),
+                refreshToken(() => createTask(projectId, createdFields)),
             onSuccess: () => {
                 return queryClient.invalidateQueries({
                     queryKey: Task.queryKeys.all(projectId),
@@ -26,25 +27,32 @@ export const Task = {
         });
     },
 
-    useFindAll: (projectId: string) =>
-        useQuery<TaskDocument[], AxiosError['response']>({
+    useFindAll: (projectId: string) => {
+        const refreshToken = Auth.useTokenRefresh();
+        return useQuery<TaskDocument[], AxiosError['response']>({
             queryKey: Task.queryKeys.all(projectId),
-            queryFn: () => getTasks(projectId),
-        }),
+            queryFn: () => refreshToken(() => getTasks(projectId)),
+        });
+    },
 
-    useFindOne: (projectId: string, taskId: string, isEnabled = true) =>
-        useQuery<TaskDocument, AxiosError['response']>({
+    useFindOne: (projectId: string, taskId: string, isEnabled = true) => {
+        const refreshToken = Auth.useTokenRefresh();
+        return useQuery<TaskDocument, AxiosError['response']>({
             enabled: isEnabled,
             queryKey: Task.queryKeys.byId(projectId, taskId),
-            queryFn: () => getTaskById(projectId, taskId),
-        }),
+            queryFn: () => refreshToken(() => getTaskById(projectId, taskId)),
+        });
+    },
 
     useUpdate: (projectId: string, taskId: string) => {
         const queryClient = useQueryClient();
+        const refreshToken = Auth.useTokenRefresh();
         return useMutation<TaskDocument, AxiosError['response'], UpdateTaskDto>(
             {
                 mutationFn: (updatedFields: UpdateTaskDto) =>
-                    updateTask(projectId, taskId, updatedFields),
+                    refreshToken(() =>
+                        updateTask(projectId, taskId, updatedFields),
+                    ),
                 onSuccess: () => {
                     return queryClient.invalidateQueries({
                         queryKey: Task.queryKeys.all(projectId),
@@ -56,8 +64,9 @@ export const Task = {
 
     useRemove: (projectId: string, taskId: string) => {
         const queryClient = useQueryClient();
+        const refreshToken = Auth.useTokenRefresh();
         return useMutation<boolean, AxiosError['response'], void>({
-            mutationFn: () => removeTask(projectId, taskId),
+            mutationFn: () => refreshToken(() => removeTask(projectId, taskId)),
             onSuccess: () => {
                 return queryClient.invalidateQueries({
                     queryKey: Task.queryKeys.all(projectId),
