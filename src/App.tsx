@@ -1,13 +1,7 @@
 import { useState } from 'react';
 
 import { Project } from './api';
-import {
-    CardView,
-    Header,
-    ProjectTitle,
-    Sidebar,
-    ToastContainer,
-} from './components';
+import { CardView, Header, ProjectTitle, Sidebar } from './components';
 import { SelectedProjectContext } from './context';
 
 function App() {
@@ -21,7 +15,6 @@ function App() {
 
     return (
         <>
-            <ToastContainer />
             <SelectedProjectContext.Provider
                 value={{ selectedProject, setSelectedProject }}
             >

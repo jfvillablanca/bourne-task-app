@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import AuthLoader from './components/AuthLoader.tsx';
+import ToastContainer from './components/ToastContainer.tsx';
 // @ts-expect-error Used by mockServiceWorker and has no declaration file
 import { worker } from './mocks/browser';
 import { populateMockDatabase } from './tests/utils';
@@ -22,6 +23,7 @@ async function main() {
     ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <React.StrictMode>
             <QueryClientProvider client={queryClient}>
+                <ToastContainer />
                 <AuthLoader>
                     <App />
                 </AuthLoader>

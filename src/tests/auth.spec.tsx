@@ -131,7 +131,6 @@ async function setup(jsx: JSX.Element) {
 function MockApp() {
     return (
         <>
-            <ToastContainer />
             <Header />
             <div>Mocked App</div>
         </>
@@ -145,9 +144,13 @@ describe.shuffle('AuthLoader', () => {
             .mockImplementation(() => "You're all set! 🥳");
 
         const { registerSuccessfully } = await setup(
-            <AuthLoader>
-                <MockApp />
-            </AuthLoader>,
+            <>
+                <ToastContainer />
+                <AuthLoader>
+                    <MockApp />
+                </AuthLoader>
+                ,
+            </>,
         );
         await registerSuccessfully();
 
@@ -162,9 +165,13 @@ describe.shuffle('AuthLoader', () => {
             .mockImplementation(() => 'Welcome back! 😊');
 
         const { registerSuccessfully, loginSuccessfully } = await setup(
-            <AuthLoader>
-                <MockApp />
-            </AuthLoader>,
+            <>
+                <ToastContainer />
+                <AuthLoader>
+                    <MockApp />
+                </AuthLoader>
+                ,
+            </>,
         );
         await registerSuccessfully();
         await loginSuccessfully();
@@ -176,9 +183,13 @@ describe.shuffle('AuthLoader', () => {
 
     it('should be able to logout back to auth screen', async () => {
         const { registerSuccessfully, loginSuccessfully, event } = await setup(
-            <AuthLoader>
-                <MockApp />
-            </AuthLoader>,
+            <>
+                <ToastContainer />
+                <AuthLoader>
+                    <MockApp />
+                </AuthLoader>
+                ,
+            </>,
         );
         await registerSuccessfully();
         await loginSuccessfully();
