@@ -79,6 +79,7 @@ export const Auth = {
 
     useLogout: () => {
         const queryClient = useQueryClient();
+        const refreshToken = Auth.useTokenRefresh();
 
         const setUser = useCallback(
             (data: User | null) =>
@@ -86,8 +87,8 @@ export const Auth = {
             [queryClient],
         );
 
-            mutationFn: () => logout(),
         return useMutation<boolean, AxiosError['response'], void>({
+            mutationFn: () => refreshToken(() => logout()),
             onError: (error) => {
                 return error;
             },
