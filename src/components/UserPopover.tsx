@@ -49,7 +49,7 @@ const UserPopover: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                         <button
                             className="btn"
                             disabled={logout.isLoading}
-                            onClick={() => logout.mutate({})}
+                            onClick={() => logout.mutate()}
                         >
                             Logout
                         </button>

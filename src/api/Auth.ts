@@ -86,8 +86,8 @@ export const Auth = {
             [queryClient],
         );
 
-        return useMutation<unknown, AxiosError['response'], unknown>({
             mutationFn: () => logout(),
+        return useMutation<boolean, AxiosError['response'], void>({
             onError: (error) => {
                 return error;
             },
