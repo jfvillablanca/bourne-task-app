@@ -429,6 +429,18 @@ describe.shuffle('Token Refresh', () => {
         vi.useRealTimers();
     });
 
+    it('[Auth.useLogout] should have its queryFn wrapped in refreshToken()', async () => {
+        const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
+
+        const { result } = renderHook(() => Auth.useLogout(), {
+            wrapper: createWrapper(),
+        });
+        result.current.mutate();
+        await waitFor(() => expect(result.current.data).toBe(true));
+
+        expect(useTokenRefreshMock).toHaveBeenCalled();
+    });
+
     it('[Project.useCreate] should have its queryFn wrapped in refreshToken()', async () => {
         const useTokenRefreshMock = vi.spyOn(Auth, 'useTokenRefresh');
 
