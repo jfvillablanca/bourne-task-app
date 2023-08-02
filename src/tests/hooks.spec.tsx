@@ -135,7 +135,7 @@ describe.shuffle('Auth', () => {
         const { result: logoutResult } = renderHook(() => Auth.useLogout(), {
             wrapper: createWrapper(),
         });
-        logoutResult.current.mutate({});
+        logoutResult.current.mutate();
         await waitFor(() => expect(logoutResult.current.data).toBe(true));
 
         expect(removeItemMock).toHaveBeenCalled();
