@@ -94,6 +94,7 @@ export const Auth = {
             },
             onSuccess: () => {
                 setUser(null);
+                tokenStorage.clearTokens();
                 queryClient.invalidateQueries();
             },
             meta: {
@@ -109,6 +110,9 @@ export const Auth = {
             void
         >({
             mutationFn: () => refresh(),
+            meta: {
+                isErrorHandledLocally: true,
+            },
         });
         const queryClient = useQueryClient();
 
@@ -129,11 +133,21 @@ export const Auth = {
                             return await queryFn();
                         }
                         if (error?.status === HttpStatusCode.Unauthorized) {
-                            await refreshMutation.mutateAsync();
+                            try {
+                                await refreshMutation.mutateAsync();
+                            } catch (err) {
+                                const error = err as AxiosError['response'];
+                                if (
+                                    error?.status ===
+                                    HttpStatusCode.Unauthorized
+                                ) {
+                                    toast.error(`Please login to continue`);
+                                    tokenStorage.clearTokens();
+                                    queryClient.invalidateQueries();
+                                }
+                            }
                             return await queryFn();
                         }
-                        tokenStorage.clearTokens();
-                        queryClient.invalidateQueries();
                     }
                 }
                 // HACK: queryFn is expected to throw a 401 here since

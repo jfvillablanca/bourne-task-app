@@ -23,10 +23,6 @@ const isAxiosErrorResponse = (
 const handleError = (error: unknown) => {
     if (error && isAxiosErrorResponse(error)) {
         if (error.status === HttpStatusCode.Unauthorized) {
-            // TODO: suppress error unless access with expired token
-            // toast.error(`Please login to continue`); // commented for now
-
-
             return;
         }
         if (error.status === HttpStatusCode.Forbidden) {
@@ -66,4 +62,16 @@ export const createQueryClient = (config?: QueryClientConfig) =>
         ...config,
     });
 
-export const queryClient = createQueryClient();
+export const queryClient = createQueryClient({
+    defaultOptions: {
+        queries: {
+            retry: (failures, err) => {
+                const error = err as AxiosError['response'];
+                if (error?.status === HttpStatusCode.Unauthorized) {
+                    return failures < 1;
+                }
+                return failures < 3;
+            },
+        },
+    },
+});
