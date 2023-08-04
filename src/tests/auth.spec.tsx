@@ -4,9 +4,14 @@ import { setupServer } from 'msw/node';
 import { toast } from 'react-toastify';
 import { describe, it, vi } from 'vitest';
 
-import { screen, waitFor } from '@testing-library/react';
+import {
+    screen,
+    waitFor,
+    waitForElementToBeRemoved,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { expirationDate } from '../common';
 import { AuthForm, AuthLoader, Header, ToastContainer } from '../components';
 import { handlers } from '../mocks/handlers';
 import { populateMockDatabase, renderWithClient } from '../tests/utils';
@@ -28,9 +33,9 @@ afterEach(() => {
 
 afterAll(() => server.close());
 
-async function setup(jsx: JSX.Element) {
+async function setup(jsx: JSX.Element, noDelay?: boolean) {
     // setup user event
-    const event = userEvent.setup();
+    const event = userEvent.setup(noDelay ? { delay: null } : undefined);
 
     // default user credentials
     const userCredentials = { email: 'iam@teapot.com', password: 'password' };
@@ -203,6 +208,52 @@ describe.shuffle('AuthLoader', () => {
         await event.click(logoutButton);
 
         expect(screen.getByText('Sign up with email')).toBeInTheDocument();
+    });
+
+    it('should render toast on a 401 error and be logged back out to auth screen', async () => {
+        const toastErrorSpy = vi
+            .spyOn(toast, 'error')
+            .mockImplementation(() => 'Please login to continue');
+
+        const { registerSuccessfully, loginSuccessfully, event } = await setup(
+            <>
+                <ToastContainer />
+                <AuthLoader>
+                    <MockApp />
+                </AuthLoader>
+                ,
+            </>,
+            true,
+        );
+        await registerSuccessfully();
+        await loginSuccessfully();
+
+        // Get current refresh_token to get expiration
+        const refreshToken = localStorage.getItem('refresh_token') ?? '';
+        const expiration = expirationDate(refreshToken);
+        vi.useFakeTimers();
+        vi.setSystemTime(expiration);
+        expect(new Date(Date.now())).toStrictEqual(new Date(expiration));
+
+        await waitFor(() => {
+            expect(screen.getByText('Mocked App')).toBeInTheDocument();
+        });
+
+        const openUserInfoButton = screen.getByTestId('open-user-info-popover');
+        await event.click(openUserInfoButton);
+        const logoutButton = screen.getByText(/logout/i);
+        await event.click(logoutButton);
+
+        await waitForElementToBeRemoved(logoutButton);
+        await waitFor(() =>
+            expect(screen.getByText('Sign up with email')).toBeInTheDocument(),
+        );
+
+        expect(toastErrorSpy).toHaveBeenCalled();
+        expect(toastErrorSpy).toHaveReturnedWith('Please login to continue');
+
+        vi.useRealTimers();
+        vi.restoreAllMocks();
     });
 });
 
