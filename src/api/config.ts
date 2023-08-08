@@ -3,7 +3,7 @@ import axios, { AxiosError } from 'axios';
 import { tokenStorage } from '../lib/utils';
 
 const apiClient = axios.create({
-    // baseURL: import.meta.env.VITE_API_URL,
+    baseURL: import.meta.env.VITE_API_URL,
 });
 
 apiClient.interceptors.request.use(
