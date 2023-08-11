@@ -11,6 +11,13 @@ Features:
 - User owning multiple projects with their own task states
 - Assigning task to multiple project members
 
+Motivation:
+- This is a personal capstone project that covers the concepts/technologies/frameworks/languages that I learned in my journey to learn the web development in the full-stack context.
+- From an '<overall>' perspective, this project features my ability in writing a full-stack application
+    - Extensive tests: 
+        - Unit tests that assert specifications of modules and functions.
+        - API calls are mocked on the network-level via `msw` so that the
+
 ### Table of Contents
 
 - [Installation](#installation)
