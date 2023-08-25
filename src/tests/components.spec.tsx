@@ -260,7 +260,7 @@ describe.shuffle('TaskCardGroup', () => {
         clearTestAccessTokenFromLocalStorage();
     });
 
-    it('should be able to add new task', async () => {
+    it('should be able to add new task via dropdown', async () => {
         const user = userEvent.setup();
         const mockProjectId = mockProjects()[0]._id;
         const mockProjectTaskState = mockProjects()[0].taskStates[0];
@@ -274,7 +274,7 @@ describe.shuffle('TaskCardGroup', () => {
         await waitFor(() => {
             expect(screen.getByText(mockProjectTaskState)).toBeInTheDocument();
         });
-        const addTaskButton = result.getByTestId('add-task-button');
+        const addTaskButton = result.getByTestId('add-task-button-dropdown');
 
         await user.click(addTaskButton);
 
