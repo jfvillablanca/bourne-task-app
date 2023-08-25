@@ -1,3 +1,5 @@
+import { HTMLAttributes } from 'react';
+
 export type UpdateTaskDto = Partial<TaskDto>;
 
 export type TaskDto = {
@@ -59,3 +61,8 @@ export type FormElementType = HTMLInputElement | HTMLTextAreaElement;
 export type FormChangeType<
     T extends keyof UpdateTaskDto = keyof UpdateTaskDto,
 > = React.ChangeEvent<FormElementType> | { name: T; value: UpdateTaskDto[T] };
+
+export interface TaskCardProps extends HTMLAttributes<HTMLDivElement> {
+    projectId: string;
+    taskState: string;
+}

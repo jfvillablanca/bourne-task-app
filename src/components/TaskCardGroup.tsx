@@ -1,16 +1,12 @@
-import { HTMLAttributes } from 'react';
 
 import { Task } from '../api';
+import { TaskCardProps } from '../common';
 import { cn } from '../lib/utils';
 
 import { Skeleton } from './ui';
 import { TaskCard, TaskCardGroupDropdown } from '.';
-interface TaskCardGroupProps extends HTMLAttributes<HTMLDivElement> {
-    projectId: string;
-    taskState: string;
-}
 
-const TaskCardGroup: React.FC<TaskCardGroupProps> = ({
+const TaskCardGroup: React.FC<TaskCardProps> = ({
     className,
     projectId,
     taskState,

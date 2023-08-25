@@ -1,17 +1,13 @@
 import { Check, MoreVertical } from 'lucide-react';
-import { HTMLAttributes, useState } from 'react';
+import { useState } from 'react';
 
 import { Task } from '../api';
 import { cn } from '../lib/utils';
+import { TaskCardProps } from '../common';
 
 import { Popover, PopoverContent, PopoverTrigger } from './ui';
 
-interface TaskCardDropdownProps extends HTMLAttributes<HTMLDivElement> {
-    projectId: string;
-    taskState: string;
-}
-
-const TaskCardGroupDropdown: React.FC<TaskCardDropdownProps> = ({
+const TaskCardGroupDropdown: React.FC<TaskCardProps> = ({
     taskState,
     projectId,
 }) => {
