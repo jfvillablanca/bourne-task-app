@@ -282,6 +282,28 @@ describe.shuffle('TaskCardGroup', () => {
         expect(titleInput).toBeInTheDocument();
     });
 
+    it('should be able to add new task via plus button', async () => {
+        const user = userEvent.setup();
+        const mockProjectId = mockProjects()[0]._id;
+        const mockProjectTaskState = mockProjects()[0].taskStates[0];
+
+        const result = renderWithClient(
+            <TaskCardGroup
+                projectId={mockProjectId}
+                taskState={mockProjectTaskState}
+            />,
+        );
+        await waitFor(() => {
+            expect(screen.getByText(mockProjectTaskState)).toBeInTheDocument();
+        });
+        const addTaskButton = result.getByTestId('add-task-button-plus');
+
+        await user.click(addTaskButton);
+
+        const titleInput = result.getByPlaceholderText(/enter new task name/i);
+        expect(titleInput).toBeInTheDocument();
+    });
+
     it('should be able to delete a task', async () => {
         const user = userEvent.setup();
         const mockProjectId = mockProjects()[0]._id;
