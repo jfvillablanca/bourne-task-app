@@ -11,6 +11,7 @@ export { default as ProjectAdd } from './ProjectAdd';
 export { default as ProjectDelete } from './ProjectDelete';
 export { default as ProjectTitle } from './ProjectTitle';
 export { default as Sidebar } from './Sidebar';
+export { default as TaskAdd } from './TaskAdd';
 export { default as TaskCard } from './TaskCard';
 export { default as TaskCardGroup } from './TaskCardGroup';
 export { default as TaskCardGroupDropdown } from './TaskCardGroupDropdown';
