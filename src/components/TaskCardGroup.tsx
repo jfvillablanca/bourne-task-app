@@ -1,10 +1,11 @@
+import { Plus } from 'lucide-react';
 
 import { Task } from '../api';
 import { TaskCardProps } from '../common';
 import { cn } from '../lib/utils';
 
 import { Skeleton } from './ui';
-import { TaskCard, TaskCardGroupDropdown } from '.';
+import { TaskAdd, TaskCard, TaskCardGroupDropdown } from '.';
 
 const TaskCardGroup: React.FC<TaskCardProps> = ({
     className,
@@ -37,6 +38,14 @@ const TaskCardGroup: React.FC<TaskCardProps> = ({
                             projectId={projectId}
                         />
                     ))}
+                    <TaskAdd taskState={taskState} projectId={projectId}>
+                        <button
+                            className="btn btn-outline border-1 btn-neutral h-min"
+                            data-testid="add-task-button-plus"
+                        >
+                            <Plus strokeWidth={3} />
+                        </button>
+                    </TaskAdd>
                 </div>
             </div>
         );
