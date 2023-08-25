@@ -1,9 +1,8 @@
-import { CircleDotIcon } from 'lucide-react';
 import { HTMLAttributes } from 'react';
 import { useToggle } from 'usehooks-ts';
 
 import { Auth } from '../api';
-import { cn } from '../lib/utils';
+import { cn, generateAvatarURL } from '../lib/utils';
 
 import { Popover, PopoverContent, PopoverTrigger } from './ui';
 
@@ -30,9 +29,13 @@ const UserPopover: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                     data-testid="open-user-info-popover"
                     onClick={toggleOpen}
                 >
-                    <div className="avatar flex items-center">
-                        {/* TODO: This is a placeholder */}
-                        <CircleDotIcon className="btn bg-transparent hover:bg-transparent border-none h-9 w-max" />
+                    <div className="avatar h-11 bg-base-300 rounded-full border-2 border-accent-content">
+                        {user.data && (
+                            <img
+                                src={generateAvatarURL(user.data.email)}
+                                alt={user.data.email}
+                            />
+                        )}
                     </div>
                 </button>
             </PopoverTrigger>
