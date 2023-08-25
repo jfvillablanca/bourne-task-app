@@ -22,7 +22,7 @@ function App() {
                     <Header className="border-b border-base-300" />
                     <div className="flex-1 flex">
                         <Sidebar
-                            className="w-max px-2 py-4 border-r border-base-300"
+                            className="w-1/4 min-w-max p-4 border-r border-base-300"
                             projectQuery={projectsQuery}
                             handleClickedProject={handleClickedProject}
                         />
