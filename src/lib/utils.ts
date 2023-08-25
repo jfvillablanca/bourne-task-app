@@ -28,3 +28,14 @@ export const tokenStorage = {
 export function decodeToken(token: string): DecodedToken {
     return jwtDecode(token);
 }
+
+const diceBearArtStyle = [
+    'pixel-art',
+    'lorelei',
+    'adventurer',
+    'big-smile',
+    'identicon',
+];
+
+export const generateAvatarURL = (seed: string) =>
+    `https://api.dicebear.com/6.x/${diceBearArtStyle[1]}/svg?seed=${seed}`;

@@ -2,17 +2,7 @@ import { HTMLAttributes } from 'react';
 
 import { Project } from '../api';
 import { ProjectMember } from '../common';
-import { cn } from '../lib/utils';
-
-const diceBearArtStyle = [
-    'pixel-art',
-    'lorelei',
-    'adventurer',
-    'big-smile',
-    'identicon',
-];
-const generateAvatarURL = (seed: string) =>
-    `https://api.dicebear.com/6.x/${diceBearArtStyle[1]}/svg?seed=${seed}`;
+import { cn, generateAvatarURL } from '../lib/utils';
 
 interface UserAvatarProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
