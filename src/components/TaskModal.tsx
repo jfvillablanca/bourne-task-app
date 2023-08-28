@@ -14,7 +14,7 @@ import {
     ExitButton,
 } from './ui';
 import {
-    FormTaskMembers,
+    FormSelectUsers,
     FormTaskStatePopover,
     MemberAvatars,
     TaskDelete,
@@ -171,7 +171,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                     editTaskForm.assignedProjMemberId ?? []
                                 }
                             />
-                            <FormTaskMembers
+                            <FormSelectUsers
                                 allUsers={projQueryMembers.data ?? []}
                                 selectedUsers={
                                     editTaskForm.assignedProjMemberId ?? []

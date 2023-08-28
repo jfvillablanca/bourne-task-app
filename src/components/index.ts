@@ -3,7 +3,7 @@ export { default as AuthenticationModal } from './AuthenticationModal';
 export { default as AuthForm } from './AuthForm';
 export { default as AuthLoader } from './AuthLoader';
 export { default as CardView } from './CardView';
-export { default as FormTaskMembers } from './FormTaskMembers';
+export { default as FormSelectUsers } from './FormSelectUsers';
 export { default as FormTaskStatePopover } from './FormTaskStatePopover';
 export { default as Header } from './Header';
 export { default as MemberAvatars } from './MemberAvatars';

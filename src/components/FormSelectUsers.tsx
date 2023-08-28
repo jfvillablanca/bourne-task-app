@@ -9,17 +9,17 @@ import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui';
 
 type OptionType = { label: string; value: string; _id: string };
 
-interface FormTaskMembersProps {
+interface FormSelectUsersProps {
     allUsers: User[];
     selectedUsers: string[];
     handleChange: (e: FormChangeType) => void;
 }
 
-const FormTaskMembers = ({
+const FormSelectUsers = ({
     allUsers,
     selectedUsers,
     handleChange,
-}: FormTaskMembersProps) => {
+}: FormSelectUsersProps) => {
     const [open, setOpen] = useState(false);
     const allUserOptions: OptionType[] = allUsers.map((user) => {
         return { label: user.email, value: user.email, _id: user._id };
@@ -138,4 +138,4 @@ const FormTaskMembers = ({
     );
 };
 
-export default FormTaskMembers;
+export default FormSelectUsers;
