@@ -2,7 +2,7 @@ import { Check, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import Select, { ActionMeta, MultiValue } from 'react-select';
 
-import { FormChangeType, ProjectMember } from '../common';
+import { FormChangeType, User } from '../common';
 import { cn } from '../lib/utils';
 
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui';
@@ -10,28 +10,28 @@ import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui';
 type OptionType = { label: string; value: string; _id: string };
 
 interface FormTaskMembersProps {
-    projectMembers: ProjectMember[];
-    value: string[];
+    allUsers: User[];
+    selectedUsers: string[];
     handleChange: (e: FormChangeType) => void;
 }
 
 const FormTaskMembers = ({
-    projectMembers,
-    value,
+    allUsers,
+    selectedUsers,
     handleChange,
 }: FormTaskMembersProps) => {
     const [open, setOpen] = useState(false);
-    const allProjectMembers: OptionType[] = projectMembers.map((member) => {
-        return { label: member.email, value: member.email, _id: member._id };
+    const allUserOptions: OptionType[] = allUsers.map((user) => {
+        return { label: user.email, value: user.email, _id: user._id };
     });
 
-    const selectedTaskMembers: OptionType[] = projectMembers
-        .filter((member) => value.includes(member._id))
-        .map((member) => {
+    const selectedUserOptions: OptionType[] = allUsers
+        .filter((user) => selectedUsers.includes(user._id))
+        .map((user) => {
             return {
-                label: member.email,
-                value: member.email,
-                _id: member._id,
+                label: user.email,
+                value: user.email,
+                _id: user._id,
             };
         });
 
@@ -121,9 +121,9 @@ const FormTaskMembers = ({
                             ),
                         placeholder: () => cn('mx-0.5'),
                     }}
-                    defaultValue={selectedTaskMembers}
+                    defaultValue={selectedUserOptions}
                     placeholder={'Select members to assign'}
-                    options={allProjectMembers}
+                    options={allUserOptions}
                     isMulti
                     unstyled
                     onChange={handleMenuChange}
