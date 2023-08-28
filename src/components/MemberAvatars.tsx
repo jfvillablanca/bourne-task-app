@@ -2,7 +2,9 @@ import { HTMLAttributes } from 'react';
 
 import { Project } from '../api';
 import { ProjectMember } from '../common';
-import { cn, generateAvatarURL } from '../lib/utils';
+import { cn } from '../lib/utils';
+
+import { Avatar } from './ui';
 
 interface UserAvatarProps extends HTMLAttributes<HTMLDivElement> {
     projectId: string;
@@ -37,21 +39,14 @@ const MemberAvatars: React.FC<UserAvatarProps> = ({
                     className={`avatar border-none ${avatarClass}`}
                     key={avatar?._id ?? 'placeholder'}
                 >
-                    <div
-                        className={cn(
-                            'w-full h-10 bg-base-300 rounded-full border-2 border-accent-content',
-                            className,
-                        )}
-                    >
-                        {avatar ? (
-                            <img
-                                src={generateAvatarURL(avatar.email)}
-                                alt={avatar.email}
-                            />
-                        ) : (
-                            <span className="text-md">{avatarCount}</span>
-                        )}
-                    </div>
+                    {avatar ? (
+                        <Avatar
+                            className="w-full h-10 bg-base-300 rounded-full border-2 border-accent-content"
+                            email={avatar.email}
+                        />
+                    ) : (
+                        <span className="text-md">{avatarCount}</span>
+                    )}
                 </li>
             );
         };

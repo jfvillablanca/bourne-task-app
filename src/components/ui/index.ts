@@ -1,3 +1,4 @@
+export * from './Avatar';
 export * from './DeleteConfirmModal';
 export * from './Dialog';
 export * from './ExitButton';
