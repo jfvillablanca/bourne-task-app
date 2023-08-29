@@ -152,6 +152,17 @@ export const handlers = [
         return res(ctx.json(generatedTokens), ctx.status(HttpStatusCode.Ok));
     }),
 
+    rest.get('/api/users', async (req, res, ctx) => {
+        const authHeader = req.headers.get('Authorization');
+        const userId = await authGuard(authHeader);
+
+        if (!userId) {
+            return res(ctx.status(HttpStatusCode.Unauthorized));
+        }
+
+        return res(ctx.json(getUsers()), ctx.status(HttpStatusCode.Ok));
+    }),
+
     rest.get('/api/users/me', async (req, res, ctx) => {
         const authHeader = req.headers.get('Authorization');
         const userId = await authGuard(authHeader);
