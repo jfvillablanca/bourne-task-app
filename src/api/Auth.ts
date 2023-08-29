@@ -14,6 +14,18 @@ type AuthError = AxiosError['response'] & { type?: 'password' | 'user' };
 export const Auth = {
     queryKey: ['authenticated-user'] as const,
 
+    useFindAllUsers: () => {
+        const refreshToken = Auth.useTokenRefresh();
+        return useQuery<User[], AxiosError['response']>({
+            queryKey: Auth.queryKey,
+            queryFn: () => refreshToken(() => findAllUsers()),
+            // retry: false,
+            // meta: {
+            //     isErrorHandledLocally: true,
+            // },
+        });
+    },
+
     useUser: () => {
         const refreshToken = Auth.useTokenRefresh();
         return useQuery<User, AxiosError['response']>({
@@ -159,6 +171,11 @@ export const Auth = {
         return refreshToken;
     },
 };
+
+async function findAllUsers(): Promise<User[]> {
+    const response = await get('/api/users');
+    return response.data;
+}
 
 async function getUser(): Promise<User> {
     const response = await get('/api/users/me');
