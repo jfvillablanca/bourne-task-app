@@ -56,7 +56,7 @@ describe.shuffle('Auth', () => {
         setItemMock.mockRestore();
     });
 
-    it('should log a user in', async () => {
+    it('should find all users', async () => {
         const user: AuthDto = {
             email: 'iam@teapot.com',
             password: 'swordfish',
@@ -83,6 +83,39 @@ describe.shuffle('Auth', () => {
         expect(setItemMock).toHaveBeenCalled();
 
         setItemMock.mockRestore();
+    });
+
+    it('should find all registered users', async () => {
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(user);
+        await waitFor(() => expect(loginResult.current.data).toBeDefined());
+
+        const { result: findAllUsersResult } = renderHook(
+            () => Auth.useFindAllUsers(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() =>
+            expect(findAllUsersResult.current.data).toBeDefined(),
+        );
+        expect(findAllUsersResult.current.data?.length).toBe(11);
+        expect(findAllUsersResult.current.data?.[10].email).toBe(user.email);
     });
 
     it('should get user info', async () => {
@@ -308,6 +341,95 @@ describe.shuffle('Auth (Error handling)', () => {
         await waitFor(() => {
             expect(getUserResult.current.error).toBeDefined();
             expect(getUserResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('[Auth.useFindAllUsers] should handle a 401 status code on requests with no access token', async () => {
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(user);
+        await waitFor(() => expect(loginResult.current.data).toBeDefined());
+
+        // Remove refresh_token to prevent a refresh request on the expected 401 error
+        localStorage.removeItem('refresh_token');
+        // Clear the access token
+        clearTestAccessTokenFromLocalStorage();
+
+        const { result: findAllUsersResult } = renderHook(
+            () => Auth.useFindAllUsers(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => {
+            expect(findAllUsersResult.current.error).toBeDefined();
+            expect(findAllUsersResult.current.error?.status).toBe(
+                HttpStatusCode.Unauthorized,
+            );
+        });
+    });
+
+    it('[Auth.useFindAllUsers] should handle a 401 status code if accessing with an expired access token', async () => {
+        const user: AuthDto = {
+            email: 'iam@teapot.com',
+            password: 'swordfish',
+        };
+        const { result: registerResult } = renderHook(
+            () => Auth.useRegisterLocal(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+        registerResult.current.mutate(user);
+        await waitFor(() => expect(registerResult.current.data).toBeDefined());
+        const { result: loginResult } = renderHook(() => Auth.useLoginLocal(), {
+            wrapper: createWrapper(),
+        });
+        loginResult.current.mutate(user);
+        await waitFor(() => expect(loginResult.current.data).toBeDefined());
+
+        // Remove refresh_token to prevent a refresh request on the expected 401 error
+        localStorage.removeItem('refresh_token');
+        // Get current access_token
+        const nonExpiredAccessToken =
+            localStorage.getItem('access_token') ?? '';
+        const userId = (await verifyToken(nonExpiredAccessToken)) ?? '';
+        const expiredAccessToken = await generateJwtToken(
+            {
+                _id: userId,
+                email: user.email,
+            },
+            '0s',
+        );
+        // Set access_token to an expired access_token
+        localStorage.setItem('access_token', expiredAccessToken);
+
+        const { result: findAllUsersResult } = renderHook(
+            () => Auth.useFindAllUsers(),
+            {
+                wrapper: createWrapper(),
+            },
+        );
+
+        await waitFor(() => {
+            expect(findAllUsersResult.current.error).toBeDefined();
+            expect(findAllUsersResult.current.error?.status).toBe(
                 HttpStatusCode.Unauthorized,
             );
         });
