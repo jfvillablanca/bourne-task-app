@@ -2,7 +2,7 @@ import { Check, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import Select, { ActionMeta, MultiValue } from 'react-select';
 
-import { FormChangeType, User } from '../common';
+import { User } from '../common';
 import { cn } from '../lib/utils';
 
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui';
@@ -12,7 +12,7 @@ type OptionType = { label: string; value: string; _id: string };
 interface FormSelectUsersProps {
     allUsers: User[];
     selectedUsers: string[];
-    handleChange: (e: FormChangeType) => void;
+    handleChange: (e: MultiValue<OptionType>) => void;
 }
 
 const FormSelectUsers = ({
@@ -44,10 +44,7 @@ const FormSelectUsers = ({
             actionMeta.action === 'remove-value' ||
             actionMeta.action === 'clear'
         ) {
-            handleChange({
-                name: 'assignedProjMemberId',
-                value: selectedOptions.map((option) => option._id),
-            });
+            handleChange(selectedOptions);
         }
     };
 

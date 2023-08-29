@@ -176,7 +176,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                 selectedUsers={
                                     editTaskForm.assignedProjMemberId ?? []
                                 }
-                                handleChange={handleChange}
+                                handleChange={(selectedOptions) => {
+                                    handleChange({
+                                        name: 'assignedProjMemberId',
+                                        value: selectedOptions.map(
+                                            (option) => option._id,
+                                        ),
+                                    });
+                                }}
                             />
                         </div>
                     </div>
