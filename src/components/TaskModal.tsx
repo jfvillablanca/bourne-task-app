@@ -16,8 +16,8 @@ import {
 import {
     FormSelectUsers,
     FormTaskStatePopover,
-    MemberAvatars,
     TaskDelete,
+    UserAvatars,
 } from '.';
 
 interface FormElementProps extends HTMLAttributes<FormElementType> {
@@ -61,6 +61,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
     const taskQuery = Task.useFindOne(projectId, taskId, isFindOneQueryEnabled);
     const taskMutation = Task.useUpdate(projectId, taskId);
     const projQueryMembers = Project.useGetProjectMembers(projectId);
+    const assignedToTask = projQueryMembers.data?.filter((projectMember) =>
+        editTaskForm.assignedProjMemberId?.includes(projectMember._id),
+    );
 
     useEffect(() => {
         if (taskQuery.isSuccess) {
@@ -164,12 +167,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             Assigned:
                         </div>
                         <div className="flex items-center">
-                            <MemberAvatars
+                            <UserAvatars
                                 className="h-11 w-max mr-1"
-                                projectId={projectId}
-                                taskMemberIds={
-                                    editTaskForm.assignedProjMemberId ?? []
-                                }
+                                users={assignedToTask ?? []}
                             />
                             <FormSelectUsers
                                 allUsers={projQueryMembers.data ?? []}

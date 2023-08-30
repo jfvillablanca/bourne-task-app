@@ -1,9 +1,10 @@
 import { HTMLAttributes } from 'react';
 
+import { Project } from '../api';
 import { TaskDocument } from '../common';
 import { cn } from '../lib/utils';
 
-import { MemberAvatars, TaskModal } from '.';
+import { TaskModal, UserAvatars } from '.';
 
 interface TaskCardProps extends HTMLAttributes<HTMLDivElement> {
     task: TaskDocument;
@@ -16,6 +17,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
     projectId,
     ...props
 }) => {
+    const projQueryMembers = Project.useGetProjectMembers(projectId);
+    const assignedToTask = projQueryMembers.data?.filter((projectMember) =>
+        task.assignedProjMemberId?.includes(projectMember._id),
+    );
+
     return (
         <div
             className={cn('flex flex-col gap-2 p-4 bg-base-200', className)}
@@ -33,10 +39,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <p>{task.description}</p>
             </div>
             {task.description && <div className="divider mt-0 mb-0"></div>}
-            <MemberAvatars
-                projectId={projectId}
-                taskMemberIds={task.assignedProjMemberId}
-            />
+            {assignedToTask ? (
+                <UserAvatars users={assignedToTask} />
+            ) : (
+                <div className={cn('', className)} {...props}>
+                    <div
+                        aria-disabled
+                        aria-label="loading"
+                        className="loading loading-spinner loading-lg"
+                    ></div>
+                </div>
+            )}
         </div>
     );
 };
