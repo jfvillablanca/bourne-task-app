@@ -61,9 +61,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
     const taskQuery = Task.useFindOne(projectId, taskId, isFindOneQueryEnabled);
     const taskMutation = Task.useUpdate(projectId, taskId);
     const projQueryMembers = Project.useGetProjectMembers(projectId);
-    const assignedToTask = projQueryMembers.data?.filter((projectMember) =>
-        editTaskForm.assignedProjMemberId?.includes(projectMember._id),
-    );
+    const assignedToTask =
+        projQueryMembers.data?.filter((projectMember) =>
+            editTaskForm.assignedProjMemberId?.includes(projectMember._id),
+        ) ?? [];
 
     useEffect(() => {
         if (taskQuery.isSuccess) {
@@ -167,10 +168,20 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             Assigned:
                         </div>
                         <div className="flex items-center">
-                            <UserAvatars
-                                className="h-11 w-max mr-1"
-                                users={assignedToTask ?? []}
-                            />
+                            {projQueryMembers.isLoading ? (
+                                <div className={cn('', className)} {...props}>
+                                    <div
+                                        aria-disabled
+                                        aria-label="loading"
+                                        className="loading loading-spinner loading-lg"
+                                    ></div>
+                                </div>
+                            ) : (
+                                <UserAvatars
+                                    className="h-11 w-max mr-1"
+                                    users={assignedToTask}
+                                />
+                            )}
                             <FormSelectUsers
                                 allUsers={projQueryMembers.data ?? []}
                                 selectedUsers={

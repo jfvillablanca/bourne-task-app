@@ -18,9 +18,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
     ...props
 }) => {
     const projQueryMembers = Project.useGetProjectMembers(projectId);
-    const assignedToTask = projQueryMembers.data?.filter((projectMember) =>
-        task.assignedProjMemberId?.includes(projectMember._id),
-    );
+    const assignedToTask =
+        projQueryMembers.data?.filter((projectMember) =>
+            task.assignedProjMemberId?.includes(projectMember._id),
+        ) ?? [];
 
     return (
         <div
@@ -39,9 +40,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <p>{task.description}</p>
             </div>
             {task.description && <div className="divider mt-0 mb-0"></div>}
-            {assignedToTask ? (
-                <UserAvatars users={assignedToTask} />
-            ) : (
+            {projQueryMembers.isLoading ? (
                 <div className={cn('', className)} {...props}>
                     <div
                         aria-disabled
@@ -49,6 +48,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         className="loading loading-spinner loading-lg"
                     ></div>
                 </div>
+            ) : (
+                <UserAvatars users={assignedToTask} />
             )}
         </div>
     );
