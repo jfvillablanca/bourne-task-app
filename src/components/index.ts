@@ -6,7 +6,7 @@ export { default as CardView } from './CardView';
 export { default as FormSelectUsers } from './FormSelectUsers';
 export { default as FormTaskStatePopover } from './FormTaskStatePopover';
 export { default as Header } from './Header';
-export { default as MemberAvatars } from './MemberAvatars';
+export { default as UserAvatars } from './MemberAvatars';
 export { default as ProjectAdd } from './ProjectAdd';
 export { default as ProjectDelete } from './ProjectDelete';
 export { default as ProjectTitle } from './ProjectTitle';
