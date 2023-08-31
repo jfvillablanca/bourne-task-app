@@ -61,8 +61,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
     const taskQuery = Task.useFindOne(projectId, taskId, isFindOneQueryEnabled);
     const taskMutation = Task.useUpdate(projectId, taskId);
     const projQueryMembers = Project.useGetProjectMembers(projectId);
+
+    const projectMembers = projQueryMembers.data ?? [];
     const assignedToTask =
-        projQueryMembers.data?.filter((projectMember) =>
+        projectMembers.filter((projectMember) =>
             editTaskForm.assignedProjMemberId?.includes(projectMember._id),
         ) ?? [];
 
@@ -181,25 +183,28 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                     ></div>
                                 </div>
                             ) : (
-                                <UserAvatars
-                                    className="h-11 w-max mr-1"
-                                    users={assignedToTask}
-                                />
+                                <>
+                                    <UserAvatars
+                                        className="h-11 w-max mr-1"
+                                        users={assignedToTask}
+                                    />
+                                    <FormSelectUsers
+                                        allUsers={projectMembers}
+                                        selectedUsers={
+                                            editTaskForm.assignedProjMemberId ??
+                                            []
+                                        }
+                                        handleChange={(selectedOptions) => {
+                                            handleChange({
+                                                name: 'assignedProjMemberId',
+                                                value: selectedOptions.map(
+                                                    (option) => option._id,
+                                                ),
+                                            });
+                                        }}
+                                    />
+                                </>
                             )}
-                            <FormSelectUsers
-                                allUsers={projQueryMembers.data ?? []}
-                                selectedUsers={
-                                    editTaskForm.assignedProjMemberId ?? []
-                                }
-                                handleChange={(selectedOptions) => {
-                                    handleChange({
-                                        name: 'assignedProjMemberId',
-                                        value: selectedOptions.map(
-                                            (option) => option._id,
-                                        ),
-                                    });
-                                }}
-                            />
                         </div>
                     </div>
                     <div className="flex justify-between">
