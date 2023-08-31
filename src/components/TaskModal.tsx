@@ -145,7 +145,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                 name="title"
                                 placeholder="What are we working on?"
                                 required={true}
-                                value={editTaskForm.title ?? ''}
+                                value={editTaskForm.title}
                                 handleChange={handleChange}
                                 FormComponent="input"
                             />
@@ -166,7 +166,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                             id="description"
                             name="description"
                             placeholder="Give a quick summary of the task"
-                            value={editTaskForm.description ?? ''}
+                            value={editTaskForm.description}
                             handleChange={handleChange}
                             FormComponent="textarea"
                         />
