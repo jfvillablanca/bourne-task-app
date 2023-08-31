@@ -190,10 +190,12 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                     />
                                     <FormSelectUsers
                                         allUsers={projectMembers}
-                                        selectedUsers={
-                                            editTaskForm.assignedProjMemberId ??
-                                            []
-                                        }
+                                        selectedUsers={projectMembers.filter(
+                                            (member) =>
+                                                editTaskForm.assignedProjMemberId?.includes(
+                                                    member._id,
+                                                ),
+                                        )}
                                         handleChange={(selectedOptions) => {
                                             handleChange({
                                                 name: 'assignedProjMemberId',

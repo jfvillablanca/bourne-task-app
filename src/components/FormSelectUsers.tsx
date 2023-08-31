@@ -11,7 +11,7 @@ type OptionType = { label: string; value: string; _id: string };
 
 interface FormSelectUsersProps {
     allUsers: User[];
-    selectedUsers: string[];
+    selectedUsers: User[];
     handleChange: (e: MultiValue<OptionType>) => void;
 }
 
@@ -25,15 +25,9 @@ const FormSelectUsers = ({
         return { label: user.email, value: user.email, _id: user._id };
     });
 
-    const selectedUserOptions: OptionType[] = allUsers
-        .filter((user) => selectedUsers.includes(user._id))
-        .map((user) => {
-            return {
-                label: user.email,
-                value: user.email,
-                _id: user._id,
-            };
-        });
+    const selectedUserOptions: OptionType[] = selectedUsers.map((user) => {
+        return { label: user.email, value: user.email, _id: user._id };
+    });
 
     const handleMenuChange = (
         selectedOptions: MultiValue<OptionType>,
