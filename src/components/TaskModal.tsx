@@ -109,13 +109,17 @@ const TaskModal: React.FC<TaskModalProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <button
-                    className="btn btn-sm btn-circle btn-ghost ml-3 self-start"
-                    data-testid={`open-task-modal-${taskId}`}
-                    onClick={() => toggleOpen()}
-                >
-                    <Pencil className="w-4" />
-                </button>
+                {taskQuery.isLoading ? (
+                    <button className="loading loading-spinner loading-sm ml-3 self-start" />
+                ) : (
+                    <button
+                        className="btn btn-sm btn-circle btn-ghost ml-3 self-start"
+                        data-testid={`open-task-modal-${taskId}`}
+                        onClick={() => toggleOpen()}
+                    >
+                        <Pencil className="w-4" />
+                    </button>
+                )}
             </DialogTrigger>
             <DialogContent
                 className={cn('h-1/2 w-1/3 p-5 bg-base-200', className)}
