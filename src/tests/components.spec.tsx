@@ -322,6 +322,9 @@ describe.shuffle('TaskCardGroup', () => {
             expect(result.getByText(mockTaskTitle)).toBeInTheDocument();
         });
         const taskCardTitle = result.getByText(mockTaskTitle);
+        await waitFor(() => {
+            result.getByTestId(`open-task-modal-${mockTaskId}`);
+        });
         const taskCardEditButton = result.getByTestId(
             `open-task-modal-${mockTaskId}`,
         );
@@ -396,6 +399,9 @@ describe.shuffle('TaskCard', () => {
             expect(result.getByRole('img')).toBeInTheDocument(),
         );
 
+        await waitFor(() => {
+            result.getByTestId(`open-task-modal-${mockTaskId}`);
+        });
         const taskCardEditButton = result.getByTestId(
             `open-task-modal-${mockTaskId}`,
         );
@@ -425,6 +431,9 @@ describe.shuffle('TaskModal', () => {
         const result = renderWithClient(
             <TaskModal taskId={mockTaskId} projectId={mockProjectId} />,
         );
+        await waitFor(() => {
+            result.getByTestId(`open-task-modal-${mockTaskId}`);
+        });
         const taskCardEditButton = result.getByTestId(
             `open-task-modal-${mockTaskId}`,
         );
@@ -453,6 +462,9 @@ describe.shuffle('TaskModal', () => {
         const result = renderWithClient(
             <TaskModal taskId={mockTaskId} projectId={mockProjectId} />,
         );
+        await waitFor(() => {
+            result.getByTestId(`open-task-modal-${mockTaskId}`);
+        });
         const taskCardEditButton = result.getByTestId(
             `open-task-modal-${mockTaskId}`,
         );
@@ -478,6 +490,9 @@ describe.shuffle('TaskModal', () => {
         const result = renderWithClient(
             <TaskModal taskId={mockTaskId} projectId={mockProjectId} />,
         );
+        await waitFor(() => {
+            result.getByTestId(`open-task-modal-${mockTaskId}`);
+        });
         const taskCardEditButton = result.getByTestId(
             `open-task-modal-${mockTaskId}`,
         );
