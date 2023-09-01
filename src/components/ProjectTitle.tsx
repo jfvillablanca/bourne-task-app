@@ -95,7 +95,7 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
             (user) => user._id !== project.ownerId,
         );
         return (
-            <>
+            <div className="flex items-center">
                 <div className={cn('flex items-center gap-2 h-14', className)}>
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
@@ -196,7 +196,7 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                         });
                     }}
                 />
-            </>
+            </div>
         );
     }
 

@@ -46,7 +46,7 @@ const FormSelectUsers = ({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <button
-                    className="p-3 rounded-full border border-dashed border-neutral-content/50 text-neutral-content/50 hover:text-accent-content hover:border-accent-content transition-colors"
+                    className="ml-1 p-3 rounded-full border border-dashed border-neutral-content/50 text-neutral-content/50 hover:text-accent-content hover:border-accent-content transition-colors"
                     data-testid={'open-select-update-assigned'}
                     onClick={(e) => {
                         e.preventDefault();

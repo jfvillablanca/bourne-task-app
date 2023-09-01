@@ -15,7 +15,7 @@ const UserAvatars: React.FC<UserAvatarsProps> = ({
     ...props
 }) => {
     const renderAvatar = (avatar?: User) => {
-        const avatarClass = !avatar ? 'placeholder font-semibold' : '';
+        const avatarClass = !avatar ? 'placeholder font-semibold text-md' : '';
         const avatarCount = !avatar ? `+${users.length - 2}` : '';
 
         return (
@@ -29,7 +29,9 @@ const UserAvatars: React.FC<UserAvatarsProps> = ({
                         email={avatar.email}
                     />
                 ) : (
-                    <span className="text-md">{avatarCount}</span>
+                    <span className="w-10 h-10 grid place-items-center bg-base-300 rounded-full border-2 border-accent-content">
+                        {avatarCount}
+                    </span>
                 )}
             </li>
         );
