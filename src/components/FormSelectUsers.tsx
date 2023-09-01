@@ -119,7 +119,7 @@ const FormSelectUsers = ({
                     unstyled
                     onChange={handleMenuChange}
                     closeMenuOnSelect={false}
-                    aria-label="select to assign project members to this task"
+                    aria-label="select project members"
                 />
                 <DialogClose className="absolute -bottom-9 right-0 w-20 min-w-[4rem] pt-2 pb-1 z-0 flex justify-center border border-neutral-content bg-base-100 text-neutral-content hover:bg-success hover:text-success-content">
                     <Check className="mr-1" />

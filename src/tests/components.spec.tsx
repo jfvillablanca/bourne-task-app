@@ -511,7 +511,7 @@ describe.shuffle('TaskModal', () => {
         await user.click(editAssignedMembersButton);
 
         const selectAssignedMembers = result.getByLabelText(
-            'select to assign project members to this task',
+            'select project members',
         );
 
         expect(selectAssignedMembers).toBeInTheDocument();
