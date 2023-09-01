@@ -188,6 +188,32 @@ describe.shuffle('ProjectTitle', () => {
         expect(titleInput).toBeInTheDocument();
         expect(titleInput).toHaveFocus();
     });
+
+    it('should render select dropdown to update project members', async () => {
+        const user = userEvent.setup();
+
+        const mockProjectId = mockProjects()[0]._id;
+        const mockProjectTitle = mockProjects()[0].title;
+        const result = renderWithClient(
+            <ProjectTitle projectId={mockProjectId} />,
+        );
+        await waitFor(() =>
+            expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
+        );
+
+        const updateProjectMembersButton = result.getByTestId(
+            'open-select-update-assigned',
+        );
+
+        await user.click(updateProjectMembersButton);
+
+        const selectAssignedMembers = result.getByLabelText(
+            'select project members',
+        );
+
+        expect(selectAssignedMembers).toBeInTheDocument();
+        expect(selectAssignedMembers).toBeVisible();
+    });
 });
 
 describe.shuffle('CardView', () => {
