@@ -7,16 +7,20 @@ import { Avatar } from './ui';
 
 interface UserAvatarsProps extends HTMLAttributes<HTMLDivElement> {
     users: User[];
+    minAvatarsToDisplay?: number;
 }
 
 const UserAvatars: React.FC<UserAvatarsProps> = ({
     className,
     users,
+    minAvatarsToDisplay = 2,
     ...props
 }) => {
     const renderAvatar = (avatar?: User) => {
         const avatarClass = !avatar ? 'placeholder font-semibold text-md' : '';
-        const avatarCount = !avatar ? `+${users.length - 2}` : '';
+        const avatarCount = !avatar
+            ? `+${users.length - minAvatarsToDisplay}`
+            : '';
 
         return (
             <li
@@ -37,13 +41,16 @@ const UserAvatars: React.FC<UserAvatarsProps> = ({
         );
     };
 
-    const avatarsToRender = users.length < 3 ? users : users.slice(0, 2);
+    const avatarsToRender =
+        users.length <= minAvatarsToDisplay
+            ? users
+            : users.slice(0, minAvatarsToDisplay);
 
     const renderedAvatars = avatarsToRender.map((avatar) =>
         renderAvatar(avatar),
     );
 
-    if (users.length > 2) {
+    if (users.length > minAvatarsToDisplay) {
         renderedAvatars.push(renderAvatar(undefined));
     }
 

@@ -179,6 +179,7 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                 <UserAvatars
                     className="h-11 w-max mr-1"
                     users={projectMembers}
+                    minAvatarsToDisplay={5}
                 />
                 <FormSelectUsers
                     allUsers={allUsers}
