@@ -29,7 +29,12 @@ const UserPopover: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                     data-testid="open-user-info-popover"
                     onClick={toggleOpen}
                 >
-                    {user.data && <Avatar email={user.data.email} />}
+                    {user.data && (
+                        <Avatar
+                            email={user.data.email}
+                            showTooltipOnHover={false}
+                        />
+                    )}
                 </button>
             </PopoverTrigger>
             <PopoverContent
@@ -42,7 +47,11 @@ const UserPopover: React.FC<HTMLAttributes<HTMLDivElement>> = ({
                 {user.data ? (
                     <div className="menu">
                         <div className="flex gap-2 mb-2">
-                            <Avatar className="h-14" email={user.data.email} />
+                            <Avatar
+                                className="h-14"
+                                email={user.data.email}
+                                showTooltipOnHover={false}
+                            />
                             <h2 className="font-semibold">{user.data.email}</h2>
                         </div>
                         <button
