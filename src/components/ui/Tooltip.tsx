@@ -116,7 +116,10 @@ export function Tooltip({
 export const TooltipTrigger = forwardRef<
     HTMLElement,
     React.HTMLProps<HTMLElement> & { asChild?: boolean }
->(function TooltipTrigger({ children, asChild = false, ...props }, propRef) {
+>(function TooltipTrigger(
+    { children, asChild = false, className, ...props },
+    propRef,
+) {
     const context = useTooltipContext();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const childrenRef = (children as any).ref;
@@ -136,14 +139,15 @@ export const TooltipTrigger = forwardRef<
     }
 
     return (
-        <button
+        <div
             ref={ref}
+            className={className}
             // The user can style the trigger based on the state
             data-state={context.open ? 'open' : 'closed'}
             {...context.getReferenceProps(props)}
         >
             {children}
-        </button>
+        </div>
     );
 });
 
