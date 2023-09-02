@@ -27,7 +27,11 @@ export const Avatar: React.FC<AvatarProps> = ({
                     <img src={generateAvatarURL(email)} alt={email} />
                 </div>
             </TooltipTrigger>
-            {showTooltipOnHover && <TooltipContent>{email}</TooltipContent>}
+            {showTooltipOnHover && (
+                <TooltipContent className="p-2 bg-base-100 shadow shadow-neutral rounded-sm">
+                    {email}
+                </TooltipContent>
+            )}
         </Tooltip>
     );
 };
