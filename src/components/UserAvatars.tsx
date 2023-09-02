@@ -3,7 +3,7 @@ import { HTMLAttributes } from 'react';
 import { User } from '../common';
 import { cn } from '../lib/utils';
 
-import { Avatar } from './ui';
+import { Avatar, AvatarGroupCount } from './ui';
 
 interface UserAvatarsProps extends HTMLAttributes<HTMLDivElement> {
     users: User[];
@@ -33,9 +33,12 @@ const UserAvatars: React.FC<UserAvatarsProps> = ({
                         email={avatar.email}
                     />
                 ) : (
-                    <span className="w-10 h-10 grid place-items-center bg-base-300 rounded-full border-2 border-accent-content">
-                        {avatarCount}
-                    </span>
+                    <AvatarGroupCount
+                        avatarCount={avatarCount}
+                        consolidatedUsers={users.slice(
+                            minAvatarsToDisplay - users.length,
+                        )}
+                    />
                 )}
             </li>
         );

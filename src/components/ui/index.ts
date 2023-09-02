@@ -1,4 +1,5 @@
 export * from './Avatar';
+export * from './AvatarGroupCount';
 export * from './DeleteConfirmModal';
 export * from './Dialog';
 export * from './ExitButton';
