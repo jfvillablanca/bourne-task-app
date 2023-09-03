@@ -15,7 +15,7 @@ import {
     TaskCardGroup,
     TaskModal,
 } from '../components';
-import { mockProjects } from '../mocks/fixtures';
+import { mockProjects, mockUsers } from '../mocks/fixtures';
 import { handlers } from '../mocks/handlers';
 import {
     clearTestAccessTokenFromLocalStorage,
@@ -213,6 +213,113 @@ describe.shuffle('ProjectTitle', () => {
 
         expect(selectAssignedMembers).toBeInTheDocument();
         expect(selectAssignedMembers).toBeVisible();
+    });
+
+    it('should display all project members to the project which includes the project owner', async () => {
+        const user = userEvent.setup();
+
+        const mockProjectId = mockProjects()[0]._id;
+        const mockProjectTitle = mockProjects()[0].title;
+        const mockProjectOwnerId = mockProjects()[0].ownerId;
+        const mockProjectMemberIds = [
+            mockProjects()[0].ownerId,
+            ...mockProjects()[0].collaborators,
+        ];
+        const mockProjectMembers = mockUsers().filter((member) =>
+            mockProjectMemberIds.includes(member._id),
+        );
+
+        const result = renderWithClient(
+            <ProjectTitle projectId={mockProjectId} />,
+        );
+        await waitFor(() =>
+            expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
+        );
+
+        const updateProjectMembersButton = result.getByTestId(
+            'open-select-update-assigned',
+        );
+
+        await user.click(updateProjectMembersButton);
+
+        mockProjectMembers.map((member) => {
+            // Expect that all project members are selected options
+            const valueOption = result.getByText(member.email);
+            expect(valueOption).toBeInTheDocument();
+
+            const valueRemoveOption = result.getByLabelText(
+                `Remove ${member.email}`,
+            );
+            // Expect that all project owner cannot be removed from the list of selected options
+            if (member._id === mockProjectOwnerId) {
+                expect(valueRemoveOption).toHaveStyle('display: none');
+            } else {
+                expect(valueRemoveOption).not.toHaveStyle('display: none');
+            }
+        });
+    });
+
+    it('should be able to remove selected project members except for the project owner', async () => {
+        const user = userEvent.setup();
+
+        const mockProjectId = mockProjects()[0]._id;
+        const mockProjectTitle = mockProjects()[0].title;
+        const mockProjectMemberIds = [
+            mockProjects()[0].ownerId,
+            ...mockProjects()[0].collaborators,
+        ];
+        const mockProjectMembers = mockUsers().filter((member) =>
+            mockProjectMemberIds.includes(member._id),
+        );
+
+        const result = renderWithClient(
+            <ProjectTitle projectId={mockProjectId} />,
+        );
+        await waitFor(() =>
+            expect(result.getByText(mockProjectTitle)).toBeInTheDocument(),
+        );
+
+        const updateProjectMembersButton = result.getByTestId(
+            'open-select-update-assigned',
+        );
+
+        await user.click(updateProjectMembersButton);
+
+        // Select the 'remove' button of the first non-owner project member.
+        const projectMemberToRemove = mockProjectMembers[1].email;
+        const selectedMemberToRemoveButton = result.getByLabelText(
+            `Remove ${projectMemberToRemove}`,
+        );
+
+        // Click the 'X' of the specific user option
+        await user.click(selectedMemberToRemoveButton);
+
+        mockProjectMembers.map((member) => {
+            // Expect that the removed member is no longer listed in the selected options
+            const valueOption = result.queryByText(member.email);
+            if (member.email === projectMemberToRemove) {
+                expect(valueOption).not.toBeInTheDocument();
+            } else {
+                expect(valueOption).toBeInTheDocument();
+            }
+        });
+
+        // Select the 'clear' button of the Select menu
+        const clearButton = result.getByLabelText('clear selected users');
+
+        // Click the 'clear' button
+        await user.click(clearButton);
+
+        mockProjectMembers.map((member) => {
+            // Expect that only the selected user option left is the project owner
+            const projectOwnerEmail = mockUsers()[0].email;
+            const valueOption = result.queryByText(member.email);
+            if (member.email === projectOwnerEmail) {
+                expect(valueOption).toBeInTheDocument();
+            } else {
+                expect(valueOption).not.toBeInTheDocument();
+            }
+        });
     });
 });
 
