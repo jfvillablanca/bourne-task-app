@@ -20,23 +20,11 @@ When you visit the live site, you might notice that it loads immediately but app
 - Subsequent requests to the server may exhibit improved responsiveness, but it's important to anticipate occasional delays in response times.
 </details>
 
-
-Features:
-- Authentication and authorization 
-    - Continuous Authentication: The access token gets refreshed when close to expiry.
-    - Security Note: The refresh and access tokens are stored in localStorage. Yes, this is not secure. Security could be improved by using a combination storing the tokens in HTTP-only cookie and in memory, but this app is for demonstration purposes only. Token rotation/revocation is not employed in the backend also.
-- User owning multiple projects with their own task states
-- Assigning task to multiple project members
-
-Motivation:
-- This is a personal capstone project that covers the concepts/technologies/frameworks/languages that I learned in my journey to learn the web development in the full-stack context.
-- From an '<overall>' perspective, this project features my ability in writing a full-stack application
-    - Extensive tests: 
-        - Unit tests that assert specifications of modules and functions.
-        - API calls are mocked on the network-level via `msw` so that the
-
 ### Table of Contents
 
+- [Features](#features)
+- [Technical Details](#technical)
+- [Motivation](#motivation)
 - [Installation](#installation)
 - [Development](#development)
 - [Testing](#testing)
@@ -44,6 +32,9 @@ Motivation:
 - [Contribute](#contribute)
 - [License](#license)
 
+## Features: <a name="features"></a>
+## Technical Details: <a name="technical"></a>
+## Motivation: <a name="motivation"></a>
 ## Installation <a name="installation"></a>
 
 ```bash
