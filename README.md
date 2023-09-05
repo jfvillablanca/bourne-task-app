@@ -40,6 +40,19 @@ When you visit the live site, you might notice that it loads immediately but app
     - **⚠️ Note**: Please be aware that the feature for manually inviting users to a project is not currently implemented. Instead, when added by the project owner to a specific project, a user is automatically included as a project member. 
 
 ## Technical Details: <a name="technical"></a>
+- **Authentication and Authorization** 
+    - Continuous Authentication: The access token is automatically refreshed when it approaches expiration. Additionally, a refresh request is sent as long as the refresh token remains valid. 
+    - **⚠️ Disclaimer**: Please note that the refresh and access tokens are stored in localStorage, which is NOT considered a secure storage method. Enhanced security measures, such as storing tokens in HTTP-only cookies and in memory, are recommended for production applications. Token rotation/revocation is not implemented on the backend for this demonstration app. 
+- **RESTful API**
+    - CRUD: Backend operations strictly adhere to appropriate HTTP methods following the REST architectural style.
+    - Axios Integration: API calls are managed through Axios, which automatically includes the required bearer tokens for authentication.
+- **Async State Management**
+    - React Query: The server's state serves as the primary data source, with React Query handling data caching and ensuring up-to-date information.
+- **API and Authentication Servers**
+    - Consolidated Functionality: To simplify the application's architecture, the API and authentication functionality are combined into a single server. All requests are directed to the same base URL and are distinguished by routing. 
+- **Nest Framework using Express**
+    - Backend Framework: The backend is built on the Nest framework, which simplifies the Express application through dependency injection and routing. 
+
 ## Motivation: <a name="motivation"></a>
 ## Installation <a name="installation"></a>
 
