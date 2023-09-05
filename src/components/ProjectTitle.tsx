@@ -42,9 +42,9 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
         description: '',
     });
     const [editProjectMeta, setEditProjectMeta] = useState(projectMeta);
-    const [selectedCollaborators, setSelectedCollaborators] = useState<User[]>(
-        [],
-    );
+    const [selectedProjectMembers, setSelectedProjectMembers] = useState<
+        (User & { isFixed?: boolean })[]
+    >([]);
 
     const allUsersQuery = Auth.useFindAllUsers();
     const projQueryMembers = Project.useGetProjectMembers(projectId);
@@ -64,10 +64,13 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
         if (projectQuery.isSuccess && projQueryMembers.isSuccess) {
             setProjectMeta(() => projectQuery.data);
             setEditProjectMeta(() => projectQuery.data);
-            setSelectedCollaborators(() =>
-                projQueryMembers.data.filter((member) =>
-                    projectQuery.data.collaborators.includes(member._id),
-                ),
+            setSelectedProjectMembers(() =>
+                projQueryMembers.data.map((user) => {
+                    if (user._id === projectQuery.data.ownerId) {
+                        return { ...user, isFixed: true };
+                    }
+                    return user;
+                }),
             );
         }
     }, [
@@ -91,9 +94,13 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
     if (projectQuery.data && allUsersQuery.data && projQueryMembers.data) {
         const project = projectQuery.data;
         const projectMembers = projQueryMembers.data;
-        const allUsers = allUsersQuery.data.filter(
-            (user) => user._id !== project.ownerId,
-        );
+        const allUsers = allUsersQuery.data.map((user) => {
+            if (user._id === project.ownerId) {
+                return { ...user, isFixed: true };
+            }
+            return user;
+        });
+
         return (
             <div className="flex items-center">
                 <div className={cn('flex items-center gap-2 h-14', className)}>
@@ -183,17 +190,19 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                 />
                 <FormSelectUsers
                     allUsers={allUsers}
-                    selectedUsers={selectedCollaborators}
-                    handleChange={(selectedOption) => {
-                        const collaboratorIds = selectedOption.map(
-                            (option) => option._id,
+                    selectedUsers={selectedProjectMembers}
+                    handleChange={(selectedUserOptions) => {
+                        const projectMemberIds = selectedUserOptions.map(
+                            (userOption) => userOption._id,
                         );
-                        const updatedCollaborators = projectMembers.filter(
-                            (member) => collaboratorIds.includes(member._id),
+                        const updatedProjectMembers = allUsers.filter((user) =>
+                            projectMemberIds.includes(user._id),
                         );
-                        setSelectedCollaborators(() => updatedCollaborators);
+                        setSelectedProjectMembers(() => updatedProjectMembers);
                         projectMutation.mutate({
-                            collaborators: collaboratorIds,
+                            collaborators: projectMemberIds.filter(
+                                (userId) => userId !== project.ownerId,
+                            ),
                         });
                     }}
                 />

@@ -20,9 +20,9 @@ type UserOption = {
 };
 
 interface FormSelectUsersProps {
-    allUsers: User[];
-    selectedUsers: User[];
-    handleChange: (e: MultiValue<OptionType>) => void;
+    allUsers: (User & { isFixed?: boolean })[];
+    selectedUsers: (User & { isFixed?: boolean })[];
+    handleChange: (e: MultiValue<UserOption>) => void;
 }
 
 const FormSelectUsers = ({
@@ -31,25 +31,51 @@ const FormSelectUsers = ({
     handleChange,
 }: FormSelectUsersProps) => {
     const [open, setOpen] = useState(false);
-    const allUserOptions: OptionType[] = allUsers.map((user) => {
-        return { label: user.email, value: user.email, _id: user._id };
+    const allUserOptions: UserOption[] = allUsers.map((user) => {
+        return {
+            label: user.email,
+            value: user.email,
+            _id: user._id,
+            isFixed: !!user.isFixed,
+        };
     });
 
-    const selectedUserOptions: OptionType[] = selectedUsers.map((user) => {
-        return { label: user.email, value: user.email, _id: user._id };
+    const selectedUserOptions: UserOption[] = selectedUsers.map((user) => {
+        return {
+            label: user.email,
+            value: user.email,
+            _id: user._id,
+            isFixed: !!user.isFixed,
+        };
     });
+
+    const orderOptions = (options: readonly UserOption[]) => {
+        return options
+            .filter((user) => user.isFixed)
+            .concat(options.filter((user) => !user.isFixed));
+    };
 
     const handleMenuChange = (
-        selectedOptions: MultiValue<OptionType>,
-        actionMeta: ActionMeta<OptionType>,
+        selectedUserOptions: OnChangeValue<UserOption, true>,
+        actionMeta: ActionMeta<UserOption>,
     ) => {
-        if (
-            actionMeta.action === 'select-option' ||
-            actionMeta.action === 'remove-value' ||
-            actionMeta.action === 'clear'
+        if (actionMeta.action === 'clear') {
+            handleChange(
+                orderOptions(
+                    selectedUserOptions.filter(
+                        (option) => option.isFixed !== true,
+                    ),
+                ),
+            );
+            return;
+        } else if (
+            (actionMeta.action === 'pop-value' ||
+                actionMeta.action === 'remove-value') &&
+            actionMeta.removedValue.isFixed
         ) {
-            handleChange(selectedOptions);
+            return;
         }
+        handleChange(orderOptions(selectedUserOptions));
     };
 
     return (
@@ -74,6 +100,13 @@ const FormSelectUsers = ({
                     className="max-w-[50rem] w-fit z-10 min-w-[30rem] min-h-[2rem]"
                     data-testid={'select-update-assigned'}
                     autoFocus
+                    styles={{
+                        multiValueRemove: (base, props) => {
+                            return props.data.isFixed
+                                ? { ...base, display: 'none' }
+                                : base;
+                        },
+                    }}
                     classNames={{
                         control: () =>
                             cn('bg-base-100 text-neutral-content h-full'),
@@ -82,11 +115,23 @@ const FormSelectUsers = ({
                                 'border border-neutral-content border-r-0 py-3 px-2',
                             ),
                         input: () => cn('m-0.5 py-0.5 text-md font-semibold'),
-                        multiValue: () =>
-                            cn(
+                        multiValue: ({ data }) => {
+                            const baseClassName = cn(
                                 'm-1 bg-base-300 rounded-md text-md text-base-content font-semibold',
-                            ),
-                        multiValueLabel: () => cn('py-1 px-2'),
+                            );
+                            return data.isFixed
+                                ? cn(
+                                      baseClassName,
+                                      'bg-base-200 border border-neutral-content',
+                                  )
+                                : baseClassName;
+                        },
+                        multiValueLabel: ({ data }) => {
+                            const baseClassName = cn('py-1 px-2');
+                            return data.isFixed
+                                ? cn(baseClassName, 'font-bold')
+                                : baseClassName;
+                        },
                         multiValueRemove: () =>
                             cn(
                                 'rounded-r-md px-1 hover:bg-error hover:text-error-content',
@@ -122,7 +167,10 @@ const FormSelectUsers = ({
                             ),
                         placeholder: () => cn('mx-0.5'),
                     }}
-                    defaultValue={selectedUserOptions}
+                    value={selectedUserOptions}
+                    isClearable={selectedUserOptions.some(
+                        (user) => !user.isFixed,
+                    )}
                     placeholder={'Select members to assign'}
                     options={allUserOptions}
                     isMulti
