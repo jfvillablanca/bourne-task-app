@@ -33,6 +33,12 @@ When you visit the live site, you might notice that it loads immediately but app
 - [License](#license)
 
 ## Features: <a name="features"></a>
+- **Support for Multiple projects**
+    - Users can create and manage multiple projects, each containing various tasks that can be organized into different task states.
+- **Flexible Project and Task Assignments**
+    - With the capability to accommodate multiple users, any user who owns a project can invite others to become project members. Furthermore, project members, including the project owner, can be assigned to specific tasks within the project. This enables collaborative task management within your projects. 
+    - **⚠️ Note**: Please be aware that the feature for manually inviting users to a project is not currently implemented. Instead, when added by the project owner to a specific project, a user is automatically included as a project member. 
+
 ## Technical Details: <a name="technical"></a>
 ## Motivation: <a name="motivation"></a>
 ## Installation <a name="installation"></a>
