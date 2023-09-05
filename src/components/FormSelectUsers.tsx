@@ -1,13 +1,23 @@
-import { Check, PlusCircle } from 'lucide-react';
-import { useState } from 'react';
-import Select, { ActionMeta, MultiValue } from 'react-select';
+import { Check, PlusCircle, X } from 'lucide-react';
+import { CSSProperties, useState } from 'react';
+import Select, {
+    ActionMeta,
+    ClearIndicatorProps,
+    MultiValue,
+    OnChangeValue,
+} from 'react-select';
 
 import { User } from '../common';
 import { cn } from '../lib/utils';
 
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui';
 
-type OptionType = { label: string; value: string; _id: string };
+type UserOption = {
+    label: string;
+    value: string;
+    _id: string;
+    isFixed: boolean;
+};
 
 interface FormSelectUsersProps {
     allUsers: User[];
@@ -119,6 +129,7 @@ const FormSelectUsers = ({
                     unstyled
                     onChange={handleMenuChange}
                     closeMenuOnSelect={false}
+                    components={{ ClearIndicator }}
                     aria-label="select project members"
                 />
                 <DialogClose className="absolute -bottom-9 right-0 w-20 min-w-[4rem] pt-2 pb-1 z-0 flex justify-center border border-neutral-content bg-base-100 text-neutral-content hover:bg-success hover:text-success-content">
@@ -130,3 +141,22 @@ const FormSelectUsers = ({
 };
 
 export default FormSelectUsers;
+
+const ClearIndicator = (props: ClearIndicatorProps<UserOption, true>) => {
+    const {
+        getStyles,
+        getClassNames,
+        innerProps: { ref, ...restInnerProps },
+    } = props;
+    return (
+        <div
+            {...restInnerProps}
+            ref={ref}
+            style={getStyles('clearIndicator', props) as CSSProperties}
+            className={getClassNames('clearIndicator', props)}
+            aria-label="clear selected users"
+        >
+            <X size={'18'} />
+        </div>
+    );
+};
