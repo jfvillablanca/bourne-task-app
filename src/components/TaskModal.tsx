@@ -204,6 +204,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                                                 ),
                                             });
                                         }}
+                                        menuHeading="Assign project member to task"
                                     />
                                 </>
                             )}

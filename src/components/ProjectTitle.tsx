@@ -205,6 +205,7 @@ const ProjectTitleWrapped: React.FC<ProjectTitleProps> = ({
                             ),
                         });
                     }}
+                    menuHeading="Select users to project"
                 />
             </div>
         );

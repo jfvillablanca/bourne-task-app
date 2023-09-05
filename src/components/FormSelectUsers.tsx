@@ -23,12 +23,14 @@ interface FormSelectUsersProps {
     allUsers: (User & { isFixed?: boolean })[];
     selectedUsers: (User & { isFixed?: boolean })[];
     handleChange: (e: MultiValue<UserOption>) => void;
+    menuHeading?: string;
 }
 
 const FormSelectUsers = ({
     allUsers,
     selectedUsers,
     handleChange,
+    menuHeading = 'Select Users',
 }: FormSelectUsersProps) => {
     const [open, setOpen] = useState(false);
     const allUserOptions: UserOption[] = allUsers.map((user) => {
@@ -96,6 +98,7 @@ const FormSelectUsers = ({
                 className="relative z-10 h-max transition"
                 overlayClassName="backdrop-blur-[2px]"
             >
+                <h1 className="mb-2 font-bold text-lg">{menuHeading}</h1>
                 <Select
                     className="max-w-[50rem] w-fit z-10 min-w-[30rem] min-h-[2rem]"
                     data-testid={'select-update-assigned'}
