@@ -1,5 +1,7 @@
 # Bourne Task App
 
+https://github.com/jfvillablanca/bourne-task-app/assets/31008330/7ea8fceb-62be-42ea-af10-bd19831fed16
+
 ### 📔 A collaborative task management app inspired by Trello.
 
 #### Check it out [live](https://jfvillablanca.github.io/bourne-task-app/)
