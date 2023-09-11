@@ -41,6 +41,15 @@ When you visit the live site, you might notice that it loads immediately but app
     - With the capability to accommodate multiple users, any user who owns a project can invite others to become project members. Furthermore, project members, including the project owner, can be assigned to specific tasks within the project. This enables collaborative task management within your projects. 
     - **⚠️ Note**: Please be aware that the feature for manually inviting users to a project is not currently implemented. Instead, when added by the project owner to a specific project, a user is automatically included as a project member. 
 
+#### Registering a new account
+https://github.com/jfvillablanca/bourne-task-app/assets/31008330/01856ab4-f926-4f51-be42-54c96e242f8d
+
+#### Creating a project and adding users as project members
+https://github.com/jfvillablanca/bourne-task-app/assets/31008330/a300b278-97b6-4881-9e46-1ba1fd50094e
+
+#### Creating a task and assigning project members to task
+https://github.com/jfvillablanca/bourne-task-app/assets/31008330/169e6b6d-06e7-41aa-a4f1-f7001b670928
+
 ## Technical Details: <a name="technical"></a>
 - **Authentication and Authorization** 
     - Continuous Authentication: The access token is automatically refreshed when it approaches expiration. Additionally, a refresh request is sent as long as the refresh token remains valid. 
