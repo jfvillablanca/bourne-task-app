@@ -22,6 +22,9 @@ When you visit the live site, you might notice that it loads immediately but app
 - Subsequent requests to the server may exhibit improved responsiveness, but it's important to anticipate occasional delays in response times.
 </details>
 
+## CS50:  
+#### I submitted this app as my final project for the [CS50](https://github.com/jfvillablanca/cs50) course. You can watch the video demo here: [https://youtu.be/JCv4GukldWw](https://youtu.be/JCv4GukldWw)
+
 ### Table of Contents
 
 - [Features](#features)
